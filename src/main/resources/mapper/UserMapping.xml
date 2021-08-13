@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.zk.spring.cloud.gateway.security.dao.UserMapper">
+    <resultMap id="BaseResultMap" type="com.github.zk.spring.cloud.gateway.security.pojo.UserInfo">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <collection property="roles" ofType="map" column="id" select="selectRolesByUserId">
+        </collection>
+    </resultMap>
+
+    <resultMap id="RolesResultMap" type="com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="role_name" property="roleName" jdbcType="VARCHAR"/>
+        <collection property="permissionInfos" ofType="map" column="id" select="selectPermissions">
+        </collection>
+    </resultMap>
+
+    <resultMap id="PermissionsResultMap" type="com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="url_name" property="urlName" jdbcType="VARCHAR"/>
+        <result column="url" property="url" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--    <resultMap id="BaseResultMapAndParams" type="cn.piesat.biserver.entity.APIManagerEntity" >-->
+    <!--        <id column="id" property="id" jdbcType="VARCHAR" />-->
+    <!--        <result column="api_name" property="apiName" jdbcType="VARCHAR" />-->
+    <!--        <result column="url" property="url" jdbcType="VARCHAR" />-->
+    <!--        <result column="type_id" property="typeId" jdbcType="INTEGER" />-->
+    <!--        <result column="request_type" property="requestType" jdbcType="VARCHAR" />-->
+    <!--        <result column="authentication" property="authentication" jdbcType="INTEGER" />-->
+    <!--        <result column="token_key" property="tokenKey" jdbcType="VARCHAR" />-->
+    <!--        <result column="token_value" property="tokenValue" jdbcType="VARCHAR" />-->
+    <!--        <result column="header" property="header" jdbcType="INTEGER" />-->
+    <!--        <result column="update_time" property="updateTime" jdbcType="VARCHAR" />-->
+    <!--        <collection property="apiParamsEntity" ofType="map" select="queryAPIParams" column="id">-->
+    <!--        </collection>-->
+    <!--    </resultMap>-->
+
+    <!--    <resultMap id="BaseParamResultMap" type="cn.piesat.biserver.entity.APIParamsEntity" >-->
+    <!--        <id column="id" property="paramId" jdbcType="VARCHAR" />-->
+    <!--        <result column="api_id" property="apiId" jdbcType="VARCHAR" />-->
+    <!--        <result column="api_param" property="apiParam" jdbcType="VARCHAR" />-->
+    <!--        <result column="param_alias" property="paramAlias" jdbcType="VARCHAR" />-->
+    <!--    </resultMap>-->
+
+    <sql id="Base_Column_List">
+        id, username, password
+    </sql>
+    <select id="selectUser" resultMap="BaseResultMap" parameterType="com.github.zk.spring.cloud.gateway.security.pojo.UserInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from t_user
+        where username = #{username}
+    </select>
+
+    <select id="selectRolesByUserId" resultMap="RolesResultMap">
+        select role_id as id, role_name from
+        (select role_id
+        from user_role
+        where user_id = #{id}) ur
+        left join t_role tr
+        on ur.role_id = tr.id
+    </select>
+
+    <select id="selectPermissions" resultMap="PermissionsResultMap">
+        select url_name, url from
+            (select permission_id from
+                role_permission
+             where role_id = #{id}) rp
+        left join t_permission tp
+        on rp.permission_id = tp.id
+    </select>
+</mapper>
