@@ -44,21 +44,7 @@ public class LoginController {
     @GetMapping("/invalid")
     public Response invalid() {
         Response response = Response.getInstance();
-        response.setError(10000, null, "未登录");
+        response.setError(10000, null, "未登录或登录超时");
         return response;
-    }
-
-    @GetMapping("/getUser")
-    public Mono<Response> getUser() {
-       return ReactiveSecurityContextHolder.getContext()
-                .switchIfEmpty(Mono.error(new IllegalStateException("ReactiveSecurityContext is empty")))
-                .map(SecurityContext::getAuthentication)
-                .map(Authentication::getPrincipal)
-                .cast(UserInfo.class)
-                .map(userInfo -> {
-                    Response response = Response.getInstance();
-                    response.setOk(Response.CodeEnum.SUCCESSED, null, "查询成功！", userInfo);
-                    return response;
-                });
     }
 }
