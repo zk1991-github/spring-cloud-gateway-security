@@ -1,6 +1,5 @@
 package com.github.zk.spring.cloud.gateway.security.service.impl;
 
-import com.github.zk.spring.cloud.gateway.security.dao.PermissionMapper;
 import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
@@ -26,8 +25,6 @@ public class UserImpl implements IUser, ReactiveUserDetailsService {
     private LoginProperties properties;
     @Autowired
     private UserMapper userMapper;
-    @Autowired
-    private PermissionMapper permissionMapper;
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
