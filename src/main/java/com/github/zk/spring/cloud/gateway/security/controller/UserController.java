@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -22,6 +23,20 @@ public class UserController {
 
     @GetMapping("/getUser")
     public Mono<Response> getUser() {
+        return ReactiveSecurityContextHolder.getContext()
+                .switchIfEmpty(Mono.error(new IllegalStateException("ReactiveSecurityContext is empty")))
+                .map(SecurityContext::getAuthentication)
+                .map(Authentication::getPrincipal)
+                .cast(UserInfo.class)
+                .map(userInfo -> {
+                    Response response = Response.getInstance();
+                    response.setOk(Response.CodeEnum.SUCCESSED, null, "查询成功！", userInfo);
+                    return response;
+                });
+    }
+
+    @PostMapping("queryUser")
+    public Mono<Response> queryUser() {
         return ReactiveSecurityContextHolder.getContext()
                 .switchIfEmpty(Mono.error(new IllegalStateException("ReactiveSecurityContext is empty")))
                 .map(SecurityContext::getAuthentication)
