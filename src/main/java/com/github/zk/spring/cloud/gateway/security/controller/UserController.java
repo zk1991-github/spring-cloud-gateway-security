@@ -9,7 +9,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 用户 请求控制
@@ -20,6 +24,8 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/gateway")
 public class UserController {
+
+    public final static Map<String, WebSession> USER_SESSIONS = new HashMap<>();
 
     @GetMapping("/getUser")
     public Mono<Response> getUser() {
@@ -48,4 +54,13 @@ public class UserController {
                     return response;
                 });
     }
+
+    @GetMapping("/getOnlineNums")
+    public Mono<Response> getOnlineNums() {
+        Response response = Response.getInstance();
+        long count = USER_SESSIONS.values().stream().filter(webSession -> !webSession.isExpired()).count();
+        response.setOk(Response.CodeEnum.SUCCESSED, null, "查询成功！", count);
+        return Mono.justOrEmpty(response);
+    }
+
 }
