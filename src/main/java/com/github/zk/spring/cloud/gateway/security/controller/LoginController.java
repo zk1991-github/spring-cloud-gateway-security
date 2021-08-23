@@ -25,9 +25,6 @@ public class LoginController {
 
     @GetMapping("/success")
     public Mono<Response> success(ServerWebExchange exchange) {
-        exchange.getSession().doOnNext(webSession -> {
-//            System.out.println(webSession.getId());
-        }).subscribe();
         return ReactiveSecurityContextHolder.getContext()
                 .switchIfEmpty(Mono.error(new IllegalStateException("ReactiveSecurityContext is empty")))
                 .map(SecurityContext::getAuthentication)
@@ -37,12 +34,10 @@ public class LoginController {
                     Response response = Response.getInstance();
                     response.setOk(Response.CodeEnum.SUCCESSED, null, "登录成功！", userInfo);
                     exchange.getSession().doOnNext(webSession -> {
-                        System.out.println("本次session：" + webSession.getId());
                         WebSession session = UserController.USER_SESSIONS.get(userInfo.getUsername());
                         // 注意，同一浏览器登录同一账号时，userSessions内的WebSession会改变。
                         // 因此需要判断历史和当前sessionId是否一致，如果一致，表示同一浏览器登录，框架自动失效上次session
                         if (session != null && !ObjectUtils.nullSafeEquals(session.getId(), webSession.getId()) && !session.isExpired()) {
-                            System.out.println("历史session：" + session.getId());
                             session.invalidate();
                         }
                         UserController.USER_SESSIONS.put(userInfo.getUsername(), webSession);
