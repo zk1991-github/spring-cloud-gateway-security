@@ -13,6 +13,9 @@ import org.springframework.security.web.server.authentication.RedirectServerAuth
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.server.session.DefaultWebSessionManager;
+import org.springframework.web.server.session.InMemoryWebSessionStore;
+import org.springframework.web.server.session.WebSessionManager;
 
 import java.util.Collections;
 
@@ -50,6 +53,7 @@ public class SecurityConfig {
 //                .and()
 //                .exceptionHandling().accessDeniedHandler(new HttpStatusServerAccessDeniedHandler(HttpStatus.FORBIDDEN))
         ;
+
         return http.build();
     }
 
@@ -62,5 +66,13 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public InMemoryWebSessionStore sessionStore(WebSessionManager webSessionManager) {
+        InMemoryWebSessionStore sessionStore = (InMemoryWebSessionStore) ((DefaultWebSessionManager) webSessionManager).getSessionStore();
+        // 设置最大同时在线人数
+        sessionStore.setMaxSessions(10000);
+        return sessionStore;
     }
 }
