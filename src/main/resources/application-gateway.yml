@@ -1,6 +1,8 @@
 spring:
   cloud:
     gateway:
+      session:
+        timeout: 30
       default-filters:
         - Session
       routes:
