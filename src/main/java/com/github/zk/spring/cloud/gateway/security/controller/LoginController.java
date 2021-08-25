@@ -13,6 +13,9 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 登录 请求控制
  *
@@ -22,6 +25,8 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/login")
 public class LoginController {
+
+    private final Map<String, WebSession> USER_SESSIONS = new HashMap<>();
 
     @GetMapping("/success")
     public Mono<Response> success(ServerWebExchange exchange) {
@@ -34,13 +39,13 @@ public class LoginController {
                     Response response = Response.getInstance();
                     response.setOk(Response.CodeEnum.SUCCESSED, null, "登录成功！", userInfo);
                     exchange.getSession().doOnNext(webSession -> {
-                        WebSession session = UserController.USER_SESSIONS.get(userInfo.getUsername());
+                        WebSession session = USER_SESSIONS.get(userInfo.getUsername());
                         // 注意，同一浏览器登录同一账号时，userSessions内的WebSession会改变。
                         // 因此需要判断历史和当前sessionId是否一致，如果一致，表示同一浏览器登录，框架自动失效上次session
                         if (session != null && !ObjectUtils.nullSafeEquals(session.getId(), webSession.getId()) && !session.isExpired()) {
                             session.invalidate();
                         }
-                        UserController.USER_SESSIONS.put(userInfo.getUsername(), webSession);
+                        USER_SESSIONS.put(userInfo.getUsername(), webSession);
                     }).subscribe();
                     return response;
                 });
