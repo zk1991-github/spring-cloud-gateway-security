@@ -1,5 +1,6 @@
 package com.github.zk.spring.cloud.gateway.security.check;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 
@@ -13,10 +14,13 @@ import java.time.Duration;
  */
 public class SessionGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
 
+    @Value("${spring.cloud.gateway.session.timeout}")
+    private long timeout;
+
     @Override
     public GatewayFilter apply(Object config) {
         return (exchange, chain) -> {
-            exchange.getSession().doOnNext(webSession -> webSession.setMaxIdleTime(Duration.ofMinutes(30))).subscribe();   //修改session时间
+            exchange.getSession().doOnNext(webSession -> webSession.setMaxIdleTime(Duration.ofMinutes(timeout))).subscribe();   //修改session时间
             return chain.filter(exchange);
         };
     }
