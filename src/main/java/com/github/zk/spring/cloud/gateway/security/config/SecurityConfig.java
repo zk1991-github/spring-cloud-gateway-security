@@ -1,6 +1,9 @@
 package com.github.zk.spring.cloud.gateway.security.config;
 
 import com.github.zk.spring.cloud.gateway.security.handler.CustomReactiveAuthorizationManager;
+import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration;
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -68,11 +71,27 @@ public class SecurityConfig {
         return source;
     }
 
+    /**
+     * Session 管理 Bean
+     * @param webSessionManager
+     * @return
+     * @see WebFluxAutoConfiguration.EnableWebFluxConfiguration#webSessionManager()
+     */
     @Bean
     public InMemoryWebSessionStore sessionStore(WebSessionManager webSessionManager) {
         InMemoryWebSessionStore sessionStore = (InMemoryWebSessionStore) ((DefaultWebSessionManager) webSessionManager).getSessionStore();
         // 设置最大同时在线人数
         sessionStore.setMaxSessions(10000);
         return sessionStore;
+    }
+
+    /**
+     * 定义默认用户实现 Bean
+     * @return
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public DefaultUserImpl defaultUserImpl() {
+        return new DefaultUserImpl(){};
     }
 }
