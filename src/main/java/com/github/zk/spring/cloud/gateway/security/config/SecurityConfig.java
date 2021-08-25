@@ -2,6 +2,7 @@ package com.github.zk.spring.cloud.gateway.security.config;
 
 import com.github.zk.spring.cloud.gateway.security.handler.CustomReactiveAuthorizationManager;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration;
 import org.springframework.cloud.gateway.config.GatewayProperties;
@@ -31,6 +32,9 @@ import java.util.Collections;
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
+
+    @Value("${spring.cloud.gateway.session.maxSessions}")
+    private int maxSessions;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, GatewayProperties gatewayProperties) {
@@ -81,7 +85,7 @@ public class SecurityConfig {
     public InMemoryWebSessionStore sessionStore(WebSessionManager webSessionManager) {
         InMemoryWebSessionStore sessionStore = (InMemoryWebSessionStore) ((DefaultWebSessionManager) webSessionManager).getSessionStore();
         // 设置最大同时在线人数
-        sessionStore.setMaxSessions(10000);
+        sessionStore.setMaxSessions(maxSessions);
         return sessionStore;
     }
 
