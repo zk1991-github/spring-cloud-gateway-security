@@ -2,6 +2,7 @@ package com.github.zk.spring.cloud.gateway.security.controller;
 
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -9,11 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.WebSession;
+import org.springframework.web.server.session.InMemoryWebSessionStore;
 import reactor.core.publisher.Mono;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 用户 请求控制
@@ -25,7 +23,8 @@ import java.util.Map;
 @RequestMapping("/gateway")
 public class UserController {
 
-    public final static Map<String, WebSession> USER_SESSIONS = new HashMap<>();
+    @Autowired
+    private InMemoryWebSessionStore sessionStore;
 
     @GetMapping("/getUser")
     public Mono<Response> getUser() {
@@ -55,10 +54,14 @@ public class UserController {
                 });
     }
 
+    /**
+     * 在线用户数
+     * @return
+     */
     @GetMapping("/getOnlineNums")
     public Mono<Response> getOnlineNums() {
         Response response = Response.getInstance();
-        long count = USER_SESSIONS.values().stream().filter(webSession -> !webSession.isExpired()).count();
+        int count = sessionStore.getSessions().size();
         response.setOk(Response.CodeEnum.SUCCESSED, null, "查询成功！", count);
         return Mono.justOrEmpty(response);
     }
