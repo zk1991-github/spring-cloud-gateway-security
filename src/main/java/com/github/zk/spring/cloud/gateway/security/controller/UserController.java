@@ -40,7 +40,7 @@ public class UserController {
                 });
     }
 
-    @PostMapping("queryUser")
+    @PostMapping("/queryUser")
     public Mono<Response> queryUser() {
         return ReactiveSecurityContextHolder.getContext()
                 .switchIfEmpty(Mono.error(new IllegalStateException("ReactiveSecurityContext is empty")))
