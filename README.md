@@ -23,10 +23,15 @@
 在 `application-gateway.yml`中 `spring.cloud.gateway.session.maxSessions`
 
 #### 5. 查询在线用户数
-请求地址 `/gateway/getOnlineNums` 需要在权限中配置 `/getOnlineNums`权限
+请求地址 `/gateway/getOnlineNums` 需要在数据库权限表中配置 `/getOnlineNums`权限
 
 #### 6. 查询当前登录用户
-请求地址 `/gateway/queryUser` ，需要在权限中配置 `/queryUser`权限
+请求地址 `/gateway/queryUser` ，需要在数据库权限表中配置 `/queryUser`权限
 
 #### 7. 异地登录踢出功能
 同一个账号在其他地方登录时，踢出上一次登录的用户
+
+### 3. 使用注意事项
+- 用户的表结构至少需要包含当前表数据及关系（数据内容不限制）
+- 修改 `application-datasource.yml` 中的数据库地址为用户表所在数据库地址
+- 修改 `application-gateway.yml` 中转发地址为所需的服务地址和拦截地址（拦截地址范围大的写在范围小的配置之后）
