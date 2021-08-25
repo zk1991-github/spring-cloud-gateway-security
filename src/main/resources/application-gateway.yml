@@ -3,6 +3,7 @@ spring:
     gateway:
       session:
         timeout: 30
+        maxSessions: 10000
       default-filters:
         - Session
       routes:
