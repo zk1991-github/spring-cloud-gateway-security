@@ -1,6 +1,11 @@
 spring:
   cloud:
     gateway:
+      session:
+        timeout: 30
+        maxSessions: 10000
+      default-filters:
+        - Session
       routes:
         - id: server_route
           # 转发地址
@@ -15,10 +20,11 @@ spring:
             # 跳过1个前缀
             - name: StripPrefix
               args:
-                skip: 1
+                # 此处 key 必须为 “parts”
+                parts: 1
 #            - StripPrefix=1
             # token身份认证 JwtCheckGatewayFilterFactory
-#            - TokenCheck
+            - TokenCheck
             # 请求流量限制，默认5MB
             - name: RequestSize
               args:

@@ -62,7 +62,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                             //查找StripPrefix配置
                             for (FilterDefinition filter : route.getFilters()) {
                                 if (ObjectUtils.nullSafeEquals(filter.getName(), "StripPrefix")) {
-                                    String skip = filter.getArgs().get("skip");
+                                    String skip = filter.getArgs().get("parts");
                                     String[] paths = requestPath.split("/");
                                     for (int i = 0; i < paths.length; i++) {
                                         if (i > Integer.parseInt(skip)) {
@@ -77,6 +77,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                     }
                 }
             }
+
 //            Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
 //            for (GrantedAuthority authority : authorities) {
 //                String authorityAuthority = authority.getAuthority();
