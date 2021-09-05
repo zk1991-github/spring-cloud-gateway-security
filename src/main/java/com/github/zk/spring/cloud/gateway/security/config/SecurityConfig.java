@@ -1,13 +1,16 @@
 package com.github.zk.spring.cloud.gateway.security.config;
 
+import com.github.zk.spring.cloud.gateway.security.handler.CustomReactiveAuthenticationManager;
 import com.github.zk.spring.cloud.gateway.security.handler.CustomReactiveAuthorizationManager;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration;
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -17,9 +20,6 @@ import org.springframework.security.web.server.authentication.RedirectServerAuth
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-import org.springframework.web.server.session.DefaultWebSessionManager;
-import org.springframework.web.server.session.InMemoryWebSessionStore;
-import org.springframework.web.server.session.WebSessionManager;
 
 import java.util.Collections;
 
@@ -35,6 +35,8 @@ public class SecurityConfig {
 
     @Value("${spring.cloud.gateway.session.maxSessions}")
     private int maxSessions;
+    @Autowired
+    private ReactiveStringRedisTemplate reactiveStringRedisTemplate;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, GatewayProperties gatewayProperties) {
@@ -47,6 +49,7 @@ public class SecurityConfig {
                 )
                 .httpBasic().disable()
                 .formLogin()
+                .authenticationManager(new CustomReactiveAuthenticationManager(defaultUserImpl(), maxSessions, reactiveStringRedisTemplate))
                 //登录服务地址
                 .loginPage("/login")
                 .authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler(
@@ -60,7 +63,6 @@ public class SecurityConfig {
 //                .and()
 //                .exceptionHandling().accessDeniedHandler(new HttpStatusServerAccessDeniedHandler(HttpStatus.FORBIDDEN))
         ;
-
         return http.build();
     }
 
@@ -81,13 +83,13 @@ public class SecurityConfig {
      * @return
      * @see WebFluxAutoConfiguration.EnableWebFluxConfiguration#webSessionManager()
      */
-    @Bean
-    public InMemoryWebSessionStore sessionStore(WebSessionManager webSessionManager) {
-        InMemoryWebSessionStore sessionStore = (InMemoryWebSessionStore) ((DefaultWebSessionManager) webSessionManager).getSessionStore();
-        // 设置最大同时在线人数
-        sessionStore.setMaxSessions(maxSessions);
-        return sessionStore;
-    }
+//    @Bean
+//    public InMemoryWebSessionStore sessionStore(WebSessionManager webSessionManager) {
+//        InMemoryWebSessionStore sessionStore = (InMemoryWebSessionStore) ((DefaultWebSessionManager) webSessionManager).getSessionStore();
+//        // 设置最大同时在线人数
+//        sessionStore.setMaxSessions(maxSessions);
+//        return sessionStore;
+//    }
 
     /**
      * 定义默认用户实现 Bean

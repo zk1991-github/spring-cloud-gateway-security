@@ -6,7 +6,6 @@ import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.ObjectUtils;
 import reactor.core.publisher.Mono;
 
@@ -33,9 +32,6 @@ public abstract class DefaultUserImpl implements ReactiveUserDetailsService {
             return Mono.just(userInfo);
         }
         userInfo = customFindByUsername(username);
-        if (userInfo == null) {
-            throw new UsernameNotFoundException("用户不存在");
-        }
         return Mono.justOrEmpty(userInfo);
     }
 
