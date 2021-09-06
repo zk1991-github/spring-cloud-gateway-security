@@ -35,20 +35,22 @@ public class CustomReactiveAuthenticationManager extends UserDetailsRepositoryRe
     public Mono<UserDetails> retrieveUser(String username) {
         //判断是否超过允许最大登录人数
         return getSessionId(username)
+                .flatMap(this::userSessionExistBySessionId)
                 .flatMap(sessionId -> super.retrieveUser(username))
                 .switchIfEmpty(onlineNum()
-                .map(aLong -> aLong >= maxSessions)
-                .flatMap(aBoolean -> {
-                    if (aBoolean) {
-                        return Mono.defer(() -> Mono.error(new BadCredentialsException("超过最大登录人数")));
-                    } else {
-                        return super.retrieveUser(username);
-                    }
-                }));
+                        .map(aLong -> aLong >= maxSessions)
+                        .flatMap(aBoolean -> {
+                            if (aBoolean) {
+                                return Mono.defer(() -> Mono.error(new BadCredentialsException("超过最大登录人数")));
+                            } else {
+                                return super.retrieveUser(username);
+                            }
+                        }));
     }
 
     /**
      * 在线用户数
+     *
      * @return
      */
     public Mono<Long> onlineNum() {
@@ -65,6 +67,19 @@ public class CustomReactiveAuthenticationManager extends UserDetailsRepositoryRe
                 .get("sessions", username)
                 .switchIfEmpty(Mono.empty())
                 .cast(String.class);
+    }
+
+    public Mono<String> userSessionExistBySessionId(String sessionId) {
+        ScanOptions options = ScanOptions
+                .scanOptions()
+                .match(ReactiveRedisSessionRepository.DEFAULT_NAMESPACE + ":sessions:" + sessionId)
+                .build();
+        return reactiveStringRedisTemplate.scan(options).count().flatMap(count -> {
+            if (count > 0) {
+                return Mono.just(sessionId);
+            }
+            return Mono.empty();
+        });
     }
 
 }
