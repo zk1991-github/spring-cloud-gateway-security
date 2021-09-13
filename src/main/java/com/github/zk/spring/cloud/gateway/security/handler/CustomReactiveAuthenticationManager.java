@@ -31,6 +31,18 @@ public class CustomReactiveAuthenticationManager extends UserDetailsRepositoryRe
         this.reactiveStringRedisTemplate = reactiveStringRedisTemplate;
     }
 
+    /**
+     * 已经登录过的用户，因异地登录或重复登录时，不受最大登录用户数限制。
+     * 流程如下：
+     * 1. 获取用户 SessionId
+     * 2. 判断用户 Session 是否存在
+     *      如果存在：返回用户信息
+     *      如果不存在：判断在线用户数是否超过允许登录最大用户数
+     *                  如果超过：返回错误信息
+     *                  如果未超过：返回用户信息
+     * @param username
+     * @return
+     */
     @Override
     public Mono<UserDetails> retrieveUser(String username) {
         //判断是否超过允许最大登录人数
@@ -61,6 +73,11 @@ public class CustomReactiveAuthenticationManager extends UserDetailsRepositoryRe
         return reactiveStringRedisTemplate.scan(options).count();
     }
 
+    /**
+     * 获取 SessionId
+     * @param username
+     * @return
+     */
     public Mono<String> getSessionId(String username) {
         return reactiveStringRedisTemplate
                 .opsForHash()
@@ -69,6 +86,11 @@ public class CustomReactiveAuthenticationManager extends UserDetailsRepositoryRe
                 .cast(String.class);
     }
 
+    /**
+     * 根据 SessionId， 查询用户 Session 是否存在
+     * @param sessionId
+     * @return
+     */
     public Mono<String> userSessionExistBySessionId(String sessionId) {
         ScanOptions options = ScanOptions
                 .scanOptions()
