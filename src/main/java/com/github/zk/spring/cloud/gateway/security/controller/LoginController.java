@@ -3,22 +3,21 @@ package com.github.zk.spring.cloud.gateway.security.controller;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 登录 请求控制
@@ -34,11 +33,6 @@ public class LoginController {
     private ReactiveStringRedisTemplate reactiveStringRedisTemplate;
     @Autowired
     private ReactiveRedisSessionRepository sessionRepository;
-
-    public final static Map<String, WebSession> USER_SESSIONS = new ConcurrentHashMap<>();
-
-    @Value("${spring.cloud.gateway.session.maxSessions}")
-    private int maxSessions;
 
     @GetMapping("/success")
     public Mono<Response> success(ServerWebExchange exchange) {
@@ -64,9 +58,16 @@ public class LoginController {
     }
 
     @GetMapping("/fail")
-    public Response fail() {
+    public Response fail(WebSession session) {
         Response response = Response.getInstance();
-        response.setError(10000, null, "用户名密码错误");
+        AuthenticationException authenticationException = session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+        String message = authenticationException.getMessage();
+        if (ObjectUtils.nullSafeEquals(message, "Invalid Credentials")) {
+            message = "密码错误";
+        }
+        response.setError(10000, null, message);
+        //使当前session失效
+        session.invalidate().subscribe();
         return response;
     }
 
@@ -145,26 +146,5 @@ public class LoginController {
         return reactiveStringRedisTemplate
                 .opsForHash()
                 .remove("sessions", userInfo.getUsername()).map(delNum -> delNum > 0);
-    }
-
-    public static void main(String[] args) {
-        Mono.just("a")
-                .flatMap(s ->
-                        notEmpty()
-                )
-                .switchIfEmpty(
-                        Mono.defer(() -> empty())
-                )
-                .subscribe(System.out::println);
-    }
-
-    public static Mono<Boolean> empty() {
-        System.out.println("empty()");
-        return Mono.just(false);
-    }
-
-    public static Mono<Boolean> notEmpty() {
-        System.out.println("notEmpty()");
-        return Mono.just(true);
     }
 }
