@@ -6,6 +6,7 @@
  */
 package com.github.zk.spring.cloud.gateway.security.common;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import java.util.Map;
  * @author zk
  * @date 2018/8/16 10:44
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"data", "api", "msg", "code"})
 public class Response {
 
