@@ -50,7 +50,7 @@ public class CustomReactiveAuthenticationManager extends UserDetailsRepositoryRe
                 .flatMap(this::userSessionExistBySessionId)
                 .flatMap(sessionId -> super.retrieveUser(username))
                 .switchIfEmpty(onlineNum()
-                        .map(aLong -> aLong >= maxSessions)
+                        .map(aLong -> maxSessions != -1 && aLong >= maxSessions)
                         .flatMap(aBoolean -> {
                             if (aBoolean) {
                                 return Mono.defer(() -> Mono.error(new BadCredentialsException("超过最大登录人数")));
