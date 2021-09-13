@@ -2,7 +2,9 @@ spring:
   cloud:
     gateway:
       session:
+        # 不限制Session过期时间：-1 单位：分钟
         timeout: 30
+        # 不限制登录人数：-1
         maxSessions: 10000
       default-filters:
         - Session
