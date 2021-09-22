@@ -3,16 +3,14 @@ package com.github.zk.spring.cloud.gateway.security.controller;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.session.InMemoryWebSessionStore;
 import reactor.core.publisher.Mono;
 
 /**
@@ -26,7 +24,7 @@ import reactor.core.publisher.Mono;
 public class UserController {
 
     @Autowired
-    private ReactiveStringRedisTemplate redisTemplate;
+    private InMemoryWebSessionStore sessionStore;
 
     @GetMapping("/getUser")
     public Mono<Response> getUser() {
@@ -62,15 +60,10 @@ public class UserController {
      */
     @GetMapping("/getOnlineNums")
     public Mono<Response> getOnlineNums() {
-        ScanOptions options = ScanOptions
-                .scanOptions()
-                .match(ReactiveRedisSessionRepository.DEFAULT_NAMESPACE + ":*")
-                .build();
-        return redisTemplate.scan(options).count().map(aLong -> {
-            Response response = Response.getInstance();
-            response.setOk(Response.CodeEnum.SUCCESSED, null, "查询成功！", aLong);
-            return response;
-        });
+        Response response = Response.getInstance();
+        int count = sessionStore.getSessions().size();
+        response.setOk(Response.CodeEnum.SUCCESSED, null, "查询成功！", count);
+        return Mono.justOrEmpty(response);
     }
 
 }

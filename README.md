@@ -7,7 +7,6 @@
 - 支持查询在线用户数
 - 支持查询当前登录用户(简要信息)
 - 支持异地登录踢出功能
-- 支持分布式部署
 
 ### 2. 功能介绍
 #### 1. 登录鉴权
@@ -18,10 +17,10 @@
 可自行修改，密码生成方式，使用 `com.github.zk.spring.cloud.gateway.security.util.PasswordGeneratorUtils` 类
 
 #### 3. Session失效时间设置
-在 `application-gateway.yml`中 `spring.cloud.gateway.session.timeout`单位（分钟），暂不支持永久有效
+在 `application-gateway.yml`中 `spring.cloud.gateway.session.timeout`单位（分钟）
 
 #### 4. 最大同时在线用户数设置
-在 `application-gateway.yml`中 `spring.cloud.gateway.session.maxSessions`。设置`-1`不限制用户数
+在 `application-gateway.yml`中 `spring.cloud.gateway.session.maxSessions`
 
 #### 5. 查询在线用户数
 请求地址 `/gateway/getOnlineNums` 需要在数据库权限表中配置 `/getOnlineNums`权限

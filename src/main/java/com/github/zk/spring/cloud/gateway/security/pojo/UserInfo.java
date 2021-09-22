@@ -17,7 +17,7 @@ import java.util.List;
  * @date 2021/1/15 14:32
  */
 @TableName(value = "t_user")
-@JsonIgnoreProperties(value = {"password"}, ignoreUnknown = true)
+@JsonIgnoreProperties({"password"})
 public class UserInfo implements UserDetails {
     private static final long serialVersionUID = -6177045879532008391L;
 

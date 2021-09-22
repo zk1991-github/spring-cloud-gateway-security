@@ -1,7 +1,6 @@
 package com.github.zk.spring.cloud.gateway.security.pojo;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
 
@@ -12,7 +11,6 @@ import java.io.Serializable;
  * @date 2021/1/21 10:41
  */
 @TableName("t_permission")
-@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
 public class PermissionInfo implements Serializable {
     private static final long serialVersionUID = 874671003093440548L;
 
