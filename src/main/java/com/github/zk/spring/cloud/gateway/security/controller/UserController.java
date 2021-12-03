@@ -1,7 +1,6 @@
 package com.github.zk.spring.cloud.gateway.security.controller;
 
 import com.github.zk.spring.cloud.gateway.security.common.Response;
-import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
@@ -34,10 +33,9 @@ public class UserController {
                 .switchIfEmpty(Mono.error(new IllegalStateException("ReactiveSecurityContext is empty")))
                 .map(SecurityContext::getAuthentication)
                 .map(Authentication::getPrincipal)
-                .cast(UserInfo.class)
-                .map(userInfo -> {
+                .map(user -> {
                     Response response = Response.getInstance();
-                    response.setOk(Response.CodeEnum.SUCCESSED, null, "查询成功！", userInfo);
+                    response.setOk(Response.CodeEnum.SUCCESSED, null, "查询成功！", user);
                     return response;
                 });
     }
@@ -48,10 +46,9 @@ public class UserController {
                 .switchIfEmpty(Mono.error(new IllegalStateException("ReactiveSecurityContext is empty")))
                 .map(SecurityContext::getAuthentication)
                 .map(Authentication::getPrincipal)
-                .cast(UserInfo.class)
-                .map(userInfo -> {
+                .map(user -> {
                     Response response = Response.getInstance();
-                    response.setOk(Response.CodeEnum.SUCCESSED, null, "查询成功！", userInfo);
+                    response.setOk(Response.CodeEnum.SUCCESSED, null, "查询成功！", user);
                     return response;
                 });
     }
