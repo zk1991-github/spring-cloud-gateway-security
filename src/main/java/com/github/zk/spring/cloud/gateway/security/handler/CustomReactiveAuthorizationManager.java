@@ -3,6 +3,9 @@ package com.github.zk.spring.cloud.gateway.security.handler;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
+import com.github.zk.spring.cloud.gateway.security.pojo.WeChatUserInfo;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.config.GatewayProperties;
@@ -87,24 +90,34 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
 //                    return new AuthorizationDecision(true);
 //                }
 //            }
-            UserInfo userInfo = (UserInfo) auth.getPrincipal();
-            System.out.printf("用户名【%s】,角色【%s】\n", userInfo.getUsername(), userInfo.getRoles());
-            //角色的url权限过滤
-            for (RoleInfo role : userInfo.getRoles()) {
-                for (PermissionInfo permissionInfo : role.getPermissionInfos()) {
-                    boolean match = ANT_PATH_MATCHER.match(permissionInfo.getUrl(),
-                            realRequestPath.isEmpty() ? requestPath : realRequestPath);
-                    if (match) {
-                        ServerHttpRequest newRequest = request.mutate()
-                                .header("username", userInfo.getUsername())
-                                .header("userId", String.valueOf(userInfo.getId()))
-                                .build();
-                        exchange.mutate().request(newRequest).build();
-                        return new AuthorizationDecision(true);
-                    }
-                }
+//            UserInfo userInfo = (UserInfo) auth.getPrincipal();
+//            System.out.printf("用户名【%s】,角色【%s】\n", userInfo.getUsername(), userInfo.getRoles());
+//            //角色的url权限过滤
+//            for (RoleInfo role : userInfo.getRoles()) {
+//                for (PermissionInfo permissionInfo : role.getPermissionInfos()) {
+//                    boolean match = ANT_PATH_MATCHER.match(permissionInfo.getUrl(),
+//                            realRequestPath.isEmpty() ? requestPath : realRequestPath);
+//                    if (match) {
+//                        ServerHttpRequest newRequest = request.mutate()
+//                                .header("username", userInfo.getUsername())
+//                                .header("userId", String.valueOf(userInfo.getId()))
+//                                .build();
+//                        exchange.mutate().request(newRequest).build();
+//                        return new AuthorizationDecision(true);
+//                    }
+//                }
+//            }
+//            return new AuthorizationDecision(false);
+            Object principal = auth.getPrincipal();
+            if (principal instanceof UserInfo) {
+                UserInfo userInfo = (UserInfo) principal;
+                return userInfoAuthorization(userInfo, exchange, requestPath, realRequestPath);
+            } else if (principal instanceof WeChatUserInfo) {
+                WeChatUserInfo weChatUserInfo = (WeChatUserInfo) principal;
+                return weChatUserInfoAuthorization(weChatUserInfo, exchange, requestPath, realRequestPath);
+            } else {
+                return new AuthorizationDecision(false);
             }
-            return new AuthorizationDecision(false);
         }).defaultIfEmpty(new AuthorizationDecision(false));
     }
 
@@ -114,5 +127,54 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                 .filter(AuthorizationDecision::isGranted)
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new AccessDeniedException("Access Denied"))))
                 .flatMap((decision) -> Mono.empty());
+    }
+
+    /**
+     * web用户
+     *
+     * @param userInfo
+     * @param exchange
+     * @param requestPath
+     * @param realRequestPath
+     * @return
+     */
+    private AuthorizationDecision userInfoAuthorization(UserInfo userInfo, ServerWebExchange exchange,
+                                                        String requestPath,
+                                                        String realRequestPath) {
+
+        System.out.printf("用户名【%s】,角色【%s】\n", userInfo.getUsername(), userInfo.getRoles());
+        //角色的url权限过滤
+        for (RoleInfo role : userInfo.getRoles()) {
+            for (PermissionInfo permissionInfo : role.getPermissionInfos()) {
+                boolean match = ANT_PATH_MATCHER.match(permissionInfo.getUrl(),
+                        realRequestPath.isEmpty() ? requestPath : realRequestPath);
+                if (match) {
+                    ServerHttpRequest newRequest = exchange.getRequest().mutate()
+                            .header("username", userInfo.getUsername())
+                            .header("userId", String.valueOf(userInfo.getId()))
+                            .build();
+                    exchange.mutate().request(newRequest).build();
+                    return new AuthorizationDecision(true);
+                }
+            }
+        }
+        return new AuthorizationDecision(false);
+    }
+
+    private AuthorizationDecision weChatUserInfoAuthorization(WeChatUserInfo weChatUserInfo, ServerWebExchange exchange,
+                                                              String requestPath,
+                                                              String realRequestPath) {
+        String encodedNickName = "";
+        try {
+            encodedNickName = URLEncoder.encode(weChatUserInfo.getNickName(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        ServerHttpRequest newRequest = exchange.getRequest().mutate()
+                .header("username", encodedNickName)
+                .header("userId", String.valueOf(weChatUserInfo.getOpenid()))
+                .build();
+        exchange.mutate().request(newRequest).build();
+        return new AuthorizationDecision(true);
     }
 }
