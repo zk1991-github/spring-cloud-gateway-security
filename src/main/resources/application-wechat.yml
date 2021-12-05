@@ -1,0 +1,4 @@
+wechat:
+  url: "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code"
+  appid: "wxfc2a27173732a7bc"
+  appsecret: "c684e9ea4fe1413569cf530f0dc890f3"

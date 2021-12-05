@@ -1,4 +1,4 @@
-package com.github.zk.spring.cloud.gateway.security.check;
+package com.github.zk.spring.cloud.gateway.security.filter.factory;
 
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;

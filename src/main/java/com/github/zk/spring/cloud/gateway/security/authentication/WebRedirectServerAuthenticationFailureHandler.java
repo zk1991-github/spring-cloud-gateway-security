@@ -1,4 +1,4 @@
-package com.github.zk.spring.cloud.gateway.security.handler;
+package com.github.zk.spring.cloud.gateway.security.authentication;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.WebAttributes;
@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
  * @author zk
  * @date 2021/9/7 11:33
  */
-public class CustomRedirectServerAuthenticationFailureHandler extends RedirectServerAuthenticationFailureHandler {
+public class WebRedirectServerAuthenticationFailureHandler extends RedirectServerAuthenticationFailureHandler {
 
 
     /**
@@ -20,7 +20,7 @@ public class CustomRedirectServerAuthenticationFailureHandler extends RedirectSe
      *
      * @param location the location to redirect to (i.e. "/login?failed")
      */
-    public CustomRedirectServerAuthenticationFailureHandler(String location) {
+    public WebRedirectServerAuthenticationFailureHandler(String location) {
         super(location);
     }
 

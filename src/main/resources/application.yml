@@ -12,4 +12,4 @@ login:
             url: /**
 spring:
   profiles:
-    active: datasource, gateway
+    active: datasource, gateway, wechat
