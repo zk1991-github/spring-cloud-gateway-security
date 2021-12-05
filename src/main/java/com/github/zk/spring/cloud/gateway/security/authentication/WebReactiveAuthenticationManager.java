@@ -1,4 +1,4 @@
-package com.github.zk.spring.cloud.gateway.security.handler;
+package com.github.zk.spring.cloud.gateway.security.authentication;
 
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
@@ -12,15 +12,15 @@ import reactor.core.publisher.Mono;
  * @author zk
  * @date 2021/9/3 10:48
  */
-public class CustomReactiveAuthenticationManager extends UserDetailsRepositoryReactiveAuthenticationManager {
+public class WebReactiveAuthenticationManager extends UserDetailsRepositoryReactiveAuthenticationManager {
 
     /**
      * 允许的最大登录人数
      */
     private final LoginProcessor loginProcessor;
 
-    public CustomReactiveAuthenticationManager(ReactiveUserDetailsService userDetailsService,
-                                               LoginProcessor loginProcessor) {
+    public WebReactiveAuthenticationManager(ReactiveUserDetailsService userDetailsService,
+                                            LoginProcessor loginProcessor) {
         super(userDetailsService);
         this.loginProcessor = loginProcessor;
     }

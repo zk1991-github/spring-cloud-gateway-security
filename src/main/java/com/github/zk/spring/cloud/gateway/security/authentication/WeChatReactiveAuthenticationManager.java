@@ -1,8 +1,8 @@
-package com.github.zk.spring.cloud.gateway.security.handler;
+package com.github.zk.spring.cloud.gateway.security.authentication;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.zk.spring.cloud.gateway.security.config.WeChatProperties;
+import com.github.zk.spring.cloud.gateway.security.property.WeChatProperties;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.core.WeChatUserDetails;
 import com.github.zk.spring.cloud.gateway.security.pojo.WeChatResult;

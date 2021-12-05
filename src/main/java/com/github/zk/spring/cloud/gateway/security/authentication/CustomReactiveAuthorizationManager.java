@@ -1,4 +1,4 @@
-package com.github.zk.spring.cloud.gateway.security.handler;
+package com.github.zk.spring.cloud.gateway.security.authentication;
 
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;

@@ -1,9 +1,9 @@
 package com.github.zk.spring.cloud.gateway.security.config;
 
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
-import com.github.zk.spring.cloud.gateway.security.handler.CustomReactiveAuthenticationManager;
-import com.github.zk.spring.cloud.gateway.security.handler.CustomReactiveAuthorizationManager;
-import com.github.zk.spring.cloud.gateway.security.handler.CustomRedirectServerAuthenticationFailureHandler;
+import com.github.zk.spring.cloud.gateway.security.authentication.WebReactiveAuthenticationManager;
+import com.github.zk.spring.cloud.gateway.security.authentication.CustomReactiveAuthorizationManager;
+import com.github.zk.spring.cloud.gateway.security.authentication.WebRedirectServerAuthenticationFailureHandler;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,12 +69,12 @@ public class SecurityConfig {
                 )
                 .httpBasic().disable()
                 .formLogin()
-                .authenticationManager(new CustomReactiveAuthenticationManager(defaultUserImpl(), loginProcessor))
+                .authenticationManager(new WebReactiveAuthenticationManager(defaultUserImpl(), loginProcessor))
                 //登录服务地址
                 .loginPage(LOGIN_URL)
                 .authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler(
                         SUCCESS_URL))
-                .authenticationFailureHandler(new CustomRedirectServerAuthenticationFailureHandler(
+                .authenticationFailureHandler(new WebRedirectServerAuthenticationFailureHandler(
                         FAIL_URL))
                 .authenticationEntryPoint(new RedirectServerAuthenticationEntryPoint(INVALID_URL))
                 .and()

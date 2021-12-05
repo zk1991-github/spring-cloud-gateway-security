@@ -1,4 +1,4 @@
-package com.github.zk.spring.cloud.gateway.security.handler;
+package com.github.zk.spring.cloud.gateway.security.authentication;
 
 import java.util.Collection;
 import org.springframework.security.authentication.AbstractAuthenticationToken;

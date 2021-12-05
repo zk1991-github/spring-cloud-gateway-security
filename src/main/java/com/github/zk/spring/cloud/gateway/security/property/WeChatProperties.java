@@ -1,4 +1,4 @@
-package com.github.zk.spring.cloud.gateway.security.config;
+package com.github.zk.spring.cloud.gateway.security.property;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

@@ -1,9 +1,9 @@
 package com.github.zk.spring.cloud.gateway.security.service.impl;
 
-import com.github.zk.spring.cloud.gateway.security.config.WeChatProperties;
+import com.github.zk.spring.cloud.gateway.security.property.WeChatProperties;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
-import com.github.zk.spring.cloud.gateway.security.handler.WeChatAuthenticationToken;
-import com.github.zk.spring.cloud.gateway.security.handler.WeChatReactiveAuthenticationManager;
+import com.github.zk.spring.cloud.gateway.security.authentication.WeChatAuthenticationToken;
+import com.github.zk.spring.cloud.gateway.security.authentication.WeChatReactiveAuthenticationManager;
 import com.github.zk.spring.cloud.gateway.security.pojo.WeChatUserInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IWeChatAuthentication;
 import org.springframework.security.core.Authentication;
