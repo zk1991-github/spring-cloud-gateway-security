@@ -132,10 +132,10 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
     /**
      * web用户
      *
-     * @param userInfo
-     * @param exchange
-     * @param requestPath
-     * @param realRequestPath
+     * @param userInfo 用户信息
+     * @param exchange web请求
+     * @param requestPath 请求地址
+     * @param realRequestPath 真实请求地址 （去掉转发地址后）
      * @return
      */
     private AuthorizationDecision userInfoAuthorization(UserInfo userInfo, ServerWebExchange exchange,
