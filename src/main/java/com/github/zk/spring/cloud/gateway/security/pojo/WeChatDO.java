@@ -6,7 +6,7 @@ package com.github.zk.spring.cloud.gateway.security.pojo;
  * @author zk
  * @date 2021/11/16 16:39
  */
-public class WeChatResult {
+public class WeChatDO {
     private String openid;
     private String session_key;
     private Integer errcode;

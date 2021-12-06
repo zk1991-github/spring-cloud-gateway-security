@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zk.spring.cloud.gateway.security.property.WeChatProperties;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.core.WeChatUserDetails;
-import com.github.zk.spring.cloud.gateway.security.pojo.WeChatResult;
+import com.github.zk.spring.cloud.gateway.security.pojo.WeChatDO;
 import com.github.zk.spring.cloud.gateway.security.pojo.WeChatUserInfo;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -90,7 +90,7 @@ public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticati
                 });
     }
 
-    private Mono<WeChatResult> weChatRequest(String weChatCode) {
+    private Mono<WeChatDO> weChatRequest(String weChatCode) {
         String formatUrl = String.format(weChatProperties.getUrl(),
                 weChatProperties.getAppid(), weChatProperties.getAppsecret(), weChatCode);
         return webClient
@@ -100,11 +100,11 @@ public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticati
                 .map(s -> {
                     ObjectMapper objectMapper = new ObjectMapper();
                     try {
-                        return objectMapper.readValue(s, WeChatResult.class);
+                        return objectMapper.readValue(s, WeChatDO.class);
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
-                    return new WeChatResult();
+                    return new WeChatDO();
                 })
                 .onErrorResume(Exception.class, (ex) -> {
                     System.out.println(ex.getMessage());

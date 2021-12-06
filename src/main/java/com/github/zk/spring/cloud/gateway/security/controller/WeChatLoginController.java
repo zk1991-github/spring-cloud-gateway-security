@@ -3,7 +3,7 @@ package com.github.zk.spring.cloud.gateway.security.controller;
 import com.github.zk.spring.cloud.gateway.security.authentication.exception.SessionStoreAuthenticationException;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
-import com.github.zk.spring.cloud.gateway.security.pojo.WeChatParam;
+import com.github.zk.spring.cloud.gateway.security.pojo.WeChatDTO;
 import com.github.zk.spring.cloud.gateway.security.service.IWeChatAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -38,7 +38,7 @@ public class WeChatLoginController extends LoginProcessor {
     }
 
     @PostMapping(WECHAT_LOGIN_URL)
-    public Mono<Response> weChatLogin(@RequestBody WeChatParam weChatParam, ServerWebExchange exchange) {
+    public Mono<Response> weChatLogin(@RequestBody WeChatDTO weChatParam, ServerWebExchange exchange) {
         return iWeChatAuthentication
                 .authenticate(loginProcessor, weChatParam.getWeChatCode(), weChatParam.getWeChatUserInfo(), exchange)
                 .flatMap(weChatUserInfo ->
