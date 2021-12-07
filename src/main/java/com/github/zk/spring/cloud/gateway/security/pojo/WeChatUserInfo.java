@@ -2,6 +2,7 @@ package com.github.zk.spring.cloud.gateway.security.pojo;
 
 import com.github.zk.spring.cloud.gateway.security.core.WeChatUserDetails;
 import java.util.Collection;
+import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
@@ -31,6 +32,8 @@ public class WeChatUserInfo implements WeChatUserDetails {
 
     /** 城市 */
     private String city;
+
+    private List<RoleInfo> roles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -111,5 +114,13 @@ public class WeChatUserInfo implements WeChatUserDetails {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public List<RoleInfo> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<RoleInfo> roles) {
+        this.roles = roles;
     }
 }

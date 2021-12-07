@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.zk.spring.cloud.gateway.security.dao.RoleMapper">
+
+    <resultMap id="RolesResultMap" type="com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="role_name" property="roleName" jdbcType="VARCHAR"/>
+        <result column="describe" property="describe" jdbcType="VARCHAR"/>
+        <collection property="permissionInfos" ofType="map" column="id" select="selectPermissions">
+        </collection>
+    </resultMap>
+
+    <resultMap id="PermissionsResultMap" type="com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="url_name" property="urlName" jdbcType="VARCHAR"/>
+        <result column="url" property="url" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, role_name, describe
+    </sql>
+
+    <select id="selectRolesByIds" resultMap="RolesResultMap">
+        select tr.id, tr.role_name, tr.describe
+        from
+        t_role tr
+        where id in
+        <foreach collection="array" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectPermissions" resultMap="PermissionsResultMap">
+        select id, pid, url_name, url from
+            (select permission_id from
+                role_permission
+             where role_id = #{id}) rp
+        left join t_permission tp
+        on rp.permission_id = tp.id
+    </select>
+</mapper>

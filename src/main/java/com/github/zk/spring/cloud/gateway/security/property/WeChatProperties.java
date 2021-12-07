@@ -15,6 +15,7 @@ public class WeChatProperties {
     private String url;
     private String appid;
     private String appsecret;
+    private Long[] roleIds;
 
     public String getUrl() {
         return url;
@@ -38,5 +39,13 @@ public class WeChatProperties {
 
     public void setAppsecret(String appsecret) {
         this.appsecret = appsecret;
+    }
+
+    public Long[] getRoleIds() {
+        return roleIds;
+    }
+
+    public void setRoleIds(Long[] roleIds) {
+        this.roleIds = roleIds;
     }
 }
