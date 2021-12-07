@@ -26,25 +26,17 @@ import reactor.core.publisher.Mono;
  * @date 2021/11/15 10:35
  */
 public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticationManager {
-    /**
-     * rest请求模板
-     */
+    /** rest请求模板 */
     private final WebClient webClient = WebClient.builder().build();
-    /**
-     *
-     */
+    /** 登录处理器 */
     private final LoginProcessor loginProcessor;
-    /**
-     * 微信认证url
-     */
+    /** 微信配置 */
     private final WeChatProperties weChatProperties;
-    /**
-     * 微信用户详情
-     */
+    /** 微信用户详情 */
     private final WeChatUserDetails weChatUserDetails;
-
+    /** 请求 */
     private final ServerWebExchange exchange;
-
+    /** Security 上下文仓储 */
     private ServerSecurityContextRepository securityContextRepository = new WebSessionServerSecurityContextRepository();
 
     public WeChatReactiveAuthenticationManager(LoginProcessor loginProcessor, WeChatProperties weChatProperties,
@@ -90,6 +82,11 @@ public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticati
                 });
     }
 
+    /**
+     * 微信请求
+     * @param weChatCode 微信 code
+     * @return
+     */
     private Mono<WeChatDO> weChatRequest(String weChatCode) {
         String formatUrl = String.format(weChatProperties.getUrl(),
                 weChatProperties.getAppid(), weChatProperties.getAppsecret(), weChatCode);
