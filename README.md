@@ -66,3 +66,4 @@
 - 用户的表结构至少需要包含当前表数据及关系（数据内容不限制）
 - 修改 `application-datasource.yml` 中的数据库地址为用户表所在数据库地址
 - 修改 `application-gateway.yml` 中转发地址为所需的服务地址和拦截地址（拦截地址范围大的写在范围小的配置之后）
+- 小程序相关配置在 `application-wechat.yml` , 其中 `roleIds` 需要与数据库中的角色id对应，设置完成后自动绑定相关权限
