@@ -22,28 +22,6 @@
         <result column="url" property="url" jdbcType="VARCHAR"/>
     </resultMap>
 
-    <!--    <resultMap id="BaseResultMapAndParams" type="cn.piesat.biserver.entity.APIManagerEntity" >-->
-    <!--        <id column="id" property="id" jdbcType="VARCHAR" />-->
-    <!--        <result column="api_name" property="apiName" jdbcType="VARCHAR" />-->
-    <!--        <result column="url" property="url" jdbcType="VARCHAR" />-->
-    <!--        <result column="type_id" property="typeId" jdbcType="INTEGER" />-->
-    <!--        <result column="request_type" property="requestType" jdbcType="VARCHAR" />-->
-    <!--        <result column="authentication" property="authentication" jdbcType="INTEGER" />-->
-    <!--        <result column="token_key" property="tokenKey" jdbcType="VARCHAR" />-->
-    <!--        <result column="token_value" property="tokenValue" jdbcType="VARCHAR" />-->
-    <!--        <result column="header" property="header" jdbcType="INTEGER" />-->
-    <!--        <result column="update_time" property="updateTime" jdbcType="VARCHAR" />-->
-    <!--        <collection property="apiParamsEntity" ofType="map" select="queryAPIParams" column="id">-->
-    <!--        </collection>-->
-    <!--    </resultMap>-->
-
-    <!--    <resultMap id="BaseParamResultMap" type="cn.piesat.biserver.entity.APIParamsEntity" >-->
-    <!--        <id column="id" property="paramId" jdbcType="VARCHAR" />-->
-    <!--        <result column="api_id" property="apiId" jdbcType="VARCHAR" />-->
-    <!--        <result column="api_param" property="apiParam" jdbcType="VARCHAR" />-->
-    <!--        <result column="param_alias" property="paramAlias" jdbcType="VARCHAR" />-->
-    <!--    </resultMap>-->
-
     <sql id="Base_Column_List">
         id, username, password
     </sql>
