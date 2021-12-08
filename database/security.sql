@@ -53,12 +53,15 @@ CREATE TABLE `t_permission` (
   `pid` bigint(32) NOT NULL COMMENT '父级id',
   `url_name` varchar(255) DEFAULT NULL COMMENT '功能名称',
   `url` varchar(255) NOT NULL COMMENT '功能请求地址',
+  `level` tinyint(1) NOT NULL COMMENT '级别',
+  `type` tinyint(1) NOT NULL COMMENT '类型 1：菜单；2：按钮',
+  `show` tinyint(1) NOT NULL COMMENT '是否显示 0：否；1：是',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 /*Data for the table `t_permission` */
 
-insert  into `t_permission`(`id`,`pid`,`url_name`,`url`) values (1,0,'全部权限','/**'),(2,1,'获取用户','/getUser'),(3,1,'在线用户数','/getOnlineNums'),(4,1,'获取用户','/login/getUser');
+insert  into `t_permission`(`id`,`pid`,`url_name`,`url`,`level`,`type`,`show`) values (1,0,'全部权限','/**',1,1,0),(2,1,'获取用户','/getUser',2,2,0),(3,1,'在线用户数','/getOnlineNums',2,2,0),(4,1,'获取用户','/login/getUser',2,2,0);
 
 /*Table structure for table `t_role` */
 
