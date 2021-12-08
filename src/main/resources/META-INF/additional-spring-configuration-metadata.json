@@ -24,5 +24,10 @@
       "name": "login.user.roles",
       "type": "java.lang.String",
       "description": "系统默认角色。"
+    },
+    {
+      "name": "login.user.id",
+      "type": "java.lang.String",
+      "description": "Description for login.user.id."
     }
   ] }

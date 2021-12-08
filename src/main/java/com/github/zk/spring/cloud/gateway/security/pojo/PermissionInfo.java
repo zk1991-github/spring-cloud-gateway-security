@@ -1,9 +1,10 @@
 package com.github.zk.spring.cloud.gateway.security.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 权限信息
@@ -20,6 +21,9 @@ public class PermissionInfo implements Serializable {
     private Long pid;
     private String urlName;
     private String url;
+    /** 数据库不包含此字段 */
+    @TableField(exist = false)
+    private List<PermissionInfo> permissionInfos;
 
     public Long getId() {
         return id;
@@ -51,6 +55,14 @@ public class PermissionInfo implements Serializable {
 
     public void setUrlName(String urlName) {
         this.urlName = urlName;
+    }
+
+    public List<PermissionInfo> getPermissionInfos() {
+        return permissionInfos;
+    }
+
+    public void setPermissionInfos(List<PermissionInfo> permissionInfos) {
+        this.permissionInfos = permissionInfos;
     }
 
     @Override

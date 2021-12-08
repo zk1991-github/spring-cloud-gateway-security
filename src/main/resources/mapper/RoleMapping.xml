@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.github.zk.spring.cloud.gateway.security.dao.UserMapper">
-    <resultMap id="BaseResultMap" type="com.github.zk.spring.cloud.gateway.security.pojo.UserInfo">
-        <id column="id" property="id" jdbcType="BIGINT"/>
-        <result column="username" property="username" jdbcType="VARCHAR"/>
-        <result column="password" property="password" jdbcType="VARCHAR"/>
-        <collection property="roles" ofType="map" column="id" select="selectRolesByUserId">
-        </collection>
-    </resultMap>
+<mapper namespace="com.github.zk.spring.cloud.gateway.security.dao.RoleMapper">
 
     <resultMap id="RolesResultMap" type="com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="role_name" property="roleName" jdbcType="VARCHAR"/>
+        <result column="describe" property="describe" jdbcType="VARCHAR"/>
         <collection property="permissionInfos" ofType="map" column="id" select="selectPermissions">
         </collection>
     </resultMap>
@@ -23,26 +17,21 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, username, password
+        id, role_name, describe
     </sql>
-    <select id="selectUser" resultMap="BaseResultMap" parameterType="com.github.zk.spring.cloud.gateway.security.pojo.UserInfo">
-        select
-        <include refid="Base_Column_List"/>
-        from t_user
-        where username = #{username}
-    </select>
 
-    <select id="selectRolesByUserId" resultMap="RolesResultMap">
-        select role_id as id, role_name from
-        (select role_id
-        from user_role
-        where user_id = #{id}) ur
-        left join t_role tr
-        on ur.role_id = tr.id
+    <select id="selectRolesByIds" resultMap="RolesResultMap">
+        select tr.id, tr.role_name, tr.describe
+        from
+        t_role tr
+        where id in
+        <foreach collection="array" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </select>
 
     <select id="selectPermissions" resultMap="PermissionsResultMap">
-        select url_name, url from
+        select id, pid, url_name, url from
             (select permission_id from
                 role_permission
              where role_id = #{id}) rp

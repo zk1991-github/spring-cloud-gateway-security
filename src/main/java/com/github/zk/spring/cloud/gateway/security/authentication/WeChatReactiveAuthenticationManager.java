@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zk.spring.cloud.gateway.security.property.WeChatProperties;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.core.WeChatUserDetails;
-import com.github.zk.spring.cloud.gateway.security.pojo.WeChatResult;
+import com.github.zk.spring.cloud.gateway.security.pojo.WeChatDO;
 import com.github.zk.spring.cloud.gateway.security.pojo.WeChatUserInfo;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -26,25 +26,17 @@ import reactor.core.publisher.Mono;
  * @date 2021/11/15 10:35
  */
 public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticationManager {
-    /**
-     * rest请求模板
-     */
+    /** rest请求模板 */
     private final WebClient webClient = WebClient.builder().build();
-    /**
-     *
-     */
+    /** 登录处理器 */
     private final LoginProcessor loginProcessor;
-    /**
-     * 微信认证url
-     */
+    /** 微信配置 */
     private final WeChatProperties weChatProperties;
-    /**
-     * 微信用户详情
-     */
+    /** 微信用户详情 */
     private final WeChatUserDetails weChatUserDetails;
-
+    /** 请求 */
     private final ServerWebExchange exchange;
-
+    /** Security 上下文仓储 */
     private ServerSecurityContextRepository securityContextRepository = new WebSessionServerSecurityContextRepository();
 
     public WeChatReactiveAuthenticationManager(LoginProcessor loginProcessor, WeChatProperties weChatProperties,
@@ -90,7 +82,12 @@ public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticati
                 });
     }
 
-    private Mono<WeChatResult> weChatRequest(String weChatCode) {
+    /**
+     * 微信请求
+     * @param weChatCode 微信 code
+     * @return
+     */
+    private Mono<WeChatDO> weChatRequest(String weChatCode) {
         String formatUrl = String.format(weChatProperties.getUrl(),
                 weChatProperties.getAppid(), weChatProperties.getAppsecret(), weChatCode);
         return webClient
@@ -100,11 +97,11 @@ public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticati
                 .map(s -> {
                     ObjectMapper objectMapper = new ObjectMapper();
                     try {
-                        return objectMapper.readValue(s, WeChatResult.class);
+                        return objectMapper.readValue(s, WeChatDO.class);
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
-                    return new WeChatResult();
+                    return new WeChatDO();
                 })
                 .onErrorResume(Exception.class, (ex) -> {
                     System.out.println(ex.getMessage());

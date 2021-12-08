@@ -6,7 +6,7 @@ package com.github.zk.spring.cloud.gateway.security.pojo;
  * @author zk
  * @date 2021/11/17 13:21
  */
-public class WeChatParam {
+public class WeChatDTO {
     /**
      * 微信code
      */

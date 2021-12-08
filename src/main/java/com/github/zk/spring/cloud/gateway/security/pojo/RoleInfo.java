@@ -2,7 +2,6 @@ package com.github.zk.spring.cloud.gateway.security.pojo;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.io.Serializable;
 import java.util.List;
 

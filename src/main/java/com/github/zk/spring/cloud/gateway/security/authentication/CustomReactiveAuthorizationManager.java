@@ -132,10 +132,10 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
     /**
      * web用户
      *
-     * @param userInfo
-     * @param exchange
-     * @param requestPath
-     * @param realRequestPath
+     * @param userInfo 用户信息
+     * @param exchange web请求
+     * @param requestPath 请求地址
+     * @param realRequestPath 真实请求地址 （去掉转发地址后）
      * @return
      */
     private AuthorizationDecision userInfoAuthorization(UserInfo userInfo, ServerWebExchange exchange,
@@ -170,11 +170,22 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        ServerHttpRequest newRequest = exchange.getRequest().mutate()
-                .header("username", encodedNickName)
-                .header("userId", String.valueOf(weChatUserInfo.getOpenid()))
-                .build();
-        exchange.mutate().request(newRequest).build();
-        return new AuthorizationDecision(true);
+        System.out.printf("昵称【%s】,角色【%s】\n", weChatUserInfo.getNickName(), weChatUserInfo.getRoles());
+        //角色的url权限过滤
+        for (RoleInfo role : weChatUserInfo.getRoles()) {
+            for (PermissionInfo permissionInfo : role.getPermissionInfos()) {
+                boolean match = ANT_PATH_MATCHER.match(permissionInfo.getUrl(),
+                        realRequestPath.isEmpty() ? requestPath : realRequestPath);
+                if (match) {
+                    ServerHttpRequest newRequest = exchange.getRequest().mutate()
+                            .header("username", encodedNickName)
+                            .header("userId", String.valueOf(weChatUserInfo.getOpenid()))
+                            .build();
+                    exchange.mutate().request(newRequest).build();
+                    return new AuthorizationDecision(true);
+                }
+            }
+        }
+        return new AuthorizationDecision(false);
     }
 }
