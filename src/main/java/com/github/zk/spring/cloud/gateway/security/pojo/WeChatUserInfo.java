@@ -12,6 +12,20 @@ import org.springframework.security.core.GrantedAuthority;
  * @date 2021/11/16 16:53
  */
 public class WeChatUserInfo implements WeChatUserDetails {
+    public WeChatUserInfo() {
+    }
+
+    public WeChatUserInfo(String openid, String nickName, Integer gender, String avatarUrl, String country, String province, String city) {
+        this.openid = openid;
+        this.nickName = nickName;
+        this.gender = gender;
+        this.avatarUrl = avatarUrl;
+        this.country = country;
+        this.province = province;
+        this.city = city;
+        this.roles = roles;
+    }
+
     /** 微信唯一id */
     private String openid;
 
