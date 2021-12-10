@@ -68,3 +68,17 @@
 - 修改 `application-datasource.yml` 中的数据库地址为用户表所在数据库地址
 - 修改 `application-gateway.yml` 中转发地址为所需的服务地址和拦截地址（拦截地址范围大的写在范围小的配置之后）
 - 小程序相关配置在 `application-wechat.yml` , 其中 `roleIds` 需要与数据库中的角色id对应，设置完成后自动绑定相关权限
+- 当前端需要代理时，服务端在 `application-gateway.yml` 中也需要配置代理地址，结构如下：
+```properties
+spring:
+  web:
+    proxy:
+      url: "/gateway"
+```
+### 4. 响应code值说明
+
+| 序号 | code  | 描述               |
+| ---: | :---: | :--------------- |
+|    1 |   0   | 成功              |
+|    2 | 9000  | 需要跳转到登录界面   |
+|    3 | 10000 | 失败              |

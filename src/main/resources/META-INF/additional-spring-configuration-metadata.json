@@ -29,5 +29,10 @@
       "name": "login.user.id",
       "type": "java.lang.String",
       "description": "Description for login.user.id."
+    },
+    {
+      "name": "spring.web.proxy.url",
+      "type": "java.lang.String",
+      "description": "Description for spring.web.proxy.url."
     }
   ] }
