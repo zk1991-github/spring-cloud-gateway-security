@@ -5,7 +5,11 @@ import com.github.zk.spring.cloud.gateway.security.authentication.WebReactiveAut
 import com.github.zk.spring.cloud.gateway.security.authentication.CustomReactiveAuthorizationManager;
 import com.github.zk.spring.cloud.gateway.security.authentication.WebRedirectServerAuthenticationFailureHandler;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
+import java.net.URI;
 import java.util.Collections;
+import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -18,6 +22,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
+import org.springframework.security.web.server.authentication.logout.RedirectServerLogoutSuccessHandler;
 import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
@@ -32,9 +37,20 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
+    private final static Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Value("${spring.cloud.gateway.session.maxSessions}")
     private int maxSessions;
+    @Value("${spring.web.proxy.url}")
+    private String proxyUrl;
+
+    @PostConstruct
+    public void init() {
+        //代理地址处理
+        proxyUrl = proxyUrl != null ? proxyUrl : "";
+        logger.info("前端代理地址【{}】", proxyUrl);
+    }
+
     @Autowired
     private ReactiveStringRedisTemplate reactiveStringRedisTemplate;
 
@@ -57,13 +73,16 @@ public class SecurityConfig {
 
     private final String WECHAT_URL = "/login/weChatLogin";
 
+    private final String LOGOUT_URL = "/login/logout";
+
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
                                                             GatewayProperties gatewayProperties,
                                                             LoginProcessor loginProcessor) {
         http
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers(SUCCESS_URL, FAIL_URL, INVALID_URL, WECHAT_URL).permitAll()
+                        .pathMatchers(SUCCESS_URL, FAIL_URL, INVALID_URL,
+                                WECHAT_URL, LOGOUT_URL).permitAll()
                         .anyExchange()
                         .access(new CustomReactiveAuthorizationManager(gatewayProperties))
                 )
@@ -73,10 +92,13 @@ public class SecurityConfig {
                 //登录服务地址
                 .loginPage(LOGIN_URL)
                 .authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler(
-                        SUCCESS_URL))
+                        proxyUrl + SUCCESS_URL))
                 .authenticationFailureHandler(new WebRedirectServerAuthenticationFailureHandler(
-                        FAIL_URL))
-                .authenticationEntryPoint(new RedirectServerAuthenticationEntryPoint(INVALID_URL))
+                        proxyUrl + FAIL_URL))
+                .authenticationEntryPoint(new RedirectServerAuthenticationEntryPoint(proxyUrl + INVALID_URL))
+                .and()
+                .logout()
+                .logoutSuccessHandler(createRedirectServerLogoutSuccessHandler())
                 .and()
                 .csrf().disable()
                 .cors()
@@ -115,5 +137,11 @@ public class SecurityConfig {
     public DefaultUserImpl defaultUserImpl() {
         return new DefaultUserImpl() {
         };
+    }
+
+    private RedirectServerLogoutSuccessHandler createRedirectServerLogoutSuccessHandler() {
+        RedirectServerLogoutSuccessHandler redirectServerLogoutSuccessHandler = new RedirectServerLogoutSuccessHandler();
+        redirectServerLogoutSuccessHandler.setLogoutSuccessUrl(URI.create(proxyUrl + LOGOUT_URL));
+        return redirectServerLogoutSuccessHandler;
     }
 }

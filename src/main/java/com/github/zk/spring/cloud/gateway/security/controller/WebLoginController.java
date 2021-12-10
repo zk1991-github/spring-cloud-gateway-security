@@ -71,7 +71,14 @@ public class WebLoginController {
     @GetMapping("/invalid")
     public Response invalid() {
         Response response = Response.getInstance();
-        response.setError(10000, null, "未登录或登录超时");
+        response.setError(9000, null, "未登录或登录超时");
+        return response;
+    }
+
+    @GetMapping("/logout")
+    public Response logout() {
+        Response response = Response.getInstance();
+        response.setOk(9000, null, "登出成功！", null);
         return response;
     }
 }
