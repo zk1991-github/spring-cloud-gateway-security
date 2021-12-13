@@ -79,7 +79,7 @@ spring:
 ```properties
 spring:
   static:
-    antPatterns: "/js/**,/css/**"
+    antpatterns: "/js/**,/css/**"
 ```
 ### 4. 响应code值说明
 
