@@ -75,6 +75,12 @@ spring:
     proxy:
       url: "/gateway"
 ```
+- 静态资源放行，在 `application-gateway.yml` 中配置，结构如下：
+```properties
+spring:
+  static:
+    antPatterns: "/js/**,/css/**"
+```
 ### 4. 响应code值说明
 
 | 序号 | code  | 描述               |

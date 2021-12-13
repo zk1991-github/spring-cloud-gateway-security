@@ -34,5 +34,10 @@
       "name": "spring.web.proxy.url",
       "type": "java.lang.String",
       "description": "Description for spring.web.proxy.url."
+    },
+    {
+      "name": "spring.static.antpatterns",
+      "type": "java.lang.String",
+      "description": "Description for spring.static.antPatterns."
     }
   ] }
