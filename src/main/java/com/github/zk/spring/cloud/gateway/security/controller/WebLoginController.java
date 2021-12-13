@@ -5,7 +5,6 @@ import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.web.WebAttributes;
@@ -57,8 +56,7 @@ public class WebLoginController {
     @GetMapping("/fail")
     public Response fail(WebSession session) {
         Response response = Response.getInstance();
-        AuthenticationException authenticationException = session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
-        String message = authenticationException.getMessage();
+        String message = session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
         if (ObjectUtils.nullSafeEquals(message, "Invalid Credentials")) {
             message = "密码错误";
         }
