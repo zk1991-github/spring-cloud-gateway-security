@@ -24,10 +24,38 @@ public class WebRedirectServerAuthenticationFailureHandler extends RedirectServe
         super(location);
     }
 
+    /**
+     * 认证失败
+     *
+     *     非跳转写法
+     *     @Override
+     *     public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException exception) {
+     *         Response response = Response.getInstance();
+     *         ServerHttpResponse serverHttpResponse = webFilterExchange.getExchange().getResponse();
+     *         serverHttpResponse.setStatusCode(HttpStatus.OK);
+     *         serverHttpResponse.getHeaders().set("Content-Type", "application/json");
+     *         response.setError(9000, null, exception.getMessage());
+     *         ObjectMapper objectMapper = new ObjectMapper();
+     *         String body = "";
+     *         try {
+     *             body = objectMapper.writeValueAsString(response);
+     *
+     *         } catch (JsonProcessingException e) {
+     *             e.printStackTrace();
+     *         }
+     *         DataBuffer dataBuffer = serverHttpResponse.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
+     *         return serverHttpResponse.writeWith(Mono.just(dataBuffer));
+     *     }
+     * @param webFilterExchange web请求
+     * @param exception 异常
+     * @return
+     */
     @Override
     public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException exception) {
         return webFilterExchange.getExchange().getSession().doOnNext(webSession -> {
-            webSession.getAttributes().put(WebAttributes.AUTHENTICATION_EXCEPTION, exception);
+            webSession.getAttributes().put(WebAttributes.AUTHENTICATION_EXCEPTION, exception.getMessage());
         }).then(super.onAuthenticationFailure(webFilterExchange, exception));
     }
+
+
 }
