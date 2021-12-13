@@ -39,5 +39,10 @@
       "name": "spring.static.antpatterns",
       "type": "java.lang.String",
       "description": "Description for spring.static.antPatterns."
+    },
+    {
+      "name": "web.webRoot",
+      "type": "java.lang.String",
+      "description": "Description for web.webRoot."
     }
   ] }
