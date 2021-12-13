@@ -22,6 +22,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.RedirectServerLogoutSuccessHandler;
+import org.springframework.security.web.server.authentication.logout.WebSessionServerLogoutHandler;
 import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
@@ -112,6 +113,8 @@ public class SecurityConfig {
                 .and()
                 // 登出设置
                 .logout()
+                // 设置登出处理器
+                .logoutHandler(new WebSessionServerLogoutHandler())
                 // 设置登出成功处理器
                 .logoutSuccessHandler(createRedirectServerLogoutSuccessHandler())
                 .and()
