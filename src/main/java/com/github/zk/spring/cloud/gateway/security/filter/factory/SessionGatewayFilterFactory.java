@@ -19,9 +19,11 @@ public class SessionGatewayFilterFactory extends AbstractGatewayFilterFactory<Ob
 
     @Override
     public GatewayFilter apply(Object config) {
-        return (exchange, chain) -> {
-            exchange.getSession().doOnNext(webSession -> webSession.setMaxIdleTime(Duration.ofMinutes(timeout))).subscribe();   //修改session时间
-            return chain.filter(exchange);
-        };
+        return (exchange, chain) ->
+                exchange.getSession()
+                        //修改session时间
+                        .doOnNext(webSession -> webSession.setMaxIdleTime(Duration.ofMinutes(timeout)))
+                        .then(chain.filter(exchange));
+
     }
 }
