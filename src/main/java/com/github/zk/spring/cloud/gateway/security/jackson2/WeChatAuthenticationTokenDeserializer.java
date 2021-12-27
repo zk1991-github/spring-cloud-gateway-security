@@ -12,7 +12,7 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
- * TODO ...
+ * 微信认证token 序列化器
  *
  * @author zk
  * @date 2021/12/7 15:14
