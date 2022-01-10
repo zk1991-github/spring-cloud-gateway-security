@@ -44,6 +44,25 @@ CREATE TABLE `t_department` (
 
 /*Data for the table `t_department` */
 
+/*Table structure for table `t_log` */
+
+DROP TABLE IF EXISTS `t_log`;
+
+CREATE TABLE `t_log` (
+  `id` bigint(64) NOT NULL COMMENT '唯一id',
+  `user_id` varchar(255) DEFAULT NULL COMMENT '用户id',
+  `username` varchar(255) DEFAULT NULL COMMENT '用户名',
+  `ip` varchar(255) DEFAULT NULL COMMENT 'ip地址',
+  `status` tinyint(1) DEFAULT NULL COMMENT '登录状态',
+  `msg` varchar(255) DEFAULT NULL COMMENT '登录信息',
+  `time` varchar(255) DEFAULT NULL COMMENT '登录时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Data for the table `t_log` */
+
+insert  into `t_log`(`id`,`user_id`,`username`,`ip`,`status`,`msg`,`time`) values (1479021086000984065,'0','superadmin','127.0.0.1',1,'登录成功','2022-01-06 17:24:40');
+
 /*Table structure for table `t_permission` */
 
 DROP TABLE IF EXISTS `t_permission`;
