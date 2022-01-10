@@ -10,10 +10,11 @@
 - 支持查询当前登录用户(简要信息)
 - 支持异地登录踢出功能
 - 支持分布式部署
+- 微信小程序认证鉴权
 
-#### v3.0新增功能
-- 小程序认证鉴权
-- 支持Session永久有效设置
+#### v3.5新增功能
+- 登录日志记录
+
 ### 2. 功能介绍
 
 #### 1. 登录鉴权
@@ -61,6 +62,19 @@
 
 同一个账号在其他地方登录时，踢出上一次登录的用户
 
+#### 8. 日志记录
+
+日志支持开关设置，默认关闭状态，如需打开，在`yml`中配置如下：
+```yaml
+log:
+  enabled: true
+```
+只记录登录成功的用户日志，分为两种模式：
+1. 在控制台打印日志（默认）
+2. 记录至数据库,
+   需要在`com.github.zk.spring.cloud.gateway.security.config.LogConfig`注入
+   `com.github.zk.spring.cloud.gateway.security.log.RepositoryLog`对象
+
 ### 3. 使用注意事项
 
 - 当前服务由于采用跳转方式，需要与前端同源，否则登录成功后会因无法获取用户，导致返回失败
@@ -69,14 +83,14 @@
 - 修改 `application-gateway.yml` 中转发地址为所需的服务地址和拦截地址（拦截地址范围大的写在范围小的配置之后）
 - 小程序相关配置在 `application-wechat.yml` , 其中 `roleIds` 需要与数据库中的角色id对应，设置完成后自动绑定相关权限
 - 当前端需要代理时，服务端在 `application-gateway.yml` 中也需要配置代理地址，结构如下：
-```properties
+```yaml
 spring:
   web:
     proxy:
       url: "/gateway"
 ```
 - 静态资源放行，在 `application-gateway.yml` 中配置，结构如下：
-```properties
+```yaml
 spring:
   static:
     antpatterns: "/js/**,/css/**"
