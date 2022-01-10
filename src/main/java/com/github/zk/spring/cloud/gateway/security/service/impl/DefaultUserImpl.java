@@ -47,6 +47,10 @@ public abstract class DefaultUserImpl implements ReactiveUserDetailsService {
         return Mono.justOrEmpty(userInfo);
     }
 
+    /**
+     * 查询所有权限
+     * @return 权限列表
+     */
     private List<PermissionInfo> findAllPermissions() {
         List<PermissionInfo> permissionInfos = permissionMapper.selectList(null);
         return permissionInfosProcess(0, permissionInfos);
@@ -56,7 +60,7 @@ public abstract class DefaultUserImpl implements ReactiveUserDetailsService {
      * 权限处理 （递归组织结构）
      * @param pid 父id
      * @param permissionInfos 权限信息
-     * @return
+     * @return 权限列表
      */
     private List<PermissionInfo> permissionInfosProcess(long pid, List<PermissionInfo> permissionInfos) {
         List<PermissionInfo> newPermissionInfos = new ArrayList<>();
@@ -81,7 +85,7 @@ public abstract class DefaultUserImpl implements ReactiveUserDetailsService {
     /**
      * 子类可覆盖
      * @param username 用户名
-     * @return
+     * @return 用户对象
      */
     protected UserInfo customFindByUsername(String username) {
         UserInfo user = new UserInfo();

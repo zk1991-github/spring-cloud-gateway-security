@@ -7,9 +7,13 @@ package com.github.zk.spring.cloud.gateway.security.pojo;
  * @date 2021/11/16 16:39
  */
 public class WeChatDO {
+    /** 微信openid */
     private String openid;
-    private String session_key;
+    /** 会话key */
+    private String sessionKey;
+    /** 错误码 */
     private Integer errcode;
+    /** 错误信息 */
     private String errmsg;
 
     public String getOpenid() {
@@ -20,12 +24,12 @@ public class WeChatDO {
         this.openid = openid;
     }
 
-    public String getSession_key() {
-        return session_key;
+    public String getSessionKey() {
+        return sessionKey;
     }
 
-    public void setSession_key(String session_key) {
-        this.session_key = session_key;
+    public void setSessionKey(String sessionKey) {
+        this.sessionKey = sessionKey;
     }
 
     public Integer getErrcode() {

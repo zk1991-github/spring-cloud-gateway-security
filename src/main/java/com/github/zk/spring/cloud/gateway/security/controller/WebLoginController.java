@@ -2,6 +2,7 @@ package com.github.zk.spring.cloud.gateway.security.controller;
 
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
+import com.github.zk.spring.cloud.gateway.security.log.LogHolder;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -29,6 +30,9 @@ public class WebLoginController {
     @Autowired
     private LoginProcessor loginProcessor;
 
+    @Autowired
+    private LogHolder logHolder;
+
     @GetMapping("/success")
     public Mono<Response> success(ServerWebExchange exchange) {
         return ReactiveSecurityContextHolder.getContext()
@@ -43,8 +47,10 @@ public class WebLoginController {
                                         .map(loginStatus -> {
                                             Response response = Response.getInstance();
                                             if (loginStatus) {
+                                                logHolder.loginLog(exchange, userInfo, 1, "登录成功");
                                                 response.setOk(Response.CodeEnum.SUCCESSED, null, "登录成功！", userInfo);
                                             } else {
+                                                logHolder.loginLog(exchange, userInfo, 0, "登录失败");
                                                 response.setError(Response.CodeEnum.FAIL, null, "登录失败，超过最大登录人数");
                                             }
                                             return response;

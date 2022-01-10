@@ -17,7 +17,7 @@ public interface RoleMapper extends BaseMapper<RoleInfo> {
     /**
      * 根据id 查询角色
      * @param ids 角色id
-     * @return
+     * @return 角色列表
      */
     List<RoleInfo> selectRolesByIds(Long[] ids);
 }

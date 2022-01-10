@@ -12,9 +12,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "wechat")
 public class WeChatProperties {
+    /** 微信请求地址  */
     private String url;
+    /** 应用id */
     private String appid;
+    /** 应用权限 */
     private String appsecret;
+    /** 角色id数组 */
     private Long[] roleIds;
 
     public String getUrl() {

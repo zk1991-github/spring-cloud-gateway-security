@@ -16,7 +16,7 @@ public interface IWeChatAuthentication {
      * 微信认证
      * @param weChatCode 微信code
      * @param weChatUserInfo 微信用户信息
-     * @return
+     * @return 微信用户对象
      */
     Mono<WeChatUserInfo> authenticate(LoginProcessor loginProcessor, String weChatCode, WeChatUserInfo weChatUserInfo, ServerWebExchange exchange);
 }

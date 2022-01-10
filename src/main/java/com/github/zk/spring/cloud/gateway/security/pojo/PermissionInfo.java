@@ -17,11 +17,15 @@ import java.util.List;
 public class PermissionInfo implements Serializable {
     private static final long serialVersionUID = 874671003093440548L;
 
+    /** 权限id */
     private Long id;
+    /** 父权限id */
     private Long pid;
+    /** 地址名称 */
     private String urlName;
+    /** 地址 */
     private String url;
-    /** 数据库不包含此字段 */
+    /** 数据库不包含权限字段 */
     @TableField(exist = false)
     private List<PermissionInfo> permissionInfos;
 

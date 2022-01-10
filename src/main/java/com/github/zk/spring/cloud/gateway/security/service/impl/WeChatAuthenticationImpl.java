@@ -49,6 +49,11 @@ public class WeChatAuthenticationImpl implements IWeChatAuthentication {
                 .cast(WeChatUserInfo.class);
     }
 
+    /**
+     * 根据角色id，查询角色列表
+     * @param roleIds 角色id
+     * @return 角色列表
+     */
     private List<RoleInfo> findByRoleId(Long[] roleIds) {
         return roleMapper.selectRolesByIds(roleIds);
     }

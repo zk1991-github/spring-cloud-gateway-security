@@ -37,6 +37,12 @@ public class WeChatLoginController extends LoginProcessor {
         super(reactiveStringRedisTemplate, sessionRepository);
     }
 
+    /**
+     * 微信登录
+     * @param weChatParam 微信参数
+     * @param exchange 请求
+     * @return 登录状态
+     */
     @PostMapping(WECHAT_LOGIN_URL)
     public Mono<Response> weChatLogin(@RequestBody WeChatDTO weChatParam, ServerWebExchange exchange) {
         return iWeChatAuthentication

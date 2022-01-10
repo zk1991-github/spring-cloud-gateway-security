@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("login")
 public class LoginProperties {
 
+    /** 用户信息 */
     private UserInfo user;
 
     public UserInfo getUser() {
