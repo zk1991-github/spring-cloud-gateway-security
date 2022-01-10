@@ -23,7 +23,6 @@ public class WeChatUserInfo implements WeChatUserDetails {
         this.country = country;
         this.province = province;
         this.city = city;
-        this.roles = roles;
     }
 
     /** 微信唯一id */

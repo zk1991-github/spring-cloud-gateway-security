@@ -16,8 +16,11 @@ import java.util.List;
 public class RoleInfo implements Serializable {
     private static final long serialVersionUID = -6703773100368931284L;
 
+    /** 角色id */
     private Long id;
+    /** 角色名称 */
     private String roleName;
+    /** 权限列表 */
     private List<PermissionInfo> permissionInfos;
 
     public Long getId() {

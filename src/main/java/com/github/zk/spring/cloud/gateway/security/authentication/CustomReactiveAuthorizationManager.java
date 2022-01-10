@@ -32,11 +32,11 @@ import reactor.core.publisher.Mono;
  */
 public class CustomReactiveAuthorizationManager implements ReactiveAuthorizationManager<AuthorizationContext> {
 
-    private Logger logger = LoggerFactory.getLogger(CustomReactiveAuthorizationManager.class);
+    private final Logger logger = LoggerFactory.getLogger(CustomReactiveAuthorizationManager.class);
 
     private static final AntPathMatcher ANT_PATH_MATCHER = new AntPathMatcher();
 
-    private GatewayProperties gatewayProperties;
+    private final GatewayProperties gatewayProperties;
 
     public CustomReactiveAuthorizationManager(GatewayProperties gatewayProperties) {
         this.gatewayProperties = gatewayProperties;
@@ -80,7 +80,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                     }
                 }
             }
-
+            logger.info("转发地址：{}", realRequestPath.isEmpty() ? requestPath : realRequestPath);
 //            Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
 //            for (GrantedAuthority authority : authorities) {
 //                String authorityAuthority = authority.getAuthority();
@@ -90,24 +90,6 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
 //                    return new AuthorizationDecision(true);
 //                }
 //            }
-//            UserInfo userInfo = (UserInfo) auth.getPrincipal();
-//            System.out.printf("用户名【%s】,角色【%s】\n", userInfo.getUsername(), userInfo.getRoles());
-//            //角色的url权限过滤
-//            for (RoleInfo role : userInfo.getRoles()) {
-//                for (PermissionInfo permissionInfo : role.getPermissionInfos()) {
-//                    boolean match = ANT_PATH_MATCHER.match(permissionInfo.getUrl(),
-//                            realRequestPath.isEmpty() ? requestPath : realRequestPath);
-//                    if (match) {
-//                        ServerHttpRequest newRequest = request.mutate()
-//                                .header("username", userInfo.getUsername())
-//                                .header("userId", String.valueOf(userInfo.getId()))
-//                                .build();
-//                        exchange.mutate().request(newRequest).build();
-//                        return new AuthorizationDecision(true);
-//                    }
-//                }
-//            }
-//            return new AuthorizationDecision(false);
             Object principal = auth.getPrincipal();
             if (principal instanceof UserInfo) {
                 UserInfo userInfo = (UserInfo) principal;
@@ -130,13 +112,13 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
     }
 
     /**
-     * web用户
+     * web鉴权
      *
      * @param userInfo 用户信息
      * @param exchange web请求
      * @param requestPath 请求地址
      * @param realRequestPath 真实请求地址 （去掉转发地址后）
-     * @return
+     * @return 权限信息
      */
     private AuthorizationDecision userInfoAuthorization(UserInfo userInfo, ServerWebExchange exchange,
                                                         String requestPath,
@@ -161,11 +143,20 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
         return new AuthorizationDecision(false);
     }
 
+    /**
+     * 微信鉴权
+     * @param weChatUserInfo 微信用户信息
+     * @param exchange 请求
+     * @param requestPath 请求地址
+     * @param realRequestPath 真实请求地址
+     * @return 权限信息
+     */
     private AuthorizationDecision weChatUserInfoAuthorization(WeChatUserInfo weChatUserInfo, ServerWebExchange exchange,
                                                               String requestPath,
                                                               String realRequestPath) {
         String encodedNickName = "";
         try {
+            //为处理中文昵称，需要编码
             encodedNickName = URLEncoder.encode(weChatUserInfo.getNickName(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();

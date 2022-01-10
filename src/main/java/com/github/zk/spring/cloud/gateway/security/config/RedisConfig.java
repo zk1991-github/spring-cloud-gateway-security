@@ -22,7 +22,11 @@ import org.springframework.session.data.redis.config.annotation.web.server.Enabl
 @EnableRedisWebSession
 public class RedisConfig {
 
-
+    /**
+     * 注入连接工厂 bean
+     * @param properties redis 配置
+     * @return 连接工厂
+     */
     @Bean
     public LettuceConnectionFactory connectionFactory(RedisProperties properties) {
         RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
@@ -35,6 +39,10 @@ public class RedisConfig {
         return new LettuceConnectionFactory(redisConfiguration);
     }
 
+    /**
+     * 注入序列化bean
+     * @return 序列化对象
+     */
     @Bean
     public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
         ObjectMapper objectMapper = new ObjectMapper();

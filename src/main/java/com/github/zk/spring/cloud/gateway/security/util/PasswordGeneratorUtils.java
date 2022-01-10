@@ -10,6 +10,11 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
  */
 public class PasswordGeneratorUtils {
 
+    /**
+     * 密码加密
+     * @param password 待加密密码
+     * @return 加密后的密码
+     */
     public static String encodePassword(String password) {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password);
     }

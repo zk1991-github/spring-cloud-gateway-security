@@ -44,7 +44,7 @@ public class LoginProcessor {
      *
      * @param hashKey    用户缓存key
      * @param webSession web会话
-     * @return
+     * @return Session 处理状态
      */
     public Mono<Boolean> webSessionProcess(String hashKey, WebSession webSession) {
         return getSessionId(hashKey)
@@ -64,7 +64,7 @@ public class LoginProcessor {
      * 如果未超过：返回用户信息
      *
      * @param hashKey 缓存key
-     * @return
+     * @return 最大同时登录人数处理状态
      */
     public Mono<Boolean> sessionLimitProcess(String hashKey) {
         //判断是否超过允许最大登录人数
@@ -86,7 +86,7 @@ public class LoginProcessor {
      * 用于判断当前用户是否登录
      *
      * @param hashKey 用户缓存key
-     * @return
+     * @return SessionId
      */
     public Mono<String> getSessionId(String hashKey) {
         return reactiveStringRedisTemplate
@@ -102,6 +102,7 @@ public class LoginProcessor {
      * @param hashKey      用户缓存key
      * @param oldSessionId 老会话id
      * @param newSessionId 新会话id
+     * @return 更改 Session 状态
      */
     public Mono<Boolean> changeSession(String hashKey, String oldSessionId, String newSessionId) {
         Mono<Void> delSession = sessionRepository.deleteById(oldSessionId);
@@ -115,6 +116,7 @@ public class LoginProcessor {
      *
      * @param hashKey   用户缓存key
      * @param sessionId 会话id
+     * @return 保存 Session 状态
      */
     public Mono<Boolean> saveSession(String hashKey, String sessionId) {
         return reactiveStringRedisTemplate
@@ -126,7 +128,7 @@ public class LoginProcessor {
      * 删除会话
      *
      * @param hashKey 用户缓存key
-     * @return
+     * @return 删除 Session 状态
      */
     public Mono<Boolean> removeSession(String hashKey) {
         return reactiveStringRedisTemplate
@@ -137,7 +139,7 @@ public class LoginProcessor {
     /**
      * 在线用户数
      *
-     * @return
+     * @return 在线用户数
      */
     public Mono<Long> onlineNum() {
         ScanOptions options = ScanOptions
@@ -150,8 +152,8 @@ public class LoginProcessor {
     /**
      * 根据 SessionId， 查询用户 Session 是否存在
      *
-     * @param sessionId
-     * @return
+     * @param sessionId 会话id
+     * @return 用户存在状态
      */
     public Mono<Boolean> userSessionExistBySessionId(String sessionId) {
         ScanOptions options = ScanOptions

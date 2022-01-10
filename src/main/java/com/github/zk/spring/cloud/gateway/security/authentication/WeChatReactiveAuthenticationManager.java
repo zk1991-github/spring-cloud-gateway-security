@@ -2,11 +2,13 @@ package com.github.zk.spring.cloud.gateway.security.authentication;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.zk.spring.cloud.gateway.security.property.WeChatProperties;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.core.WeChatUserDetails;
 import com.github.zk.spring.cloud.gateway.security.pojo.WeChatDO;
 import com.github.zk.spring.cloud.gateway.security.pojo.WeChatUserInfo;
+import com.github.zk.spring.cloud.gateway.security.property.WeChatProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -26,6 +28,8 @@ import reactor.core.publisher.Mono;
  * @date 2021/11/15 10:35
  */
 public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticationManager {
+    private final Logger logger = LoggerFactory.getLogger(WeChatReactiveAuthenticationManager.class);
+
     /** rest请求模板 */
     private final WebClient webClient = WebClient.builder().build();
     /** 登录处理器 */
@@ -85,7 +89,7 @@ public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticati
     /**
      * 微信请求
      * @param weChatCode 微信 code
-     * @return
+     * @return 请求结果
      */
     private Mono<WeChatDO> weChatRequest(String weChatCode) {
         String formatUrl = String.format(weChatProperties.getUrl(),
@@ -104,7 +108,7 @@ public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticati
                     return new WeChatDO();
                 })
                 .onErrorResume(Exception.class, (ex) -> {
-                    System.out.println(ex.getMessage());
+                    logger.info(ex.getMessage());
                     return Mono.empty();
                 });
     }
@@ -113,7 +117,7 @@ public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticati
      * 创建认证令牌
      *
      * @param weChatUserDetails 微信用户详情
-     * @return
+     * @return 认证对象
      */
     private Authentication createWeChatAuthenticationToken(WeChatUserDetails weChatUserDetails) {
         return new WeChatAuthenticationToken(weChatUserDetails, weChatUserDetails.getAuthorities());

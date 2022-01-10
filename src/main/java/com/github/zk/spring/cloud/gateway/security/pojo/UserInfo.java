@@ -21,10 +21,14 @@ import java.util.List;
 public class UserInfo implements UserDetails {
     private static final long serialVersionUID = -6177045879532008391L;
 
+    /** 用户id */
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
+    /** 用户名 */
     private String username;
+    /** 密码 */
     private transient String password;
+    /**角色列表 */
     private List<RoleInfo> roles;
 
     public Long getId() {

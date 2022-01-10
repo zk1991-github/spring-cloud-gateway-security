@@ -27,8 +27,8 @@ public class WebReactiveAuthenticationManager extends UserDetailsRepositoryReact
 
     /**
      * 获取用户
-     * @param username
-     * @return
+     * @param username 用户名
+     * @return 用户信息
      */
     @Override
     public Mono<UserDetails> retrieveUser(String username) {

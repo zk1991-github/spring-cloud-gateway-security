@@ -78,6 +78,13 @@ public class SecurityConfig {
 
     private final String LOGOUT_URL = "/login/logout";
 
+    /**
+     * 注入 Security 拦截链 bean
+     * @param http http对象
+     * @param gatewayProperties 网关配置
+     * @param loginProcessor 登录处理器
+     * @return 拦截对象bean
+     */
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
                                                             GatewayProperties gatewayProperties,
@@ -129,10 +136,10 @@ public class SecurityConfig {
     }
 
     /**
-     * 登录处理器
+     * 注入登录处理器 bean
      * @param reactiveStringRedisTemplate 响应式 Redis 模板
      * @param sessionRepository 会话仓储
-     * @return
+     * @return 登录处理器 bean
      */
     @Bean
     public LoginProcessor loginProcessor(ReactiveStringRedisTemplate reactiveStringRedisTemplate,
@@ -144,7 +151,7 @@ public class SecurityConfig {
 
     /**
      *  Security 跨域处理
-     * @return
+     * @return 跨域配置对象
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -160,7 +167,7 @@ public class SecurityConfig {
     /**
      * 定义默认用户实现 Bean
      *
-     * @return
+     * @return 用户实现
      */
     @Bean
     @ConditionalOnMissingBean
@@ -171,7 +178,7 @@ public class SecurityConfig {
 
     /**
      * 创建登出成功跳转处理器
-     * @return
+     * @return 跳转成功处理器对象
      */
     private RedirectServerLogoutSuccessHandler createRedirectServerLogoutSuccessHandler() {
         RedirectServerLogoutSuccessHandler redirectServerLogoutSuccessHandler = new RedirectServerLogoutSuccessHandler();

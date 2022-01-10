@@ -13,5 +13,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserMapper extends BaseMapper<UserInfo> {
 
+    /**
+     * 根据条件，查询用户
+     * @param userInfo 用户信息
+     * @return 用户信息
+     */
     UserInfo selectUser(UserInfo userInfo);
 }
