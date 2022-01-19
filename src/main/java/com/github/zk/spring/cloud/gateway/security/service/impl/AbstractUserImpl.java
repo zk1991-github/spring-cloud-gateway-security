@@ -23,6 +23,7 @@ import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
+import com.github.zk.spring.cloud.gateway.security.service.IUser;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +40,7 @@ import reactor.core.publisher.Mono;
  * @author zk
  * @date 2021/1/15 14:36
  */
-public abstract class DefaultUserImpl implements ReactiveUserDetailsService {
+public abstract class AbstractUserImpl implements IUser, ReactiveUserDetailsService {
 
     @Autowired
     private LoginProperties properties;
@@ -69,7 +70,8 @@ public abstract class DefaultUserImpl implements ReactiveUserDetailsService {
      * 查询所有权限
      * @return 权限列表
      */
-    private List<PermissionInfo> findAllPermissions() {
+    @Override
+    public List<PermissionInfo> findAllPermissions() {
         List<PermissionInfo> permissionInfos = permissionMapper.selectList(null);
         return permissionInfosProcess(0, permissionInfos);
     }
@@ -80,7 +82,8 @@ public abstract class DefaultUserImpl implements ReactiveUserDetailsService {
      * @param permissionInfos 权限信息
      * @return 权限列表
      */
-    private List<PermissionInfo> permissionInfosProcess(long pid, List<PermissionInfo> permissionInfos) {
+    @Override
+    public List<PermissionInfo> permissionInfosProcess(long pid, List<PermissionInfo> permissionInfos) {
         List<PermissionInfo> newPermissionInfos = new ArrayList<>();
         Iterator<PermissionInfo> iterator = permissionInfos.iterator();
         while (iterator.hasNext()) {
@@ -92,7 +95,7 @@ public abstract class DefaultUserImpl implements ReactiveUserDetailsService {
                 iterator.remove();
                 // 查找子权限
                 List<PermissionInfo> childPermissionInfos =
-                        permissionInfosProcess(permissionInfo.getId(), permissionInfos);
+                        permissionInfosProcess(permissionInfo.getId(), new ArrayList<>(permissionInfos));
                 // 设置子权限
                 permissionInfo.setPermissionInfos(childPermissionInfos);
             }
