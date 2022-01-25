@@ -22,11 +22,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * 用户信息 实体
@@ -46,6 +45,10 @@ public class UserInfo implements UserDetails {
     private String username;
     /** 密码 */
     private transient String password;
+    /** 电话号码 */
+    private String phone;
+
+    private boolean accountNonLocked;
     /**角色列表 */
     private List<RoleInfo> roles;
 
@@ -67,9 +70,13 @@ public class UserInfo implements UserDetails {
         return true;
     }
 
+    public void setAccountNonLocked(boolean accountNonLocked) {
+        this.accountNonLocked = accountNonLocked;
+    }
+
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return accountNonLocked;
     }
 
     @Override
@@ -98,6 +105,14 @@ public class UserInfo implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public List<RoleInfo> getRoles() {

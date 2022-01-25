@@ -27,7 +27,6 @@ import com.github.zk.spring.cloud.gateway.security.service.IUser;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -42,12 +41,15 @@ import reactor.core.publisher.Mono;
  */
 public abstract class AbstractUserImpl implements IUser, ReactiveUserDetailsService {
 
-    @Autowired
-    private LoginProperties properties;
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private PermissionMapper permissionMapper;
+    private final LoginProperties properties;
+    private final UserMapper userMapper;
+    private final PermissionMapper permissionMapper;
+
+    public AbstractUserImpl(LoginProperties properties, UserMapper userMapper, PermissionMapper permissionMapper) {
+        this.properties = properties;
+        this.userMapper = userMapper;
+        this.permissionMapper = permissionMapper;
+    }
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
@@ -82,8 +84,7 @@ public abstract class AbstractUserImpl implements IUser, ReactiveUserDetailsServ
      * @param permissionInfos 权限信息
      * @return 权限列表
      */
-    @Override
-    public List<PermissionInfo> permissionInfosProcess(long pid, List<PermissionInfo> permissionInfos) {
+    private List<PermissionInfo> permissionInfosProcess(long pid, List<PermissionInfo> permissionInfos) {
         List<PermissionInfo> newPermissionInfos = new ArrayList<>();
         Iterator<PermissionInfo> iterator = permissionInfos.iterator();
         while (iterator.hasNext()) {

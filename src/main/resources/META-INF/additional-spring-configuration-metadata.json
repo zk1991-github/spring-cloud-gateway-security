@@ -3,27 +3,32 @@
     {
       "name": "spring.cloud.gateway.session.timeout",
       "type": "java.lang.String",
-      "description": "Session 过期时间，-1代表永久有效（暂不支持）。"
+      "description": "Session 过期时间，-1代表永久有效（暂不支持）."
     },
     {
       "name": "spring.cloud.gateway.session.maxSessions",
       "type": "java.lang.String",
-      "description": "最大允许同时登录用户数，-1代表不限制。"
+      "description": "最大允许同时登录用户数，-1代表不限制."
     },
     {
       "name": "login.user.username",
       "type": "java.lang.String",
-      "description": "系统默认用户名。"
+      "description": "系统默认用户名."
     },
     {
       "name": "login.user.password",
       "type": "java.lang.String",
-      "description": "系统默认密码，需要使用Spring Security使用bcrypt编码。"
+      "description": "系统默认密码，需要使用Spring Security使用bcrypt编码."
+    },
+    {
+      "name": "login.user.accountNonLocked",
+      "type": "java.lang.String",
+      "description": "用户是否未锁定."
     },
     {
       "name": "login.user.roles",
       "type": "java.lang.String",
-      "description": "系统默认角色。"
+      "description": "系统默认角色."
     },
     {
       "name": "login.user.id",
@@ -48,6 +53,6 @@
     {
       "name": "log.enabled",
       "type": "java.lang.Boolean",
-      "description": "日志记录开关"
+      "description": "日志记录开关."
     }
   ] }

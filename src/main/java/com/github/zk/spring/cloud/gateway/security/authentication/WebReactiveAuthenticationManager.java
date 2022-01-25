@@ -19,8 +19,11 @@
 package com.github.zk.spring.cloud.gateway.security.authentication;
 
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
+import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
+import org.springframework.core.log.LogMessage;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import reactor.core.publisher.Mono;
 
@@ -32,19 +35,19 @@ import reactor.core.publisher.Mono;
  */
 public class WebReactiveAuthenticationManager extends UserDetailsRepositoryReactiveAuthenticationManager {
 
-    /**
-     * 允许的最大登录人数
-     */
+    private final DefaultUserImpl userDetailsService;
     private final LoginProcessor loginProcessor;
 
-    public WebReactiveAuthenticationManager(ReactiveUserDetailsService userDetailsService,
+    public WebReactiveAuthenticationManager(DefaultUserImpl userDetailsService,
                                             LoginProcessor loginProcessor) {
         super(userDetailsService);
+        this.userDetailsService = userDetailsService;
         this.loginProcessor = loginProcessor;
     }
 
     /**
      * 获取用户
+     *
      * @param username 用户名
      * @return 用户信息
      */
@@ -55,6 +58,21 @@ public class WebReactiveAuthenticationManager extends UserDetailsRepositoryReact
                 .sessionLimitProcess(username)
                 .filter(isAllow -> isAllow)
                 .then(super.retrieveUser(username));
+    }
+
+    @Override
+    public Mono<Authentication> authenticate(Authentication authentication) {
+        String username = authentication.getName();
+        return super.authenticate(authentication)
+                .doOnNext(auth -> loginProcessor.removeLockRecord(username).subscribe())
+                .doOnError(BadCredentialsException.class, (ex) -> {
+                    logger.info(LogMessage.format("%s Authentication failed: %s", username, ex.getMessage()));
+                    loginProcessor.isLockUser(username).doOnNext(aBoolean -> {
+                        if (aBoolean) {
+                            userDetailsService.lockUser(username);
+                        }
+                    }).subscribe();
+                });
     }
 
 }

@@ -22,6 +22,9 @@ import com.github.zk.spring.cloud.gateway.security.authentication.CustomReactive
 import com.github.zk.spring.cloud.gateway.security.authentication.WebReactiveAuthenticationManager;
 import com.github.zk.spring.cloud.gateway.security.authentication.WebRedirectServerAuthenticationFailureHandler;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
+import com.github.zk.spring.cloud.gateway.security.dao.PermissionMapper;
+import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
+import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
 import java.net.URI;
 import java.util.Collections;
@@ -106,7 +109,8 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
                                                             GatewayProperties gatewayProperties,
-                                                            LoginProcessor loginProcessor) {
+                                                            LoginProcessor loginProcessor,
+                                                            DefaultUserImpl userDetailsService) {
         http.authorizeExchange(exchanges -> {
             ServerHttpSecurity.AuthorizeExchangeSpec access = exchanges
                     .pathMatchers(SUCCESS_URL, FAIL_URL, INVALID_URL,
@@ -124,7 +128,7 @@ public class SecurityConfig {
                 // 登录设置
                 .formLogin()
                 // 设置认证管理器
-                .authenticationManager(new WebReactiveAuthenticationManager(defaultUserImpl(), loginProcessor))
+                .authenticationManager(new WebReactiveAuthenticationManager(userDetailsService, loginProcessor))
                 //登录服务地址
                 .loginPage(LOGIN_URL)
                 // 设置认证成功处理器
@@ -189,9 +193,10 @@ public class SecurityConfig {
      */
     @Bean
     @ConditionalOnMissingBean
-    public DefaultUserImpl defaultUserImpl() {
-        return new DefaultUserImpl() {
-        };
+    public DefaultUserImpl userDetailsService(LoginProperties properties,
+                                                      UserMapper userMapper,
+                                                      PermissionMapper permissionMapper) {
+        return new DefaultUserImpl(properties, userMapper, permissionMapper);
     }
 
     /**

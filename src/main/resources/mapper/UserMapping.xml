@@ -5,6 +5,8 @@
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="username" property="username" jdbcType="VARCHAR"/>
         <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="account_non_locked" property="accountNonLocked" jdbcType="TINYINT"/>
         <collection property="roles" ofType="map" column="id" select="selectRolesByUserId">
         </collection>
     </resultMap>
@@ -23,7 +25,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, username, password
+        id, username, password, phone, account_non_locked
     </sql>
     <select id="selectUser" resultMap="BaseResultMap" parameterType="com.github.zk.spring.cloud.gateway.security.pojo.UserInfo">
         select

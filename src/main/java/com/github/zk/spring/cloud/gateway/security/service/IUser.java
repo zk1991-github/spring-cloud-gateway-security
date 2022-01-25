@@ -18,6 +18,9 @@
 
 package com.github.zk.spring.cloud.gateway.security.service;
 
+import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
+import java.util.List;
+
 /**
  * 用户接口
  *
@@ -25,5 +28,18 @@ package com.github.zk.spring.cloud.gateway.security.service;
  * @date 2021/1/15 14:35
  */
 public interface IUser {
+
+    /**
+     * 查询所有权限
+     * @return 权限列表
+     */
+    List<PermissionInfo> findAllPermissions();
+
+    /**
+     * 锁定用户
+     * @param username 用户名
+     * @return 是否锁定成功
+     */
+    boolean lockUser(String username);
 
 }

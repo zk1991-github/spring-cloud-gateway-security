@@ -42,6 +42,12 @@ public class LoginProcessor {
      */
     private int maxSessions;
 
+    private final String DEFAULT_NAMESPACE = "password:error";
+
+    private final String namespace = DEFAULT_NAMESPACE + ":";
+
+    private Integer allowPasswordErrorRecord = 3;
+
     public LoginProcessor(ReactiveStringRedisTemplate reactiveStringRedisTemplate,
                           ReactiveRedisSessionRepository sessionRepository) {
         this.reactiveStringRedisTemplate = reactiveStringRedisTemplate;
@@ -55,6 +61,10 @@ public class LoginProcessor {
      */
     public void setMaxSessions(int maxSessions) {
         this.maxSessions = maxSessions;
+    }
+
+    public void setAllowPasswordErrorRecord(Integer allowPasswordErrorRecord) {
+        this.allowPasswordErrorRecord = allowPasswordErrorRecord;
     }
 
     /**
@@ -185,4 +195,21 @@ public class LoginProcessor {
             return Mono.empty();
         });
     }
+
+    public Mono<Boolean> isLockUser(String username) {
+        return reactiveStringRedisTemplate
+                .opsForValue()
+                .increment(namespace + username)
+                .flatMap(num -> {
+                    if (num < allowPasswordErrorRecord) {
+                        return Mono.empty();
+                    }
+                    return reactiveStringRedisTemplate.opsForValue().delete(namespace + username);
+                });
+    }
+
+    public Mono<Boolean> removeLockRecord(String username) {
+        return reactiveStringRedisTemplate.opsForValue().delete(namespace + username);
+    }
+
 }
