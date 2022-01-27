@@ -42,4 +42,13 @@ public interface IUser {
      */
     boolean lockUser(String username);
 
+    /**
+     * 修改密码
+     * @param username 用户名
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     * @return 修改状态
+     */
+    boolean updatePassword(String username, String oldPassword, String newPassword);
+
 }

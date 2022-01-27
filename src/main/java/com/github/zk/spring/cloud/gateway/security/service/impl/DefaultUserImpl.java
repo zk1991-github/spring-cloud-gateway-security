@@ -23,6 +23,9 @@ import com.github.zk.spring.cloud.gateway.security.dao.PermissionMapper;
 import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * 用户默认实现
@@ -33,6 +36,8 @@ import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
 public class DefaultUserImpl extends AbstractUserImpl {
 
     private final UserMapper userMapper;
+
+    private PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     public DefaultUserImpl(LoginProperties properties, UserMapper userMapper, PermissionMapper permissionMapper) {
         super(properties, userMapper, permissionMapper);
@@ -48,5 +53,24 @@ public class DefaultUserImpl extends AbstractUserImpl {
         updateWrapper.eq("username", username);
         int update = userMapper.update(userInfo, updateWrapper);
         return update > 0;
+    }
+
+    @Override
+    public boolean updatePassword(String username, String oldPassword, String newPassword) {
+        UserInfo userInfo = customFindByUsername(username);
+        if (userInfo == null) {
+            throw new UsernameNotFoundException("用户不存在!");
+        }
+        // 旧密码匹配
+        boolean matches = passwordEncoder.matches(oldPassword, userInfo.getPassword());
+        if (matches) {
+            String encodedPassword = passwordEncoder.encode(newPassword);
+            UpdateWrapper<UserInfo> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.set("password", encodedPassword);
+            updateWrapper.eq("username", username);
+            int update = userMapper.update(null, updateWrapper);
+            return update > 0;
+        }
+        return false;
     }
 }
