@@ -50,6 +50,10 @@ public class FilterConfig {
         return new SessionGatewayFilterFactory();
     }
 
+    /**
+     * 修改请求体拦截 bean
+     * @return 修改请求体工厂
+     */
     @Bean
     public RequestBodyOperationGatewayFilterFactory requestBodyOperationFilterFactory() {
         return new RequestBodyOperationGatewayFilterFactory();
