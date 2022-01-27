@@ -18,6 +18,7 @@
 
 package com.github.zk.spring.cloud.gateway.security.config;
 
+import com.github.zk.spring.cloud.gateway.security.filter.factory.RequestBodyOperationGatewayFilterFactory;
 import com.github.zk.spring.cloud.gateway.security.filter.factory.SessionGatewayFilterFactory;
 import com.github.zk.spring.cloud.gateway.security.filter.factory.TokenCheckGatewayFilterFactory;
 import org.springframework.context.annotation.Bean;
@@ -47,5 +48,10 @@ public class FilterConfig {
     @Bean
     public SessionGatewayFilterFactory sessionGatewayFilterFactory() {
         return new SessionGatewayFilterFactory();
+    }
+
+    @Bean
+    public RequestBodyOperationGatewayFilterFactory requestBodyOperationFilterFactory() {
+        return new RequestBodyOperationGatewayFilterFactory();
     }
 }

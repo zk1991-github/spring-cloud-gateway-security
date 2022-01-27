@@ -19,6 +19,8 @@
 package com.github.zk.spring.cloud.gateway.security.controller;
 
 import com.github.zk.spring.cloud.gateway.security.common.Response;
+import com.github.zk.spring.cloud.gateway.security.pojo.UpdatePasswordDTO;
+import com.github.zk.spring.cloud.gateway.security.service.IUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
@@ -26,10 +28,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 /**
@@ -45,6 +44,9 @@ public class UserController {
     @Autowired
     private ReactiveStringRedisTemplate redisTemplate;
 
+    @Autowired
+    private IUser iUser;
+
     /**
      * get请求方式获取用户
      * @return 用户信息
@@ -57,7 +59,7 @@ public class UserController {
                 .map(Authentication::getPrincipal)
                 .map(user -> {
                     Response response = Response.getInstance();
-                    response.setOk(Response.CodeEnum.SUCCESSED, null, "查询成功！", user);
+                    response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/getUser", "查询成功！", user);
                     return response;
                 });
     }
@@ -74,7 +76,7 @@ public class UserController {
                 .map(Authentication::getPrincipal)
                 .map(user -> {
                     Response response = Response.getInstance();
-                    response.setOk(Response.CodeEnum.SUCCESSED, null, "查询成功！", user);
+                    response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/queryUser", "查询成功！", user);
                     return response;
                 });
     }
@@ -91,9 +93,23 @@ public class UserController {
                 .build();
         return redisTemplate.scan(options).count().map(aLong -> {
             Response response = Response.getInstance();
-            response.setOk(Response.CodeEnum.SUCCESSED, null, "查询成功！", aLong);
+            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/getOnlineNums", "查询成功！", aLong);
             return response;
         });
+    }
+
+    @PostMapping("updatePassword")
+    public Mono<Response> updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO) {
+        Response response = Response.getInstance();
+        boolean b = iUser.updatePassword(updatePasswordDTO.getUsername(),
+                updatePasswordDTO.getOldPassword(),
+                updatePasswordDTO.getNewPassword());
+        if (b) {
+            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/updatePassword", "密码修改成功！", b);
+        } else {
+            response.setError(Response.CodeEnum.FAIL, "/gateway/updatePassword", "密码修改失败！");
+        }
+        return Mono.just(response);
     }
 
 }

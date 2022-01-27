@@ -18,97 +18,59 @@
 
 package com.github.zk.spring.cloud.gateway.security.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.zk.spring.cloud.gateway.security.dao.PermissionMapper;
 import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
-import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.util.ObjectUtils;
-import reactor.core.publisher.Mono;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * 用户接口实现
+ * 用户默认实现
  *
  * @author zk
- * @date 2021/1/15 14:36
+ * @date 2022/1/19 16:45
  */
-public abstract class DefaultUserImpl implements ReactiveUserDetailsService {
+public class DefaultUserImpl extends AbstractUserImpl {
 
-    @Autowired
-    private LoginProperties properties;
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private PermissionMapper permissionMapper;
+    private final UserMapper userMapper;
+
+    private PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
+    public DefaultUserImpl(LoginProperties properties, UserMapper userMapper, PermissionMapper permissionMapper) {
+        super(properties, userMapper, permissionMapper);
+        this.userMapper = userMapper;
+    }
+
 
     @Override
-    public Mono<UserDetails> findByUsername(String username) {
-        UserInfo userInfo = null;
-        if (ObjectUtils.nullSafeEquals(properties.getUser().getUsername(), username)) {
-            //超级管理员
-            userInfo = properties.getUser();
-            userInfo.getRoles().get(0).setPermissionInfos(findAllPermissions());
+    public boolean lockUser(String username) {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setAccountNonLocked(false);
+        UpdateWrapper<UserInfo> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("username", username);
+        int update = userMapper.update(userInfo, updateWrapper);
+        return update > 0;
+    }
 
-            return Mono.just(userInfo);
-        }
-        userInfo = customFindByUsername(username);
+    @Override
+    public boolean updatePassword(String username, String oldPassword, String newPassword) {
+        UserInfo userInfo = customFindByUsername(username);
         if (userInfo == null) {
-            throw new UsernameNotFoundException("用户不存在");
+            throw new UsernameNotFoundException("用户不存在!");
         }
-        return Mono.justOrEmpty(userInfo);
-    }
-
-    /**
-     * 查询所有权限
-     * @return 权限列表
-     */
-    private List<PermissionInfo> findAllPermissions() {
-        List<PermissionInfo> permissionInfos = permissionMapper.selectList(null);
-        return permissionInfosProcess(0, permissionInfos);
-    }
-
-    /**
-     * 权限处理 （递归组织结构）
-     * @param pid 父id
-     * @param permissionInfos 权限信息
-     * @return 权限列表
-     */
-    private List<PermissionInfo> permissionInfosProcess(long pid, List<PermissionInfo> permissionInfos) {
-        List<PermissionInfo> newPermissionInfos = new ArrayList<>();
-        Iterator<PermissionInfo> iterator = permissionInfos.iterator();
-        while (iterator.hasNext()) {
-            PermissionInfo permissionInfo = iterator.next();
-            if (pid == permissionInfo.getPid()) {
-                // 添加父权限
-                newPermissionInfos.add(permissionInfo);
-                // 剔出本对象
-                iterator.remove();
-                // 查找子权限
-                List<PermissionInfo> childPermissionInfos =
-                        permissionInfosProcess(permissionInfo.getId(), permissionInfos);
-                // 设置子权限
-                permissionInfo.setPermissionInfos(childPermissionInfos);
-            }
+        // 旧密码匹配
+        boolean matches = passwordEncoder.matches(oldPassword, userInfo.getPassword());
+        if (matches) {
+            String encodedPassword = passwordEncoder.encode(newPassword);
+            UpdateWrapper<UserInfo> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.set("password", encodedPassword);
+            updateWrapper.eq("username", username);
+            int update = userMapper.update(null, updateWrapper);
+            return update > 0;
         }
-        return newPermissionInfos;
-    }
-
-    /**
-     * 子类可覆盖
-     * @param username 用户名
-     * @return 用户对象
-     */
-    protected UserInfo customFindByUsername(String username) {
-        UserInfo user = new UserInfo();
-        user.setUsername(username);
-        return userMapper.selectUser(user);
+        return false;
     }
 }
-

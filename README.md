@@ -12,9 +12,12 @@
 - 支持分布式部署
 - 微信小程序认证鉴权
 - 登录日志记录
-
-#### v3.5.2新增功能
 - 新增Apache2.0开源协议
+
+#### v3.6新增功能
+- 多次密码输入错误，锁定账户
+- 用户修改密码
+- 提供密码加密处理
 
 ### 2. 功能介绍
 
@@ -76,6 +79,37 @@ log:
    需要在`com.github.zk.spring.cloud.gateway.security.config.LogConfig`注入
    `com.github.zk.spring.cloud.gateway.security.log.RepositoryLog`对象
 
+#### 9. 用户修改密码
+POST请求地址 `/gateway/updatePassword`，参数为JSON格式
+```json
+{
+    "username": "admin",
+    "oldPassword": "123456",
+    "newPassword": "12345"
+}
+```
+
+#### 10. 密码加密
+在`application-gateway.yml`配置文件中相应的url路由下配置 - RequestBodyOperation，如：
+```yaml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: server_route
+          # 转发地址
+          uri: http://127.0.0.1:8080
+          predicates:
+            # 拦截请求路径
+            - name: Path
+              args:
+                matcher: /gateway/**
+          filters:
+            - name: StripPrefix
+              args:
+                parts: 1
+            - RequestBodyOperation
+```
 ### 3. 使用注意事项
 
 - 当前服务由于采用跳转方式，需要与前端同源，否则登录成功后会因无法获取用户，导致返回失败
