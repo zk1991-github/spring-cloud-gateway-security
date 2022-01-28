@@ -27,10 +27,6 @@ CREATE TABLE `role_permission` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
-/*Data for the table `role_permission` */
-
-insert  into `role_permission`(`id`,`role_id`,`permission_id`) values (1,1,1),(2,2,2),(3,2,3),(4,2,4);
-
 /*Table structure for table `t_department` */
 
 DROP TABLE IF EXISTS `t_department`;
@@ -41,8 +37,6 @@ CREATE TABLE `t_department` (
   `department_name` varchar(50) NOT NULL COMMENT '部门名称',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-/*Data for the table `t_department` */
 
 /*Table structure for table `t_log` */
 
@@ -59,10 +53,6 @@ CREATE TABLE `t_log` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Data for the table `t_log` */
-
-insert  into `t_log`(`id`,`user_id`,`username`,`ip`,`status`,`msg`,`time`) values (1479021086000984065,'0','superadmin','127.0.0.1',1,'登录成功','2022-01-06 17:24:40');
-
 /*Table structure for table `t_permission` */
 
 DROP TABLE IF EXISTS `t_permission`;
@@ -78,10 +68,6 @@ CREATE TABLE `t_permission` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
-/*Data for the table `t_permission` */
-
-insert  into `t_permission`(`id`,`pid`,`url_name`,`url`,`level`,`type`,`show`) values (1,0,'全部权限','/**',1,1,0),(2,1,'获取用户','/getUser',2,2,0),(3,1,'在线用户数','/getOnlineNums',2,2,0),(4,1,'获取用户','/login/getUser',2,2,0);
-
 /*Table structure for table `t_role` */
 
 DROP TABLE IF EXISTS `t_role`;
@@ -93,10 +79,6 @@ CREATE TABLE `t_role` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
-/*Data for the table `t_role` */
-
-insert  into `t_role`(`id`,`role_name`,`describe`) values (1,'超级管理员',NULL),(2,'管理员',NULL);
-
 /*Table structure for table `t_user` */
 
 DROP TABLE IF EXISTS `t_user`;
@@ -106,12 +88,9 @@ CREATE TABLE `t_user` (
   `username` varchar(20) NOT NULL COMMENT '用户名',
   `password` varchar(255) NOT NULL COMMENT '密码',
   `phone` varchar(255) DEFAULT NULL COMMENT '手机号',
+  `account_non_locked` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否未被锁定',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
-
-/*Data for the table `t_user` */
-
-insert  into `t_user`(`id`,`username`,`password`,`phone`) values (1,'admin','{bcrypt}$2a$10$0EQexC0XYw58x.ys.Ym8QO3H2Llr0G4wEAFddm8PkOUGy6hQraaui','13333333333'),(2,'zk','{bcrypt}$2a$10$0EQexC0XYw58x.ys.Ym8QO3H2Llr0G4wEAFddm8PkOUGy6hQraaui','14444444444');
 
 /*Table structure for table `user_department` */
 
@@ -124,8 +103,6 @@ CREATE TABLE `user_department` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Data for the table `user_department` */
-
 /*Table structure for table `user_role` */
 
 DROP TABLE IF EXISTS `user_role`;
@@ -136,10 +113,6 @@ CREATE TABLE `user_role` (
   `role_id` bigint(32) NOT NULL COMMENT '角色id',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
-
-/*Data for the table `user_role` */
-
-insert  into `user_role`(`id`,`user_id`,`role_id`) values (1,1,1),(2,1,2),(3,2,2);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
