@@ -84,7 +84,7 @@ public class WebLoginController {
         if (ObjectUtils.nullSafeEquals(message, "Invalid Credentials")) {
             message = "密码错误";
         }
-        response.setError(10000, null, message);
+        response.setError(Response.CodeEnum.FAIL, null, message);
         //使当前session失效
         session.invalidate().subscribe();
         return response;
@@ -93,14 +93,14 @@ public class WebLoginController {
     @GetMapping("/invalid")
     public Response invalid() {
         Response response = Response.getInstance();
-        response.setError(9000, null, "未登录或登录超时");
+        response.setError(Response.CodeEnum.INVALID, null, "未登录或登录超时");
         return response;
     }
 
     @GetMapping("/logout")
     public Response logout() {
         Response response = Response.getInstance();
-        response.setOk(9000, null, "登出成功！", null);
+        response.setOk(Response.CodeEnum.SUCCESSED, null, "登出成功！", null);
         return response;
     }
 }
