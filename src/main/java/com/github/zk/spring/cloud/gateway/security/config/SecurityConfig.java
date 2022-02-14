@@ -22,7 +22,6 @@ import com.github.zk.spring.cloud.gateway.security.authentication.CustomReactive
 import com.github.zk.spring.cloud.gateway.security.authentication.WebReactiveAuthenticationManager;
 import com.github.zk.spring.cloud.gateway.security.authentication.WebRedirectServerAuthenticationFailureHandler;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
-import com.github.zk.spring.cloud.gateway.security.dao.PermissionMapper;
 import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
 import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
@@ -194,9 +193,8 @@ public class SecurityConfig {
     @Bean
     @ConditionalOnMissingBean
     public DefaultUserImpl userDetailsService(LoginProperties properties,
-                                                      UserMapper userMapper,
-                                                      PermissionMapper permissionMapper) {
-        return new DefaultUserImpl(properties, userMapper, permissionMapper);
+                                                      UserMapper userMapper) {
+        return new DefaultUserImpl(properties, userMapper);
     }
 
     /**
