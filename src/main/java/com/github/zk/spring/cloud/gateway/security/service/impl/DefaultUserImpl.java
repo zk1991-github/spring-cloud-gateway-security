@@ -36,7 +36,7 @@ public class DefaultUserImpl extends AbstractUserImpl {
 
     private final UserMapper userMapper;
 
-    private PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     public DefaultUserImpl(LoginProperties properties, UserMapper userMapper) {
         super(properties, userMapper);
