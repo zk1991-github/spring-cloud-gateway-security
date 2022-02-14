@@ -18,11 +18,9 @@
 
 package com.github.zk.spring.cloud.gateway.security.pojo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 权限信息
@@ -37,15 +35,14 @@ public class PermissionInfo implements Serializable {
 
     /** 权限id */
     private Long id;
-    /** 父权限id */
-    private Long pid;
     /** 地址名称 */
     private String urlName;
     /** 地址 */
     private String url;
-    /** 数据库不包含权限字段 */
-    @TableField(exist = false)
-    private List<PermissionInfo> permissionInfos;
+    /** 是否公开 0：不公开；1：公开 */
+    private Integer open;
+    /** 描述 */
+    private String description;
 
     public Long getId() {
         return id;
@@ -63,14 +60,6 @@ public class PermissionInfo implements Serializable {
         this.url = url;
     }
 
-    public Long getPid() {
-        return pid;
-    }
-
-    public void setPid(Long pid) {
-        this.pid = pid;
-    }
-
     public String getUrlName() {
         return urlName;
     }
@@ -79,21 +68,29 @@ public class PermissionInfo implements Serializable {
         this.urlName = urlName;
     }
 
-    public List<PermissionInfo> getPermissionInfos() {
-        return permissionInfos;
+    public Integer getOpen() {
+        return open;
     }
 
-    public void setPermissionInfos(List<PermissionInfo> permissionInfos) {
-        this.permissionInfos = permissionInfos;
+    public void setOpen(Integer open) {
+        this.open = open;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
     public String toString() {
         return "PermissionInfo{" +
                 "id=" + id +
-                ", pid=" + pid +
                 ", urlName='" + urlName + '\'' +
                 ", url='" + url + '\'' +
+                ", description='" + description + '\'' +
                 '}';
     }
 }
