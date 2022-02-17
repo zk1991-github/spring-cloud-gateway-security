@@ -18,9 +18,12 @@
 
 package com.github.zk.spring.cloud.gateway.security.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 权限信息
@@ -43,6 +46,14 @@ public class PermissionInfo implements Serializable {
     private Integer open;
     /** 描述 */
     private String description;
+    /** 创建时间 */
+    private String createTime;
+    /** 分页对象 */
+    @TableField(exist = false)
+    private Page<PermissionInfo> permissionInfoPage;
+    /** 角色列表 */
+    @TableField(exist = false)
+    private List<RoleInfo> roleInfos;
 
     public Long getId() {
         return id;
@@ -82,6 +93,30 @@ public class PermissionInfo implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public Page<PermissionInfo> getPermissionInfoPage() {
+        return permissionInfoPage;
+    }
+
+    public void setPermissionInfoPage(Page<PermissionInfo> permissionInfoPage) {
+        this.permissionInfoPage = permissionInfoPage;
+    }
+
+    public List<RoleInfo> getRoleInfos() {
+        return roleInfos;
+    }
+
+    public void setRoleInfos(List<RoleInfo> roleInfos) {
+        this.roleInfos = roleInfos;
     }
 
     @Override
