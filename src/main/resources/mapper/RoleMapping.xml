@@ -14,6 +14,9 @@
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="url_name" property="urlName" jdbcType="VARCHAR"/>
         <result column="url" property="url" jdbcType="VARCHAR"/>
+        <result column="open" property="open" jdbcType="INTEGER"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -31,7 +34,7 @@
     </select>
 
     <select id="selectPermissions" resultMap="PermissionsResultMap">
-        select id, pid, url_name, url from
+        select id, url_name, url, open, description, create_time from
             (select permission_id from
                 role_permission
              where role_id = #{id}) rp
