@@ -18,6 +18,7 @@
 
 package com.github.zk.spring.cloud.gateway.security.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
@@ -39,6 +40,7 @@ public class RoleInfo implements Serializable {
     /** 角色名称 */
     private String roleName;
     /** 权限列表 */
+    @TableField(exist = false)
     private List<PermissionInfo> permissionInfos;
 
     public Long getId() {
