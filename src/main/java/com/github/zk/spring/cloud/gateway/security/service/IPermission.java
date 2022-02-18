@@ -21,6 +21,7 @@ package com.github.zk.spring.cloud.gateway.security.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * 权限接口
@@ -64,5 +65,16 @@ public interface IPermission {
      * @return 权限
      */
     List<PermissionInfo> queryPermissionByOpen(int open);
+
+    /**
+     * 缓存公开权限
+     */
+    void cacheOpenPermissions();
+
+    /**
+     * 获取缓存中的公开权限
+     * @return 权限列表
+     */
+    Mono<List<PermissionInfo>> getCacheOpenPermission();
 
 }
