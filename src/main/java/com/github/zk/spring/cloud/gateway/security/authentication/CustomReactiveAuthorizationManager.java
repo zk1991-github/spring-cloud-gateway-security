@@ -22,6 +22,7 @@ import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.WeChatUserInfo;
+import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import org.slf4j.Logger;
@@ -56,49 +57,53 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
 
     private final GatewayProperties gatewayProperties;
 
-    public CustomReactiveAuthorizationManager(GatewayProperties gatewayProperties) {
+    private final IPermission iPermission;
+
+    public CustomReactiveAuthorizationManager(GatewayProperties gatewayProperties, IPermission iPermission) {
         this.gatewayProperties = gatewayProperties;
+        this.iPermission = iPermission;
     }
 
     @Override
     public Mono<AuthorizationDecision> check(Mono<Authentication> authentication, AuthorizationContext authorizationContext) {
-        return authentication.map(auth -> {
-            ServerWebExchange exchange = authorizationContext.getExchange();
-            ServerHttpRequest request = exchange.getRequest();
-            //请求的uri
-            String requestPath = request.getURI().getPath();
-            logger.info("访问地址：{}", requestPath);
-            //真正请求地址
-            String realRequestPath = "";
-            outer:
-            for (RouteDefinition route : gatewayProperties.getRoutes()) {
-                for (PredicateDefinition predicate : route.getPredicates()) {
-                    //查找Path配置
-                    if (ObjectUtils.nullSafeEquals(predicate.getName(), "Path")) {
-                        String matcher = predicate.getArgs().get("matcher");
-                        if (ObjectUtils.isEmpty(matcher)) {
-                            continue;
-                        }
-                        if (ANT_PATH_MATCHER.match(matcher, requestPath)) {
-                            //查找StripPrefix配置
-                            for (FilterDefinition filter : route.getFilters()) {
-                                if (ObjectUtils.nullSafeEquals(filter.getName(), "StripPrefix")) {
-                                    String skip = filter.getArgs().get("parts");
-                                    String[] paths = requestPath.split("/");
-                                    for (int i = 0; i < paths.length; i++) {
-                                        if (i > Integer.parseInt(skip)) {
-                                            realRequestPath += "/" + paths[i];
+        return authentication
+                .map(auth -> {
+                    ServerWebExchange exchange = authorizationContext.getExchange();
+                    ServerHttpRequest request = exchange.getRequest();
+                    //请求的uri
+                    String requestPath = request.getURI().getPath();
+                    logger.info("访问地址：{}", requestPath);
+                    //真正请求地址
+                    String realRequestPath = "";
+                    outer:
+                    for (RouteDefinition route : gatewayProperties.getRoutes()) {
+                        for (PredicateDefinition predicate : route.getPredicates()) {
+                            //查找Path配置
+                            if (ObjectUtils.nullSafeEquals(predicate.getName(), "Path")) {
+                                String matcher = predicate.getArgs().get("matcher");
+                                if (ObjectUtils.isEmpty(matcher)) {
+                                    continue;
+                                }
+                                if (ANT_PATH_MATCHER.match(matcher, requestPath)) {
+                                    //查找StripPrefix配置
+                                    for (FilterDefinition filter : route.getFilters()) {
+                                        if (ObjectUtils.nullSafeEquals(filter.getName(), "StripPrefix")) {
+                                            String skip = filter.getArgs().get("parts");
+                                            String[] paths = requestPath.split("/");
+                                            for (int i = 0; i < paths.length; i++) {
+                                                if (i > Integer.parseInt(skip)) {
+                                                    realRequestPath += "/" + paths[i];
+                                                }
+                                            }
+                                            //找到相应参数后，跳出到最外层
+                                            break outer;
                                         }
                                     }
-                                    //找到相应参数后，跳出到最外层
-                                    break outer;
                                 }
                             }
                         }
                     }
-                }
-            }
-            logger.info("转发地址：{}", realRequestPath.isEmpty() ? requestPath : realRequestPath);
+                    logger.info("转发地址：{}", realRequestPath.isEmpty() ? requestPath : realRequestPath);
 //            Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
 //            for (GrantedAuthority authority : authorities) {
 //                String authorityAuthority = authority.getAuthority();
@@ -108,17 +113,73 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
 //                    return new AuthorizationDecision(true);
 //                }
 //            }
-            Object principal = auth.getPrincipal();
-            if (principal instanceof UserInfo) {
-                UserInfo userInfo = (UserInfo) principal;
-                return userInfoAuthorization(userInfo, exchange, requestPath, realRequestPath);
-            } else if (principal instanceof WeChatUserInfo) {
-                WeChatUserInfo weChatUserInfo = (WeChatUserInfo) principal;
-                return weChatUserInfoAuthorization(weChatUserInfo, exchange, requestPath, realRequestPath);
-            } else {
-                return new AuthorizationDecision(false);
+                    Object principal = auth.getPrincipal();
+                    if (principal instanceof UserInfo) {
+                        UserInfo userInfo = (UserInfo) principal;
+                        return userInfoAuthorization(userInfo, exchange, requestPath, realRequestPath);
+                    } else if (principal instanceof WeChatUserInfo) {
+                        WeChatUserInfo weChatUserInfo = (WeChatUserInfo) principal;
+                        return weChatUserInfoAuthorization(weChatUserInfo, exchange, requestPath, realRequestPath);
+                    } else {
+                        return new AuthorizationDecision(false);
+                    }
+                })
+                .flatMap(authorizationDecision -> {
+                    if (authorizationDecision.isGranted()) {
+                        return Mono.just(new AuthorizationDecision(true));
+                    }
+                    ServerWebExchange exchange = authorizationContext.getExchange();
+                    ServerHttpRequest request = exchange.getRequest();
+                    //请求的uri
+                    String requestPath = request.getURI().getPath();
+                    logger.info("访问地址：{}", requestPath);
+                    //真正请求地址
+                    String realRequestPath = "";
+                    outer:
+                    for (RouteDefinition route : gatewayProperties.getRoutes()) {
+                        for (PredicateDefinition predicate : route.getPredicates()) {
+                            //查找Path配置
+                            if (ObjectUtils.nullSafeEquals(predicate.getName(), "Path")) {
+                                String matcher = predicate.getArgs().get("matcher");
+                                if (ObjectUtils.isEmpty(matcher)) {
+                                    continue;
+                                }
+                                if (ANT_PATH_MATCHER.match(matcher, requestPath)) {
+                                    //查找StripPrefix配置
+                                    for (FilterDefinition filter : route.getFilters()) {
+                                        if (ObjectUtils.nullSafeEquals(filter.getName(), "StripPrefix")) {
+                                            String skip = filter.getArgs().get("parts");
+                                            String[] paths = requestPath.split("/");
+                                            for (int i = 0; i < paths.length; i++) {
+                                                if (i > Integer.parseInt(skip)) {
+                                                    realRequestPath += "/" + paths[i];
+                                                }
+                                            }
+                                            //找到相应参数后，跳出到最外层
+                                            break outer;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    logger.info("转发地址：{}", realRequestPath.isEmpty() ? requestPath : realRequestPath);
+                    return openPermissionMatch(requestPath, realRequestPath);
+                })
+                .defaultIfEmpty(new AuthorizationDecision(false));
+    }
+
+    private Mono<AuthorizationDecision> openPermissionMatch(String requestPath, String realRequestPath) {
+        return iPermission.getCacheOpenPermission().map(permissionInfos -> {
+            for (PermissionInfo permissionInfo : permissionInfos) {
+                boolean matchUrl = ANT_PATH_MATCHER.match(permissionInfo.getUrl(),
+                        realRequestPath.isEmpty() ? requestPath : realRequestPath);
+                if (matchUrl) {
+                    return new AuthorizationDecision(true);
+                }
             }
-        }).defaultIfEmpty(new AuthorizationDecision(false));
+            return new AuthorizationDecision(false);
+        });
     }
 
     @Override
@@ -132,9 +193,9 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
     /**
      * web鉴权
      *
-     * @param userInfo 用户信息
-     * @param exchange web请求
-     * @param requestPath 请求地址
+     * @param userInfo        用户信息
+     * @param exchange        web请求
+     * @param requestPath     请求地址
      * @param realRequestPath 真实请求地址 （去掉转发地址后）
      * @return 权限信息
      */
@@ -142,7 +203,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                                                         String requestPath,
                                                         String realRequestPath) {
 
-        System.out.printf("用户名【%s】,角色【%s】\n", userInfo.getUsername(), userInfo.getRoles());
+        logger.info("用户名【{}】,角色【{}】", userInfo.getUsername(), userInfo.getRoles());
         //角色的url权限过滤
         for (RoleInfo role : userInfo.getRoles()) {
             for (PermissionInfo permissionInfo : role.getPermissionInfos()) {
@@ -163,9 +224,10 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
 
     /**
      * 微信鉴权
-     * @param weChatUserInfo 微信用户信息
-     * @param exchange 请求
-     * @param requestPath 请求地址
+     *
+     * @param weChatUserInfo  微信用户信息
+     * @param exchange        请求
+     * @param requestPath     请求地址
      * @param realRequestPath 真实请求地址
      * @return 权限信息
      */
@@ -179,7 +241,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        System.out.printf("昵称【%s】,角色【%s】\n", weChatUserInfo.getNickName(), weChatUserInfo.getRoles());
+        logger.info("昵称【{}】,角色【{}】", weChatUserInfo.getNickName(), weChatUserInfo.getRoles());
         //角色的url权限过滤
         for (RoleInfo role : weChatUserInfo.getRoles()) {
             for (PermissionInfo permissionInfo : role.getPermissionInfos()) {
