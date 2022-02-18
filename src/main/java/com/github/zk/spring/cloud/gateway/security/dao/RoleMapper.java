@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import java.util.List;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -42,8 +43,9 @@ public interface RoleMapper extends BaseMapper<RoleInfo> {
 
     /**
      * 根据角色查询权限
-     * @param roleId 角色id
+     * @param id 角色id
+     * @param open 公开状态
      * @return 权限信息
      */
-    List<PermissionInfo> selectPermissionsByRoleId(Long roleId);
+    List<PermissionInfo> selectPermissionsByRoleId(@Param("id") Long id, @Param("open") Integer open);
 }
