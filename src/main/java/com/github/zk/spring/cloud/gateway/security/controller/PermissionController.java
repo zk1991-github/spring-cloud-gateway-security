@@ -116,4 +116,16 @@ public class PermissionController {
         }
         return response;
     }
+
+    @GetMapping("/queryPermissionByRoleId")
+    public Response queryPermissionByRoleId(@RequestParam Long roleId) {
+        Response response = Response.getInstance();
+        PermissionInfo permissionInfo = iPermission.queryPermissionByRoleId(roleId);
+        if (permissionInfo != null) {
+            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/queryPermissionByRoleId", "查新成功！", permissionInfo);
+        } else {
+            response.setError(Response.CodeEnum.FAIL, "/gateway/queryPermissionByRoleId", "查询失败！");
+        }
+        return response;
+    }
 }

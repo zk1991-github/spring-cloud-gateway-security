@@ -20,6 +20,7 @@ package com.github.zk.spring.cloud.gateway.security.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
+import java.util.List;
 
 /**
  * 权限接口
@@ -52,8 +53,23 @@ public interface IPermission {
 
     /**
      * 分页查询权限
-     * @param permissionInfo 权限信息
+     * @param permissionInfo 查询条件
      * @return 权限列表
      */
     Page<PermissionInfo> queryPermission(PermissionInfo permissionInfo);
+
+    /**
+     * 根据角色查询权限
+     * @param roleId 角色id
+     * @return 权限信息
+     */
+    PermissionInfo queryPermissionByRoleId(Long roleId);
+
+    /**
+     * 根据公开状态查询权限列表
+     * @param open 公开状态
+     * @return 权限
+     */
+    List<PermissionInfo> queryPermissionByOpen(int open);
+
 }

@@ -103,4 +103,16 @@ public class PermissionImpl implements IPermission {
         queryWrapper.orderByDesc("create_time");
         return permissionMapper.selectPage(permissionInfo.getPermissionInfoPage(), queryWrapper);
     }
+
+    @Override
+    public PermissionInfo queryPermissionByRoleId(Long roleId) {
+        return permissionMapper.selectPermissionByRoleId(roleId);
+    }
+
+    @Override
+    public List<PermissionInfo> queryPermissionByOpen(int open) {
+        QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("open", open);
+        return permissionMapper.selectList(queryWrapper);
+    }
 }
