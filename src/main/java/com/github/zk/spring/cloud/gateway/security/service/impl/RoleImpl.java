@@ -19,6 +19,7 @@
 package com.github.zk.spring.cloud.gateway.security.service.impl;
 
 import com.github.zk.spring.cloud.gateway.security.dao.RoleMapper;
+import com.github.zk.spring.cloud.gateway.security.enums.IntfTypeEnum;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IRole;
@@ -58,6 +59,6 @@ public class RoleImpl implements IRole {
 
     @Override
     public List<PermissionInfo> queryPermissionsByRoleId(Long roleId) {
-        return roleMapper.selectPermissionsByRoleId(roleId);
+        return roleMapper.selectPermissionsByRoleId(roleId, IntfTypeEnum.PRIVATE_PERMISSION.getIndex());
     }
 }
