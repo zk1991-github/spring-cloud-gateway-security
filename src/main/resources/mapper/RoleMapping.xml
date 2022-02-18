@@ -40,5 +40,6 @@
              where role_id = #{id}) rp
         left join t_permission tp
         on rp.permission_id = tp.id
+        where tp.open = #{open}
     </select>
 </mapper>
