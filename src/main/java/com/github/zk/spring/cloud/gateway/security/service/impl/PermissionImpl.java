@@ -21,15 +21,18 @@ package com.github.zk.spring.cloud.gateway.security.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.zk.spring.cloud.gateway.security.dao.PermissionMapper;
+import com.github.zk.spring.cloud.gateway.security.enums.IntfTypeEnum;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import com.github.zk.spring.cloud.gateway.security.service.IRolePermission;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import reactor.core.publisher.Mono;
 
 /**
  * 权限实现类
@@ -39,11 +42,14 @@ import org.springframework.util.ObjectUtils;
  */
 @Service
 public class PermissionImpl implements IPermission {
+    private final String PUBLIC_PERMISSION_KEY = "publicPermission";
 
     @Autowired
     private PermissionMapper permissionMapper;
     @Autowired
     private IRolePermission iRolePermission;
+    @Autowired
+    private ReactiveRedisTemplate reactiveRedisTemplate;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -51,6 +57,10 @@ public class PermissionImpl implements IPermission {
         int insert = permissionMapper.insert(permissionInfo);
         Long permissionId = permissionInfo.getId();
         List<RoleInfo> roleInfos = permissionInfo.getRoleInfos();
+        // 公开权限只添加权限表
+        if (permissionInfo.getOpen() == IntfTypeEnum.PUBLIC_PERMISSION.getIndex()) {
+            return insert;
+        }
         //绑定权限
         boolean b = iRolePermission.addBatchPermissionRoles(permissionId, roleInfos);
         if (b) {
@@ -75,8 +85,12 @@ public class PermissionImpl implements IPermission {
     public int updatePermission(PermissionInfo permissionInfo) {
         int update = permissionMapper.updateById(permissionInfo);
         List<RoleInfo> roleInfos = permissionInfo.getRoleInfos();
+        Long permissionId = permissionInfo.getId();
+        // 接口公开时，删除绑定此接口的角色关系
+        if (permissionInfo.getOpen() == IntfTypeEnum.PUBLIC_PERMISSION.getIndex()) {
+            iRolePermission.delRolePermissionByPermissionId(permissionId);
+        }
         if (roleInfos != null) {
-            Long permissionId = permissionInfo.getId();
             //删除原有权限
             boolean del = iRolePermission.delRolePermissionByPermissionId(permissionId);
             // 绑定新权限
@@ -109,5 +123,17 @@ public class PermissionImpl implements IPermission {
         QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("open", open);
         return permissionMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public void cacheOpenPermissions() {
+        // 查询公开接口权限列表
+        List<PermissionInfo> permissionInfos = queryPermissionByOpen(IntfTypeEnum.PUBLIC_PERMISSION.getIndex());
+        reactiveRedisTemplate.opsForValue().set(PUBLIC_PERMISSION_KEY, permissionInfos).subscribe();
+    }
+
+    @Override
+    public Mono<List<PermissionInfo>> getCacheOpenPermission() {
+        return reactiveRedisTemplate.opsForValue().get(PUBLIC_PERMISSION_KEY);
     }
 }
