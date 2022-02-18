@@ -55,4 +55,9 @@ public class RoleImpl implements IRole {
         boolean add = iRolePermission.addBatchRolePermissions(roleId, permissionInfos);
         return del && add;
     }
+
+    @Override
+    public List<PermissionInfo> queryPermissionsByRoleId(Long roleId) {
+        return roleMapper.selectPermissionsByRoleId(roleId);
+    }
 }

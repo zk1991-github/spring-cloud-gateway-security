@@ -59,13 +59,6 @@ public interface IPermission {
     Page<PermissionInfo> queryPermission(PermissionInfo permissionInfo);
 
     /**
-     * 根据角色查询权限
-     * @param roleId 角色id
-     * @return 权限信息
-     */
-    PermissionInfo queryPermissionByRoleId(Long roleId);
-
-    /**
      * 根据公开状态查询权限列表
      * @param open 公开状态
      * @return 权限

@@ -18,6 +18,7 @@
 
 package com.github.zk.spring.cloud.gateway.security.service;
 
+import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import java.util.List;
 
@@ -40,5 +41,12 @@ public interface IRole {
      * @return 绑定状态
      */
     boolean bindPermissionsByRole(RoleInfo roleInfo);
+
+    /**
+     * 根据角色查询权限
+     * @param roleId 角色id
+     * @return 权限信息
+     */
+    List<PermissionInfo> queryPermissionsByRoleId(Long roleId);
 
 }

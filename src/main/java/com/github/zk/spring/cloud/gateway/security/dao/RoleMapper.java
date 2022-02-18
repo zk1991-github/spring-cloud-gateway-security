@@ -19,6 +19,7 @@
 package com.github.zk.spring.cloud.gateway.security.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import java.util.List;
 import org.springframework.stereotype.Repository;
@@ -38,4 +39,11 @@ public interface RoleMapper extends BaseMapper<RoleInfo> {
      * @return 角色列表
      */
     List<RoleInfo> selectRolesByIds(Long[] ids);
+
+    /**
+     * 根据角色查询权限
+     * @param roleId 角色id
+     * @return 权限信息
+     */
+    List<PermissionInfo> selectPermissionsByRoleId(Long roleId);
 }
