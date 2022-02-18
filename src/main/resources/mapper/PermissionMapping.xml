@@ -37,13 +37,4 @@
                 on tr.id = rp.role_id
         where rp.permission_id = #{id}
     </select>
-
-    <select id="selectPermissionByRoleId" resultType="com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo">
-        select
-        tp.id, tp.url_name, tp.url, tp.open, tp.description, tp.create_time
-        from role_permission rp
-        left join t_permission tp
-        on rp.permission_id = tp.id
-        where rp.role_id = #{roleId}
-    </select>
 </mapper>
