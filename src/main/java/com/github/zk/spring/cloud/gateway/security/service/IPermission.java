@@ -69,12 +69,17 @@ public interface IPermission {
     /**
      * 缓存公开权限
      */
-    void cacheOpenPermissions();
+    int cacheOpenPermissions();
 
     /**
      * 获取缓存中的公开权限
      * @return 权限列表
      */
     Mono<List<PermissionInfo>> getCacheOpenPermission();
+
+    /**
+     * 刷新公开权限
+     */
+    void refreshOpenPermission();
 
 }

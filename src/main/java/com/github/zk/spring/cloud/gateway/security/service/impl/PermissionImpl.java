@@ -54,16 +54,22 @@ public class PermissionImpl implements IPermission {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public int addPermission(PermissionInfo permissionInfo) {
+        List<RoleInfo> roleInfos = permissionInfo.getRoleInfos();
+        if (permissionInfo.getOpen() == IntfTypeEnum.PRIVATE_PERMISSION.getIndex() &&
+                ObjectUtils.isEmpty(roleInfos)) {
+            return 0;
+        }
         int insert = permissionMapper.insert(permissionInfo);
         Long permissionId = permissionInfo.getId();
-        List<RoleInfo> roleInfos = permissionInfo.getRoleInfos();
         // 公开权限只添加权限表
         if (permissionInfo.getOpen() == IntfTypeEnum.PUBLIC_PERMISSION.getIndex()) {
+            refreshOpenPermission();
             return insert;
         }
         //绑定权限
         boolean b = iRolePermission.addBatchPermissionRoles(permissionId, roleInfos);
         if (b) {
+            refreshOpenPermission();
             return insert;
         }
         return 0;
@@ -75,6 +81,7 @@ public class PermissionImpl implements IPermission {
         int del = permissionMapper.deleteById(id);
         boolean b = iRolePermission.delRolePermissionByPermissionId(id);
         if (b) {
+            refreshOpenPermission();
             return del;
         }
         return 0;
@@ -83,25 +90,29 @@ public class PermissionImpl implements IPermission {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public int updatePermission(PermissionInfo permissionInfo) {
-        int update = permissionMapper.updateById(permissionInfo);
         List<RoleInfo> roleInfos = permissionInfo.getRoleInfos();
         Long permissionId = permissionInfo.getId();
+        if (permissionInfo.getOpen() == IntfTypeEnum.PRIVATE_PERMISSION.getIndex() &&
+                ObjectUtils.isEmpty(roleInfos)) {
+            return 0;
+        }
+        int update = permissionMapper.updateById(permissionInfo);
         // 接口公开时，删除绑定此接口的角色关系
         if (permissionInfo.getOpen() == IntfTypeEnum.PUBLIC_PERMISSION.getIndex()) {
             iRolePermission.delRolePermissionByPermissionId(permissionId);
+            refreshOpenPermission();
             return update;
         }
-        if (!ObjectUtils.isEmpty(roleInfos)) {
-            //删除原有权限
-            iRolePermission.delRolePermissionByPermissionId(permissionId);
-            // 绑定新权限
-            boolean add = iRolePermission.addBatchPermissionRoles(permissionId, roleInfos);
-            if (add) {
-                return update;
-            }
-            return 0;
+
+        //删除原有权限
+        iRolePermission.delRolePermissionByPermissionId(permissionId);
+        // 绑定新权限
+        boolean add = iRolePermission.addBatchPermissionRoles(permissionId, roleInfos);
+        if (add) {
+            refreshOpenPermission();
+            return update;
         }
-        return update;
+        return 0;
     }
 
     @Override
@@ -127,14 +138,20 @@ public class PermissionImpl implements IPermission {
     }
 
     @Override
-    public void cacheOpenPermissions() {
+    public int cacheOpenPermissions() {
         // 查询公开接口权限列表
         List<PermissionInfo> permissionInfos = queryPermissionByOpen(IntfTypeEnum.PUBLIC_PERMISSION.getIndex());
         reactiveRedisTemplate.opsForValue().set(PUBLIC_PERMISSION_KEY, permissionInfos).subscribe();
+        return permissionInfos.size();
     }
 
     @Override
     public Mono<List<PermissionInfo>> getCacheOpenPermission() {
         return reactiveRedisTemplate.opsForValue().get(PUBLIC_PERMISSION_KEY);
+    }
+
+    @Override
+    public void refreshOpenPermission() {
+        cacheOpenPermissions();
     }
 }
