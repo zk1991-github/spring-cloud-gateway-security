@@ -31,7 +31,7 @@ import java.util.List;
  * @author zk
  * @date 2021/1/21 10:41
  */
-@TableName("t_permission")
+@TableName("gateway_permission")
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
 public class PermissionInfo implements Serializable {
     private static final long serialVersionUID = 874671003093440548L;

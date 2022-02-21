@@ -28,7 +28,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
  * @author zk
  * @date 2022/2/15 14:45
  */
-@TableName("role_permission")
+@TableName("gateway_role_permission")
 public class RolePermission {
     /** 唯一id */
     @TableId(type = IdType.ASSIGN_ID)

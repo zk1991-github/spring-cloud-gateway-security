@@ -27,13 +27,13 @@
     <select id="selectPage" resultMap="PermissionsResultMap">
         select
         <include refid="Base_Column_List"/>
-        from t_permission ${ew.customSqlSegment}
+        from gateway_permission ${ew.customSqlSegment}
     </select>
 
     <select id="selectRoles" resultMap="RolesResultMap">
         select tr.id, role_name
         from t_role tr
-            left join role_permission rp
+            left join gateway_role_permission rp
                 on tr.id = rp.role_id
         where rp.permission_id = #{id}
     </select>

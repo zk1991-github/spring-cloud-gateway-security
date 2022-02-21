@@ -49,9 +49,9 @@
     <select id="selectPermissions" resultMap="PermissionsResultMap">
         select id, url_name, url, open, description, create_time from
             (select permission_id from
-                role_permission
+                gateway_role_permission
              where role_id = #{id}) rp
-        left join t_permission tp
+        left join gateway_permission tp
         on rp.permission_id = tp.id
     </select>
 </mapper>
