@@ -24,6 +24,7 @@ import com.github.zk.spring.cloud.gateway.security.authentication.WebRedirectSer
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
 import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
+import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
 import java.net.URI;
 import java.util.Collections;
@@ -109,7 +110,8 @@ public class SecurityConfig {
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
                                                             GatewayProperties gatewayProperties,
                                                             LoginProcessor loginProcessor,
-                                                            DefaultUserImpl userDetailsService) {
+                                                            DefaultUserImpl userDetailsService,
+                                                            IPermission iPermission) {
         http.authorizeExchange(exchanges -> {
             ServerHttpSecurity.AuthorizeExchangeSpec access = exchanges
                     .pathMatchers(SUCCESS_URL, FAIL_URL, INVALID_URL,
@@ -120,7 +122,7 @@ public class SecurityConfig {
             }
             // 设置授权管理器
             access.anyExchange()
-                    .access(new CustomReactiveAuthorizationManager(gatewayProperties));
+                    .access(new CustomReactiveAuthorizationManager(gatewayProperties, iPermission));
         })
                 // 禁用http默认设置
                 .httpBasic().disable()
