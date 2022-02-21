@@ -89,13 +89,14 @@ public class PermissionImpl implements IPermission {
         // 接口公开时，删除绑定此接口的角色关系
         if (permissionInfo.getOpen() == IntfTypeEnum.PUBLIC_PERMISSION.getIndex()) {
             iRolePermission.delRolePermissionByPermissionId(permissionId);
+            return update;
         }
-        if (roleInfos != null) {
+        if (!ObjectUtils.isEmpty(roleInfos)) {
             //删除原有权限
-            boolean del = iRolePermission.delRolePermissionByPermissionId(permissionId);
+            iRolePermission.delRolePermissionByPermissionId(permissionId);
             // 绑定新权限
             boolean add = iRolePermission.addBatchPermissionRoles(permissionId, roleInfos);
-            if (del && add) {
+            if (add) {
                 return update;
             }
             return 0;
