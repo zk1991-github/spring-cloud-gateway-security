@@ -1,0 +1,2 @@
+org.springframework.boot.SpringApplicationRunListener = \
+com.github.zk.spring.cloud.gateway.security.listener.MySpringApplicationRunListener
