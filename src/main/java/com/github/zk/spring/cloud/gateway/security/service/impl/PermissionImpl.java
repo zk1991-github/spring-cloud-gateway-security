@@ -79,12 +79,9 @@ public class PermissionImpl implements IPermission {
     @Override
     public int delPermission(long id) {
         int del = permissionMapper.deleteById(id);
-        boolean b = iRolePermission.delRolePermissionByPermissionId(id);
-        if (b) {
-            refreshOpenPermission();
-            return del;
-        }
-        return 0;
+        iRolePermission.delRolePermissionByPermissionId(id);
+        refreshOpenPermission();
+        return del;
     }
 
     @Transactional(rollbackFor = Exception.class)
