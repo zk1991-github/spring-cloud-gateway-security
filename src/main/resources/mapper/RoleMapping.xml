@@ -6,7 +6,7 @@
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="role_name" property="roleName" jdbcType="VARCHAR"/>
         <result column="describe" property="describe" jdbcType="VARCHAR"/>
-        <collection property="permissionInfos" ofType="map" column="id" select="selectPermissions">
+        <collection property="permissionInfos" ofType="map" column="id" select="selectPermissionsByRoleId">
         </collection>
     </resultMap>
 
@@ -14,6 +14,9 @@
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="url_name" property="urlName" jdbcType="VARCHAR"/>
         <result column="url" property="url" jdbcType="VARCHAR"/>
+        <result column="open" property="open" jdbcType="INTEGER"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -30,12 +33,13 @@
         </foreach>
     </select>
 
-    <select id="selectPermissions" resultMap="PermissionsResultMap">
-        select id, pid, url_name, url from
+    <select id="selectPermissionsByRoleId" resultMap="PermissionsResultMap">
+        select id, url_name, url, open, description, create_time from
             (select permission_id from
-                role_permission
+                gateway_role_permission
              where role_id = #{id}) rp
-        left join t_permission tp
+        left join gateway_permission tp
         on rp.permission_id = tp.id
+        where tp.open = #{open}
     </select>
 </mapper>

@@ -49,6 +49,7 @@ public class UserController {
 
     /**
      * get请求方式获取用户
+     *
      * @return 用户信息
      */
     @GetMapping("/getUser")
@@ -66,6 +67,7 @@ public class UserController {
 
     /**
      * post 请求方式获取用户
+     *
      * @return
      */
     @PostMapping("/queryUser")
@@ -83,6 +85,7 @@ public class UserController {
 
     /**
      * 在线用户数
+     *
      * @return 在线用户数量
      */
     @GetMapping("/getOnlineNums")

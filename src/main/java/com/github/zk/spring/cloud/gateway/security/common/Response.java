@@ -48,6 +48,8 @@ public class Response {
          * 成功返回
          */
         SUCCESSED(0),
+        /** 登录失效 */
+        INVALID(9000),
         /**
          * 失败返回
          */

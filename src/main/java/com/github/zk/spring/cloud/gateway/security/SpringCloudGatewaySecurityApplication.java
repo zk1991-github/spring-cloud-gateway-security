@@ -21,8 +21,10 @@ package com.github.zk.spring.cloud.gateway.security;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
+@EnableTransactionManagement
 @MapperScan("com.github.zk.spring.cloud.gateway.security.dao")
 public class SpringCloudGatewaySecurityApplication {
 

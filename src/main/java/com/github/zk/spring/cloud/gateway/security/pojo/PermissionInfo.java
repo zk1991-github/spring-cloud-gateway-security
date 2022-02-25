@@ -20,6 +20,7 @@ package com.github.zk.spring.cloud.gateway.security.pojo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.util.List;
@@ -30,22 +31,29 @@ import java.util.List;
  * @author zk
  * @date 2021/1/21 10:41
  */
-@TableName("t_permission")
+@TableName("gateway_permission")
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
 public class PermissionInfo implements Serializable {
     private static final long serialVersionUID = 874671003093440548L;
 
     /** 权限id */
     private Long id;
-    /** 父权限id */
-    private Long pid;
     /** 地址名称 */
     private String urlName;
     /** 地址 */
     private String url;
-    /** 数据库不包含权限字段 */
+    /** 是否公开 0：不公开；1：公开 */
+    private Integer open;
+    /** 描述 */
+    private String description;
+    /** 创建时间 */
+    private String createTime;
+    /** 分页对象 */
     @TableField(exist = false)
-    private List<PermissionInfo> permissionInfos;
+    private Page<PermissionInfo> permissionInfoPage;
+    /** 角色列表 */
+    @TableField(exist = false)
+    private List<RoleInfo> roleInfos;
 
     public Long getId() {
         return id;
@@ -63,14 +71,6 @@ public class PermissionInfo implements Serializable {
         this.url = url;
     }
 
-    public Long getPid() {
-        return pid;
-    }
-
-    public void setPid(Long pid) {
-        this.pid = pid;
-    }
-
     public String getUrlName() {
         return urlName;
     }
@@ -79,21 +79,53 @@ public class PermissionInfo implements Serializable {
         this.urlName = urlName;
     }
 
-    public List<PermissionInfo> getPermissionInfos() {
-        return permissionInfos;
+    public Integer getOpen() {
+        return open;
     }
 
-    public void setPermissionInfos(List<PermissionInfo> permissionInfos) {
-        this.permissionInfos = permissionInfos;
+    public void setOpen(Integer open) {
+        this.open = open;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public Page<PermissionInfo> getPermissionInfoPage() {
+        return permissionInfoPage;
+    }
+
+    public void setPermissionInfoPage(Page<PermissionInfo> permissionInfoPage) {
+        this.permissionInfoPage = permissionInfoPage;
+    }
+
+    public List<RoleInfo> getRoleInfos() {
+        return roleInfos;
+    }
+
+    public void setRoleInfos(List<RoleInfo> roleInfos) {
+        this.roleInfos = roleInfos;
     }
 
     @Override
     public String toString() {
         return "PermissionInfo{" +
                 "id=" + id +
-                ", pid=" + pid +
                 ", urlName='" + urlName + '\'' +
                 ", url='" + url + '\'' +
+                ", description='" + description + '\'' +
                 '}';
     }
 }

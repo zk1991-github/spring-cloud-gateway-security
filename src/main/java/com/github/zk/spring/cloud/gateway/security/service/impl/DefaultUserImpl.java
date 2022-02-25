@@ -19,7 +19,6 @@
 package com.github.zk.spring.cloud.gateway.security.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.github.zk.spring.cloud.gateway.security.dao.PermissionMapper;
 import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
@@ -37,10 +36,10 @@ public class DefaultUserImpl extends AbstractUserImpl {
 
     private final UserMapper userMapper;
 
-    private PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-    public DefaultUserImpl(LoginProperties properties, UserMapper userMapper, PermissionMapper permissionMapper) {
-        super(properties, userMapper, permissionMapper);
+    public DefaultUserImpl(LoginProperties properties, UserMapper userMapper) {
+        super(properties, userMapper);
         this.userMapper = userMapper;
     }
 
