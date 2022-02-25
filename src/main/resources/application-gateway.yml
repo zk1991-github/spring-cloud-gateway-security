@@ -47,4 +47,4 @@ spring:
   application:
     name: gateway
   static:
-    antpatterns: "/html/**"
+    antpatterns: "/dist/**"
