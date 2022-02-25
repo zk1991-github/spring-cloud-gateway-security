@@ -6,4 +6,4 @@ spring:
 web:
   ## 打包后使用与jar包相对路径即可
   ## 如jar包同级存在web目录： \web
-  webRoot: D:\work\workspace\github\spring-cloud-gateway-security\src\main\resources\web\
+  webRoot: D:\work\workspace\github\spring-cloud-gateway-security\web
