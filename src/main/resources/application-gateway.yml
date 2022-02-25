@@ -46,3 +46,5 @@ spring:
         use404: true
   application:
     name: gateway
+  static:
+    antpatterns: "/html/**"
