@@ -119,7 +119,7 @@ spring:
 #### 12. 权限管理界面
 
 - 在 `application-release.yml` 配置发布地址。
-- 界面请求地址 `http://<IP>:<PORT>/dist/index.html`
+- 界面请求地址 `http://<IP>:<PORT>/web/dist/index.html`
 
 ### 3. 使用注意事项
 
