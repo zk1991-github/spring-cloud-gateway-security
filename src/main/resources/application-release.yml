@@ -5,5 +5,5 @@ spring:
 #允许访问的文件路径
 web:
   ## 打包后使用与jar包相对路径即可
-  ## 如jar包同级存在web目录： release/
+  ## 如jar包同级存在release目录： release/
   release: D:\work\workspace\github\spring-cloud-gateway-security\release
