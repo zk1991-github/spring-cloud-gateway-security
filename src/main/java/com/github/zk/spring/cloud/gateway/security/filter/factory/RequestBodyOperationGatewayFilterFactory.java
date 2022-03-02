@@ -56,6 +56,10 @@ public class RequestBodyOperationGatewayFilterFactory extends AbstractGatewayFil
         this.passwordKey = passwordKey;
     }
 
+    public RequestBodyOperationGatewayFilterFactory() {
+        super(Config.class);
+    }
+
     private Mono<Void> operationExchange(ServerWebExchange exchange, GatewayFilterChain chain) {
         // mediaType
         MediaType mediaType = exchange.getRequest().getHeaders().getContentType();
