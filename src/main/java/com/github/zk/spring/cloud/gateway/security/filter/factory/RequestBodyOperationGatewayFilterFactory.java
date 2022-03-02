@@ -110,6 +110,9 @@ public class RequestBodyOperationGatewayFilterFactory extends AbstractGatewayFil
         String modifiedBody = "";
         try {
             bodyMap = objectMapper.readValue(body, Map.class);
+            if (!bodyMap.containsKey(passwordKey)) {
+                return body;
+            }
             String presentedPassword = bodyMap.get(passwordKey);
             String encodedPassword = PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(presentedPassword);
             bodyMap.put(passwordKey, encodedPassword);
