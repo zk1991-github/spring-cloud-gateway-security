@@ -28,6 +28,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 /**
  * 角色实现类
@@ -53,8 +54,10 @@ public class RoleImpl implements IRole {
         Long roleId = roleInfo.getId();
         List<PermissionInfo> permissionInfos = roleInfo.getPermissionInfos();
         boolean del = iRolePermission.delRolePermissionByRoleId(roleId);
-        boolean add = iRolePermission.addBatchRolePermissions(roleId, permissionInfos);
-        return del && add;
+        if (!ObjectUtils.isEmpty(permissionInfos)) {
+            return iRolePermission.addBatchRolePermissions(roleId, permissionInfos);
+        }
+        return del;
     }
 
     @Override
