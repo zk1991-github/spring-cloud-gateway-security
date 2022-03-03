@@ -69,7 +69,6 @@ public class PermissionImpl implements IPermission {
         //绑定权限
         boolean b = iRolePermission.addBatchPermissionRoles(permissionId, roleInfos);
         if (b) {
-            refreshOpenPermission();
             return insert;
         }
         return 0;
@@ -79,8 +78,22 @@ public class PermissionImpl implements IPermission {
     @Override
     public int delPermission(long id) {
         int del = permissionMapper.deleteById(id);
-        iRolePermission.delRolePermissionByPermissionId(id);
-        refreshOpenPermission();
+        boolean delRolePermission = iRolePermission.delRolePermissionByPermissionId(id);
+        // 角色关系删除成功表示此权限为公开权限，需要刷新公开权限
+        if (delRolePermission) {
+            refreshOpenPermission();
+        }
+        return del;
+    }
+
+    @Override
+    public int delPermissions(List<Long> ids) {
+        int del = permissionMapper.deleteBatchIds(ids);
+        int delNum = iRolePermission.delRolePermissionByPermissionIds(ids);
+        // 角色关系删除数量与权限id数量不相等时，表示存在公开权限，需要刷新公开权限
+        if (delNum != ids.size()) {
+            refreshOpenPermission();
+        }
         return del;
     }
 
@@ -96,8 +109,11 @@ public class PermissionImpl implements IPermission {
         int update = permissionMapper.updateById(permissionInfo);
         // 接口公开时，删除绑定此接口的角色关系
         if (permissionInfo.getOpen() == IntfTypeEnum.PUBLIC_PERMISSION.getIndex()) {
-            iRolePermission.delRolePermissionByPermissionId(permissionId);
-            refreshOpenPermission();
+            boolean delRolePermission = iRolePermission.delRolePermissionByPermissionId(permissionId);
+            // 删除成功，刷新公开权限
+            if (delRolePermission) {
+                refreshOpenPermission();
+            }
             return update;
         }
 
@@ -106,7 +122,6 @@ public class PermissionImpl implements IPermission {
         // 绑定新权限
         boolean add = iRolePermission.addBatchPermissionRoles(permissionId, roleInfos);
         if (add) {
-            refreshOpenPermission();
             return update;
         }
         return 0;
