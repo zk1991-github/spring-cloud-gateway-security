@@ -5,7 +5,7 @@
     <resultMap id="RolesResultMap" type="com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="role_name" property="roleName" jdbcType="VARCHAR"/>
-        <result column="describe" property="describe" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
         <collection property="permissionInfos" ofType="map" column="id" select="selectPermissionsByRoleId">
         </collection>
     </resultMap>
@@ -20,11 +20,11 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, role_name, describe
+        id, role_name, description
     </sql>
 
     <select id="selectRolesByIds" resultMap="RolesResultMap">
-        select tr.id, tr.role_name, tr.describe
+        select tr.id, tr.role_name, tr.description
         from
         t_role tr
         where id in
