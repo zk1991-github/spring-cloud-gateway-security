@@ -91,9 +91,11 @@ public class WebLoginController {
     }
 
     @GetMapping("/invalid")
-    public Response invalid() {
+    public Response invalid(WebSession session) {
         Response response = Response.getInstance();
         response.setError(Response.CodeEnum.INVALID, null, "未登录或登录超时");
+        //使当前session失效
+        session.invalidate().subscribe();
         return response;
     }
 
