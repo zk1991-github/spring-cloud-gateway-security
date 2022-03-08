@@ -27,6 +27,7 @@ import com.github.zk.spring.cloud.gateway.security.pojo.RolePermission;
 import com.github.zk.spring.cloud.gateway.security.service.IRolePermission;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -37,11 +38,19 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RolePermissionImpl extends ServiceImpl<RolePermissionMapper, RolePermission> implements IRolePermission {
+    @Autowired
+    private RolePermissionMapper rolePermissionMapper;
+
     @Override
     public boolean delRolePermissionByPermissionId(Long permissionId) {
         QueryWrapper<RolePermission> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("permission_id", permissionId);
         return remove(queryWrapper);
+    }
+
+    @Override
+    public int delRolePermissionByPermissionIds(List<Long> permissionIds) {
+        return rolePermissionMapper.delRolePermissionByPermissions(permissionIds);
     }
 
     @Override

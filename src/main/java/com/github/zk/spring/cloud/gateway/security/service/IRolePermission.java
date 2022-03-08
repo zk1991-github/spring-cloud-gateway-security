@@ -39,6 +39,13 @@ public interface IRolePermission extends IService<RolePermission> {
     boolean delRolePermissionByPermissionId(Long permissionId);
 
     /**
+     * 根据权限id，批量删除角色权限关系
+     * @param permissionIds 权限id
+     * @return 删除状态
+     */
+    int delRolePermissionByPermissionIds(List<Long> permissionIds);
+
+    /**
      * 根据角色id，删除角色权限关系
      * @param roleId 角色id
      * @return 删除状态

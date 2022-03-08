@@ -70,13 +70,15 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                 .flatMap(auth -> {
                     ServerWebExchange exchange = authorizationContext.getExchange();
                     String realRequestPath = getRealRequestPath(exchange);
-                    logger.info("转发地址：{}", realRequestPath);
                     return openPermissionMatch(auth, realRequestPath);
                 })
-                .filter(authenticationHolder -> !authenticationHolder.getAuthorizationDecision().isGranted())
                 .map(authenticationHolder -> {
+                    if (authenticationHolder.getAuthorizationDecision().isGranted()) {
+                        return new AuthorizationDecision(true);
+                    }
                     ServerWebExchange exchange = authorizationContext.getExchange();
                     String realRequestPath = getRealRequestPath(exchange);
+                    logger.info("转发地址：{}", realRequestPath);
 //            Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
 //            for (GrantedAuthority authority : authorities) {
 //                String authorityAuthority = authority.getAuthority();
@@ -97,7 +99,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                         return new AuthorizationDecision(false);
                     }
                 })
-                .defaultIfEmpty(new AuthorizationDecision(true));
+                .defaultIfEmpty(new AuthorizationDecision(false));
     }
 
     /**
@@ -113,6 +115,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
             for (PermissionInfo permissionInfo : permissionInfos) {
                 boolean matchUrl = ANT_PATH_MATCHER.match(permissionInfo.getUrl(), requestPath);
                 if (matchUrl) {
+                    logger.info("转发地址：{}", requestPath);
                     authenticationHolder.setAuthorizationDecision(new AuthorizationDecision(true));
                     return authenticationHolder;
                 }
@@ -198,7 +201,6 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
         ServerHttpRequest request = exchange.getRequest();
         //请求的uri
         String requestPath = request.getURI().getPath();
-        logger.info("访问地址：{}", requestPath);
         //真正请求地址
         StringBuilder realRequestPath = new StringBuilder();
         outer:
@@ -230,7 +232,6 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
             }
         }
         realRequestPath = new StringBuilder((realRequestPath.length() == 0) ? requestPath : realRequestPath.toString());
-        logger.info("真实请求地址：{}", realRequestPath.toString());
         return realRequestPath.toString();
     }
 }

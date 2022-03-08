@@ -67,6 +67,18 @@ public class PermissionController {
         return response;
     }
 
+    @GetMapping("delPermissions")
+    public Response delPermissions(@RequestParam List<Long> ids) {
+        Response response = Response.getInstance();
+        int del = iPermission.delPermissions(ids);
+        if (del > 0) {
+            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/delPermissions", "删除成功！", del);
+        } else {
+            response.setError(Response.CodeEnum.FAIL, "/gateway/delPermissions", "删除失败！");
+        }
+        return response;
+    }
+
     @PostMapping("/updatePermission")
     public Response updatePermission(@RequestBody PermissionInfo permissionInfo) {
         Response response = Response.getInstance();

@@ -46,6 +46,13 @@ public interface IPermission {
     int delPermission(long id);
 
     /**
+     * 批量删除权限
+     * @param ids 权限id
+     * @return 删除条数
+     */
+    int delPermissions(List<Long> ids);
+
+    /**
      * 修改权限
      * @param permissionInfo 权限信息
      * @return 修改权限

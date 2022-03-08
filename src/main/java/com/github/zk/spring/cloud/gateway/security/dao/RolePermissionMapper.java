@@ -20,6 +20,7 @@ package com.github.zk.spring.cloud.gateway.security.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.zk.spring.cloud.gateway.security.pojo.RolePermission;
+import java.util.List;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -30,4 +31,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface RolePermissionMapper extends BaseMapper<RolePermission> {
+    /**
+     * 根据权限id，批量删除角色权限关系
+     * @param permissionIds 权限id
+     * @return 删除条数
+     */
+    int delRolePermissionByPermissions(List<Long> permissionIds);
 }
