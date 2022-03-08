@@ -72,8 +72,10 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                     String realRequestPath = getRealRequestPath(exchange);
                     return openPermissionMatch(auth, realRequestPath);
                 })
-                .filter(authenticationHolder -> !authenticationHolder.getAuthorizationDecision().isGranted())
                 .map(authenticationHolder -> {
+                    if (authenticationHolder.getAuthorizationDecision().isGranted()) {
+                        return new AuthorizationDecision(true);
+                    }
                     ServerWebExchange exchange = authorizationContext.getExchange();
                     String realRequestPath = getRealRequestPath(exchange);
                     logger.info("转发地址：{}", realRequestPath);
@@ -97,7 +99,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                         return new AuthorizationDecision(false);
                     }
                 })
-                .defaultIfEmpty(new AuthorizationDecision(true));
+                .defaultIfEmpty(new AuthorizationDecision(false));
     }
 
     /**
