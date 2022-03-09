@@ -58,11 +58,11 @@ CREATE TABLE `gateway_permission` (
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1495638486122831874 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1499320522679283715 DEFAULT CHARSET=utf8;
 
 /*Data for the table `gateway_permission` */
 
-insert  into `gateway_permission`(`id`,`url_name`,`url`,`open`,`description`,`create_time`) values (1495637399244447746,'分页查询权限','/queryPermission',0,'分页查询权限','2022-02-21 13:51:59'),(1495637567519924225,'新增权限','/addPermission',0,'新增权限','2022-02-21 13:52:39'),(1495637664693559298,'删除权限','/delPermission',0,'删除权限','2022-02-21 13:53:02'),(1495637762299207682,'修改权限','/updatePermission',0,'修改权限','2022-02-21 13:53:25'),(1495637865344868354,'查询所有角色','/queryAllRoles',0,'查询所有角色','2022-02-21 13:53:50'),(1495637948090097665,'根据角色绑定权限','/bindPermissionByRole',0,'根据角色绑定权限','2022-02-21 13:54:09'),(1495638064385564674,'根据角色id，查询权限','/queryPermissionsByRoleId',0,'根据角色id，查询权限','2022-02-21 13:54:37'),(1495638486122831873,'根据字典类型id，查询字典信息','/queryDictByDictTypeId',1,'根据字典类型id，查询字典信息','2022-02-21 13:56:18');
+insert  into `gateway_permission`(`id`,`url_name`,`url`,`open`,`description`,`create_time`) values (1495637399244447746,'分页查询权限','/queryPermission',0,'分页查询权限','2022-02-21 13:51:59'),(1495637567519924225,'新增权限','/addPermission',0,'新增权限','2022-02-21 13:52:39'),(1495637664693559298,'删除权限','/delPermission',0,'删除权限','2022-02-21 13:53:02'),(1495637762299207682,'修改权限','/updatePermission',0,'修改权限','2022-02-21 13:53:25'),(1495637865344868354,'查询所有角色','/queryAllRoles',0,'查询所有角色','2022-02-21 13:53:50'),(1495637948090097665,'根据角色绑定权限','/bindPermissionByRole',0,'根据角色绑定权限','2022-02-21 13:54:09'),(1495638064385564674,'根据角色id，查询权限','/queryPermissionsByRoleId',0,'根据角色id，查询权限','2022-02-21 13:54:37'),(1495638486122831873,'根据字典类型id，查询字典信息','/queryDictByDictTypeId',1,'根据字典类型id，查询字典信息','2022-02-21 13:56:18'),(1499320522679283714,'批量删除权限','/delPermission',0,'根据权限id，批量删除权限','2022-03-03 17:47:23');
 
 /*Table structure for table `gateway_role_permission` */
 
@@ -73,11 +73,11 @@ CREATE TABLE `gateway_role_permission` (
   `role_id` bigint(32) NOT NULL COMMENT '角色id',
   `permission_id` bigint(32) NOT NULL COMMENT '权限id',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1495647479218085891 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1501446451589382146 DEFAULT CHARSET=utf8;
 
 /*Data for the table `gateway_role_permission` */
 
-insert  into `gateway_role_permission`(`id`,`role_id`,`permission_id`) values (1495637399257030657,1,1495637399244447746),(1495637567528312833,1,1495637567519924225),(1495637664752279554,1,1495637664693559298),(1495637762307596290,1,1495637762299207682),(1495637865353256961,1,1495637865344868354),(1495637948098486273,1,1495637948090097665),(1495638064398147585,1,1495638064385564674);
+insert  into `gateway_role_permission`(`id`,`role_id`,`permission_id`) values (1499321834665979905,1,1495637948090097665),(1499321834678562818,1,1495638064385564674),(1499321834686951426,1,1495637865344868354),(1499321834686951427,1,1495637664693559298),(1499321834686951428,1,1495637762299207682),(1499321834686951429,1,1495637567519924225),(1499321834695340034,1,1499320522679283714),(1499321834695340035,1,1495637399244447746);
 
 /*Table structure for table `t_log` */
 
@@ -105,13 +105,13 @@ DROP TABLE IF EXISTS `t_role`;
 CREATE TABLE `t_role` (
   `id` bigint(32) NOT NULL AUTO_INCREMENT,
   `role_name` varchar(50) NOT NULL COMMENT '角色名称',
-  `describe` varchar(255) DEFAULT NULL COMMENT '描述',
+  `description` varchar(255) DEFAULT NULL COMMENT '描述',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 /*Data for the table `t_role` */
 
-insert  into `t_role`(`id`,`role_name`,`describe`) values (1,'管理员',NULL),(2,'普通用户',NULL);
+insert  into `t_role`(`id`,`role_name`,`description`) values (1,'管理员',NULL),(2,'普通用户',NULL);
 
 /*Table structure for table `t_user` */
 
