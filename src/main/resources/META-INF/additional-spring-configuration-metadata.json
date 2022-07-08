@@ -54,5 +54,10 @@
       "name": "log.enabled",
       "type": "java.lang.Boolean",
       "description": "日志记录开关."
+    },
+    {
+      "name": "log.database",
+      "type": "java.lang.String",
+      "description": "是否记录到数据库"
     }
   ] }

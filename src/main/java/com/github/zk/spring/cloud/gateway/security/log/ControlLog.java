@@ -35,7 +35,7 @@ public class ControlLog implements Log {
     @Override
     public void loginLog(LogInfo logInfo) {
         logger.info("用户id【{}】，用户名【{}】，ip【{}】，登录状态【{}】，登录信息【{}】，时间【{}】",
-                logInfo.getId(), logInfo.getUsername(),
+                logInfo.getUserId(), logInfo.getUsername(),
                 logInfo.getIp(), logInfo.getStatus(),
                 logInfo.getMsg(), logInfo.getTime());
     }

@@ -19,9 +19,8 @@
 - 接口权限管理
 - 权限管理界面
 
-#### v4.0.2新增功能
-- 批量删除权限
-- 关键字查询权限
+#### v4.0.3新增功能
+- 支持通过yml配置修改日志记录方式
 
 ### 2. 功能介绍
 
@@ -79,9 +78,11 @@ log:
 ```
 只记录登录成功的用户日志，分为两种模式：
 1. 在控制台打印日志（默认）
-2. 记录至数据库,
-   需要在`com.github.zk.spring.cloud.gateway.security.config.LogConfig`注入
-   `com.github.zk.spring.cloud.gateway.security.log.RepositoryLog`对象
+2. 记录至数据库
+```properties
+log:
+  database: true
+```
 
 #### 9. 用户修改密码
 POST请求地址 `/gateway/updatePassword`，参数为JSON格式
@@ -94,7 +95,7 @@ POST请求地址 `/gateway/updatePassword`，参数为JSON格式
 ```
 
 #### 10. 密码加密
-在`application-gateway.yml`配置文件中相应的url路由下配置 - RequestBodyOperation，如：
+用于注册用户时，提供密码加密功能。在`application-gateway.yml`配置文件中相应的url路由下配置 - RequestBodyOperation，如：
 ```yaml
 spring:
   cloud:
@@ -135,7 +136,13 @@ spring:
 spring:
   web:
     proxy:
-      url: "/gateway"
+      url: "/proxy"
+```
+> 注意： 代理时需要代理服务自动去掉代理的路径，如nginx代理地址为`/proxy`,请求时应将`/proxy`去掉，配置如：
+```text
+location /proxy/ {
+  proxy_pass  http://127.0.0.1:8080/;
+}
 ```
 - 静态资源放行，在 `application-gateway.yml` 中配置，结构如下：
 ```yaml
