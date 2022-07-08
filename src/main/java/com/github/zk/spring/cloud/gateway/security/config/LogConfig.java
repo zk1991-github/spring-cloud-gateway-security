@@ -18,10 +18,12 @@
 
 package com.github.zk.spring.cloud.gateway.security.config;
 
+import com.github.zk.spring.cloud.gateway.security.dao.LogMapper;
 import com.github.zk.spring.cloud.gateway.security.log.Log;
 import com.github.zk.spring.cloud.gateway.security.log.LogHolder;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.zk.spring.cloud.gateway.security.log.RepositoryLog;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -34,23 +36,22 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class LogConfig {
 
-    @Autowired(required = false)
-    private Log log;
-
     /**
      * 日志记录开关
      */
     @Value("${log.enabled:false}")
     private boolean enabled;
+    @Value("${log.database:false}")
+    private boolean database;
     /**
      * 注入日志持有 bean
      * @return 日志持有 bean
      */
     @Bean
-    public LogHolder logHolder() {
+    public LogHolder logHolder(Log log) {
         LogHolder logHolder = new LogHolder();
         logHolder.setEnabled(enabled);
-        if (log != null) {
+        if (database) {
             logHolder.setLog(log);
         }
         return logHolder;
@@ -60,8 +61,9 @@ public class LogConfig {
      * 注入日志实现 bean
      * @return 日志实现
      */
-//    @Bean
-//    public static Log log() {
-//        return new RepositoryLog();
-//    }
+    @Bean
+    @ConditionalOnMissingBean(Log.class)
+    public Log log(LogMapper logMapper) {
+        return new RepositoryLog(logMapper);
+    }
 }
