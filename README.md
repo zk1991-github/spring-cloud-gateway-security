@@ -18,9 +18,10 @@
 - 提供密码加密处理
 - 接口权限管理
 - 权限管理界面
+- 负载均衡
 
-#### v4.0.3新增功能
-- 支持通过yml配置修改日志记录方式
+#### v4.1.0新增功能
+- 对转发的目标服务支持负载均衡
 
 ### 2. 功能介绍
 
@@ -124,6 +125,57 @@ spring:
 - 在 `application-release.yml` 配置发布地址。
 - 界面请求地址 `http://<IP>:<PORT>/web/dist/index.html`
 
+#### 13. 负载均衡配置
+- 在 `application-loadbalance.yml` 和 `application-gateway.yml` 中配置负载均衡
+- 首先在 `application-loadbalance.yml` 配置负载均衡节点和负载均衡策略
+```yaml
+spring:
+  cloud:
+    discovery:
+      client:
+        simple:
+          instances:
+            ## 负载均衡地址
+            providerService:
+              - uri: http://1.1.1.1:8080
+              - uri: http://1.1.1.2:8080
+    loadbalancer:
+      healthCheck:
+        ## 健康检查地址， 可以采用服务其中一个地址作为健康检查地址
+        path:
+          providerService: /health/healthCheck
+        ## 健康检查初始延迟
+        initialDelay: 0
+        ## 重新运行健康检查周期间隔
+        interval: 5s
+#        refetchInstances: true
+      configurations: health-check
+```
+- 然后在 `application-gateway.yml` 配置路由，注意地址使用 `lb://` 开始
+```yaml
+- id: server_route2
+  # 转发地址, providerService为"application-loadbalance.yml"配置文件中
+  # spring.cloud.discovery:client.simple.instances 下的key
+  uri: lb://providerService
+  predicates:
+    # 拦截请求路径
+    - name: Path
+      args:
+        matcher: /loadbalance/**
+  filters:
+    # 跳过1个前缀
+    - name: StripPrefix
+      args:
+        # 此处 key 必须为 “parts”
+        parts: 1
+    #            - StripPrefix=1
+    # token身份认证 JwtCheckGatewayFilterFactory
+    - TokenCheck
+    # 请求流量限制，默认5MB
+    - name: RequestSize
+      args:
+        maxSize: 5000000
+```
 ### 3. 使用注意事项
 
 - 当前服务由于采用跳转方式，需要与前端同源，否则登录成功后会因无法获取用户，导致返回失败
