@@ -21,7 +21,6 @@ package com.github.zk.spring.cloud.gateway.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.codec.Encoder;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
@@ -34,7 +33,9 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
  * @author zk
  * @date 2023/3/28 17:09
  */
-@Configuration
+// 取消统一处理 Long 类型转换 String，由于前端对有些应该是 Long 类型的字段，
+// 转换为 String 后，处理可能出现问题，如分页中 total 字段
+//@Configuration
 public class WebConfig implements WebFluxConfigurer {
 
     @Override

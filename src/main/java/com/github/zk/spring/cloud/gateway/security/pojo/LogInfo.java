@@ -21,6 +21,8 @@ package com.github.zk.spring.cloud.gateway.security.pojo;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 /**
  * 日志实体类
@@ -32,6 +34,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 public class LogInfo {
     /** 唯一id */
     @TableId(type = IdType.ASSIGN_ID)
+    @JsonSerialize(using = ToStringSerializer.class)
     private String id;
     /** 用户id */
     private String userId;

@@ -21,6 +21,8 @@ package com.github.zk.spring.cloud.gateway.security.pojo;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import java.io.Serializable;
 import java.util.List;
 
@@ -36,6 +38,7 @@ public class RoleInfo implements Serializable {
     private static final long serialVersionUID = -6703773100368931284L;
 
     /** 角色id */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     /** 角色名称 */
     private String roleName;
