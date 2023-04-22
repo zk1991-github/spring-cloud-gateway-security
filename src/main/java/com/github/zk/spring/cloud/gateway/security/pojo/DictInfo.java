@@ -19,6 +19,8 @@
 package com.github.zk.spring.cloud.gateway.security.pojo;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 /**
  * 字典信息实体
@@ -29,6 +31,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("gateway_dict")
 public class DictInfo {
     /** 字典id */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     /** 字典类型id */
     private Long dictTypeId;

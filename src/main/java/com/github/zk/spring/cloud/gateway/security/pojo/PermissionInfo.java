@@ -22,6 +22,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import java.io.Serializable;
 import java.util.List;
 
@@ -37,6 +39,7 @@ public class PermissionInfo implements Serializable {
     private static final long serialVersionUID = 874671003093440548L;
 
     /** 权限id */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     /** 地址名称 */
     private String urlName;
