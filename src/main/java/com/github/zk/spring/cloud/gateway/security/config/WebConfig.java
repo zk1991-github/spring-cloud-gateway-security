@@ -42,8 +42,8 @@ public class WebConfig implements WebFluxConfigurer {
     public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
         ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
         SimpleModule module = new SimpleModule();
-        module.addSerializer(Integer.class, ToStringSerializer.instance);
-        module.addSerializer(Integer.TYPE, ToStringSerializer.instance);
+        module.addSerializer(Long.class, ToStringSerializer.instance);
+        module.addSerializer(Long.TYPE, ToStringSerializer.instance);
         objectMapper.registerModule(module);
         Encoder<?> encoder = new Jackson2JsonEncoder(objectMapper);
         configurer.defaultCodecs().jackson2JsonEncoder(encoder);
