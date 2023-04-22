@@ -18,6 +18,7 @@
 
 package com.github.zk.spring.cloud.gateway.security.pojo;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -50,6 +51,7 @@ public class PermissionInfo implements Serializable {
     /** 描述 */
     private String description;
     /** 创建时间 */
+    @TableField(fill = FieldFill.INSERT)
     private String createTime;
     /** 分页对象 */
     @TableField(exist = false)
