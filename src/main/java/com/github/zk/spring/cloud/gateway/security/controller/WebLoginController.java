@@ -69,7 +69,7 @@ public class WebLoginController {
                                                 response.setOk(Response.CodeEnum.SUCCESSED, null, "登录成功！", userInfo);
                                             } else {
                                                 logHolder.loginLog(exchange, userInfo, 0, "登录失败");
-                                                response.setError(Response.CodeEnum.FAIL, null, "登录失败，超过最大登录人数");
+                                                response.setError(Response.CodeEnum.FAIL, null, "登录失败，Session存储失败！");
                                             }
                                             return response;
                                         })
@@ -81,12 +81,23 @@ public class WebLoginController {
     public Response fail(WebSession session) {
         Response response = Response.getInstance();
         String message = session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+        // message为空时，请求工具没有存储session， 因此跳转后session被重新创建
+        if (ObjectUtils.isEmpty(message)) {
+            response.setError(Response.CodeEnum.FAIL, null,
+                    "请求工具未能存储Cookies，请配置后重试！");
+            return response;
+        }
+
         if (ObjectUtils.nullSafeEquals(message, "Invalid Credentials")) {
             message = "密码错误";
+            // TODO 考虑是否增加登录失败日志， 应考虑日志过多问题，使用存在的用户进行记录
         }
         response.setError(Response.CodeEnum.FAIL, null, message);
         //使当前session失效
         session.invalidate().subscribe();
+
+
+
         return response;
     }
 
