@@ -24,6 +24,7 @@ import com.github.zk.spring.cloud.gateway.security.pojo.WeChatUserInfo;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.ServerWebExchange;
 
 /**
@@ -82,10 +83,28 @@ public class LogHolder {
             userId = weChatUserInfo.getOpenid();
             username = weChatUserInfo.getNickName();
         }
-        String ip = Objects.requireNonNull(exchange.getRequest().getRemoteAddress()).getHostName();
+        String ip = getIpAddr(exchange.getRequest());
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String time = LocalDateTime.now().format(dateTimeFormatter);
         LogInfo logInfo = new LogInfo(userId, username, ip, status, msg, time);
         log.loginLog(logInfo);
     }
+
+    private String getIpAddr(ServerHttpRequest request) {
+        //Nginx 使用 x-forwarded-for 请求头存放真实 ip 地址
+        String ip = request.getHeaders().getFirst("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            // Apache Http 代理使用 Proxy-Client-IP 请求头存放真实 ip 地址
+            ip = request.getHeaders().getFirst("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            // WebLogic 代理使用 WL-Proxy-Client-IP 请求头存放真实 ip 地址
+            ip = request.getHeaders().getFirst("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = Objects.requireNonNull(request.getRemoteAddress()).getHostName();
+        }
+        return ip;
+    }
+
 }
