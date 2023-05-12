@@ -50,8 +50,16 @@ import reactor.core.publisher.Mono;
  */
 public class RequestBodyOperationGatewayFilterFactory extends AbstractGatewayFilterFactory<RequestBodyOperationGatewayFilterFactory.Config> {
 
+    /**
+     * 前端传入密码的 key
+     */
     private String passwordKey = "password";
 
+    /**
+     * 设置前端输入的密码 key
+     *
+     * @param passwordKey 密码 key
+     */
     public void setPasswordKey(String passwordKey) {
         this.passwordKey = passwordKey;
     }
@@ -104,6 +112,12 @@ public class RequestBodyOperationGatewayFilterFactory extends AbstractGatewayFil
                 }));
     }
 
+    /**
+     * 修改请求体
+     *
+     * @param body 请求体
+     * @return 修改后的请求体
+     */
     private String modifyBody(String body) {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> bodyMap;

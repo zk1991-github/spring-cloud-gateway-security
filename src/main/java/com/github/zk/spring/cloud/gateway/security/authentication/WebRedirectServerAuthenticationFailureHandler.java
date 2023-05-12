@@ -71,6 +71,7 @@ public class WebRedirectServerAuthenticationFailureHandler extends RedirectServe
     @Override
     public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException exception) {
         return webFilterExchange.getExchange().getSession().doOnNext(webSession -> {
+            // 将失败信息记录到 session 中， 由于使用的是失败跳转方式，只能通过session传递失败信息
             webSession.getAttributes().put(WebAttributes.AUTHENTICATION_EXCEPTION, exception.getMessage());
         }).then(super.onAuthenticationFailure(webFilterExchange, exception));
     }

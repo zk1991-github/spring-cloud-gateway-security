@@ -95,8 +95,14 @@ public class SecurityConfig {
      */
     private final String INVALID_URL = "/login/invalid";
 
+    /**
+     * 小程序登录地址
+     */
     private final String WECHAT_URL = "/login/weChatLogin";
 
+    /**
+     * 登出地址
+     */
     private final String LOGOUT_URL = "/login/logout";
 
     /**
@@ -179,10 +185,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        // 允许所有头请求
         configuration.setAllowedHeaders(Collections.singletonList("*"));
+        // 允许所有域请求
         configuration.setAllowedOrigins(Collections.singletonList("*"));
+        // 允许所有方法请求
         configuration.setAllowedMethods(Collections.singletonList("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // 允许所有地址请求
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

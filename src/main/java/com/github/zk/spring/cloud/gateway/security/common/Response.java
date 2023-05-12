@@ -40,15 +40,17 @@ import java.util.Map;
 @JsonPropertyOrder({"data", "api", "msg", "code"})
 public class Response {
 
-	/**
-	 * 返回枚举类
-	 */
+    /**
+     * 返回枚举类
+     */
     public enum CodeEnum {
         /**
          * 成功返回
          */
         SUCCESSED(0),
-        /** 登录失效 */
+        /**
+         * 登录失效
+         */
         INVALID(9000),
         /**
          * 失败返回
@@ -66,20 +68,43 @@ public class Response {
         }
     }
 
+    /**
+     * 状态码
+     */
     private int code;
+    /**
+     * 提示信息
+     */
     private String msg;
+    /**
+     * 网关地址
+     */
     private String api;
+    /**
+     * 数据
+     */
     private Object data;
+    /**
+     * 详细信息
+     */
     private Map<String, Object> detailsMap;
 
     private Response() {
     }
 
     public static Response getInstance() {
-        Response response = new Response();
-        return response;
+        return new Response();
     }
 
+    /**
+     * 设置成功返回
+     *
+     * @param code 状态码
+     * @param api 网关地址
+     * @param msg 提示信息
+     * @param data 数据
+     * @return 响应对象
+     */
     public Response setOk(int code, String api, String msg, Object data) {
         this.setCode(code);
         this.setApi(api);
@@ -88,6 +113,15 @@ public class Response {
         return this;
     }
 
+    /**
+     * 设置成功返回
+     *
+     * @param codeEnum 状态码枚举
+     * @param api 网关地址
+     * @param msg 提示信息
+     * @param data 数据
+     * @return 响应对象
+     */
     public Response setOk(CodeEnum codeEnum, String api, String msg, Object data) {
         this.setCode(codeEnum.getCode());
         this.setApi(api);
@@ -96,6 +130,16 @@ public class Response {
         return this;
     }
 
+    /**
+     * 设置成功返回
+     *
+     * @param code 状态码
+     * @param api 网关地址
+     * @param msg 提示信息
+     * @param data 数据
+     * @param total 数据总条数
+     * @return 响应对象
+     */
     public Response setOk(int code, String api, String msg, Object data, long total) {
         detailsMap = new HashMap<String, Object>(16);
         detailsMap.put("details", data);
@@ -108,6 +152,16 @@ public class Response {
         return this;
     }
 
+    /**
+     * 设置成功返回
+     *
+     * @param codeEnum 状态码枚举
+     * @param api 网关地址
+     * @param msg 提示信息
+     * @param data 数据
+     * @param total 数据总条数
+     * @return 响应对象
+     */
     public Response setOk(CodeEnum codeEnum, String api, String msg, Object data, long total) {
         detailsMap = new HashMap<String, Object>(16);
         detailsMap.put("details", data);
@@ -120,6 +174,14 @@ public class Response {
         return this;
     }
 
+    /**
+     * 设置失败返回
+     *
+     * @param code 状态码
+     * @param api 网关地址
+     * @param msg 提示信息
+     * @return 响应对象
+     */
     public Response setError(int code, String api, String msg) {
         this.setCode(code);
         this.setApi(api);
@@ -127,12 +189,20 @@ public class Response {
         return this;
     }
 
-	public Response setError(CodeEnum codeEnum, String api, String msg) {
-		this.setCode(codeEnum.getCode());
-		this.setApi(api);
-		this.setMsg(msg);
-		return this;
-	}
+    /**
+     * 设置失败返回
+     *
+     * @param codeEnum 状态码枚举
+     * @param api 网关地址
+     * @param msg 提示信息
+     * @return 响应对象
+     */
+    public Response setError(CodeEnum codeEnum, String api, String msg) {
+        this.setCode(codeEnum.getCode());
+        this.setApi(api);
+        this.setMsg(msg);
+        return this;
+    }
 
     public String getApi() {
         return api;

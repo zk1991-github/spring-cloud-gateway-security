@@ -54,20 +54,28 @@ public class WebLoginController {
     @GetMapping("/success")
     public Mono<Response> success(ServerWebExchange exchange) {
         return ReactiveSecurityContextHolder.getContext()
+                // session 中无数据时抛出异常
                 .switchIfEmpty(Mono.error(new IllegalStateException("ReactiveSecurityContext is empty")))
+                // 获取认证信息
                 .map(SecurityContext::getAuthentication)
+                // 获取用户信息
                 .map(Authentication::getPrincipal)
+                // 转换用户对象
                 .cast(UserInfo.class)
                 .flatMap(userInfo ->
                         exchange.getSession().flatMap(webSession ->
+                                // 登录处理
                                 loginProcessor
                                         .webSessionProcess(userInfo.getUsername(), webSession)
+                                        // 登录状态处理
                                         .map(loginStatus -> {
                                             Response response = Response.getInstance();
                                             if (loginStatus) {
+                                                // 记录日志
                                                 logHolder.loginLog(exchange, userInfo, 1, "登录成功");
                                                 response.setOk(Response.CodeEnum.SUCCESSED, null, "登录成功！", userInfo);
                                             } else {
+                                                // 记录日志
                                                 logHolder.loginLog(exchange, userInfo, 0, "登录失败");
                                                 response.setError(Response.CodeEnum.FAIL, null, "登录失败，Session存储失败！");
                                             }
@@ -95,9 +103,6 @@ public class WebLoginController {
         response.setError(Response.CodeEnum.FAIL, null, message);
         //使当前session失效
         session.invalidate().subscribe();
-
-
-
         return response;
     }
 

@@ -83,6 +83,7 @@ public class LogHolder {
             userId = weChatUserInfo.getOpenid();
             username = weChatUserInfo.getNickName();
         }
+        // 获取 ip 地址
         String ip = getIpAddr(exchange.getRequest());
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String time = LocalDateTime.now().format(dateTimeFormatter);
@@ -90,6 +91,12 @@ public class LogHolder {
         log.loginLog(logInfo);
     }
 
+    /**
+     * 获取真实 IP 地址
+     *
+     * @param request 请求对象
+     * @return ip地址
+     */
     private String getIpAddr(ServerHttpRequest request) {
         //Nginx 使用 x-forwarded-for 请求头存放真实 ip 地址
         String ip = request.getHeaders().getFirst("x-forwarded-for");
@@ -102,6 +109,7 @@ public class LogHolder {
             ip = request.getHeaders().getFirst("WL-Proxy-Client-IP");
         }
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            // 无代理时，直接获取远程地址
             ip = Objects.requireNonNull(request.getRemoteAddress()).getHostName();
         }
         return ip;

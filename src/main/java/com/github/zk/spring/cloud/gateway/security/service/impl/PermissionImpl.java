@@ -55,6 +55,7 @@ public class PermissionImpl implements IPermission {
     @Override
     public int addPermission(PermissionInfo permissionInfo) {
         List<RoleInfo> roleInfos = permissionInfo.getRoleInfos();
+        // 如果为私有权限，并且角色为空时，传入参数有误，不插入权限直接返回失败
         if (permissionInfo.getOpen() == IntfTypeEnum.PRIVATE_PERMISSION.getIndex() &&
                 ObjectUtils.isEmpty(roleInfos)) {
             return 0;
@@ -63,10 +64,11 @@ public class PermissionImpl implements IPermission {
         Long permissionId = permissionInfo.getId();
         // 公开权限只添加权限表
         if (permissionInfo.getOpen() == IntfTypeEnum.PUBLIC_PERMISSION.getIndex()) {
+            // 刷新公开权限数据
             refreshOpenPermission();
             return insert;
         }
-        //绑定权限
+        // 角色绑定权限
         boolean b = iRolePermission.addBatchPermissionRoles(permissionId, roleInfos);
         if (b) {
             return insert;

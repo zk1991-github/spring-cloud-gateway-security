@@ -40,7 +40,7 @@ public class TokenCheckGatewayFilterFactory extends AbstractGatewayFilterFactory
         return (exchange, chain) -> {
             String token = exchange.getRequest().getHeaders().getFirst("username");
 
-            //校验jwtToken的合法性
+            // 是否登录成功状态
             if (token != null) {
                 // 合法
                 // 将用户id作为参数传递下去

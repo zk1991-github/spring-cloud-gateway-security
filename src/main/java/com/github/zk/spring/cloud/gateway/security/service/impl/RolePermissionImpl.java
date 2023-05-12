@@ -64,6 +64,7 @@ public class RolePermissionImpl extends ServiceImpl<RolePermissionMapper, RolePe
     public boolean addBatchPermissionRoles(long permissionId, List<RoleInfo> roleInfos) {
         List<RolePermission> rolePermissions = new ArrayList<>();
         roleInfos.forEach(roleInfo -> {
+            // 构建角色和权限关联关系，用于批量插入
             RolePermission rp = new RolePermission();
             rp.setRoleId(roleInfo.getId());
             rp.setPermissionId(permissionId);
@@ -76,6 +77,7 @@ public class RolePermissionImpl extends ServiceImpl<RolePermissionMapper, RolePe
     public boolean addBatchRolePermissions(long roleId, List<PermissionInfo> permissionInfos) {
         List<RolePermission> rolePermissions = new ArrayList<>();
         permissionInfos.forEach(permissionInfo -> {
+            // 构建角色和权限关联关系，用于批量插入
             RolePermission rp = new RolePermission();
             rp.setRoleId(roleId);
             rp.setPermissionId(permissionInfo.getId());
