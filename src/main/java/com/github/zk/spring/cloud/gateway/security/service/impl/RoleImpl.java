@@ -52,9 +52,12 @@ public class RoleImpl implements IRole {
     @Override
     public boolean bindPermissionsByRole(RoleInfo roleInfo) {
         Long roleId = roleInfo.getId();
+        // 获取角色下权限列表信息
         List<PermissionInfo> permissionInfos = roleInfo.getPermissionInfos();
+        // 根据角色，删除权限
         boolean del = iRolePermission.delRolePermissionByRoleId(roleId);
         if (!ObjectUtils.isEmpty(permissionInfos)) {
+            // 批量添加角色的权限信息
             return iRolePermission.addBatchRolePermissions(roleId, permissionInfos);
         }
         return del;

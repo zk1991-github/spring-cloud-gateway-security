@@ -35,7 +35,13 @@ import reactor.core.publisher.Mono;
  */
 public class WebReactiveAuthenticationManager extends UserDetailsRepositoryReactiveAuthenticationManager {
 
+    /**
+     * 定义用户实现服务
+     */
     private final DefaultUserImpl userDetailsService;
+    /**
+     * 定义登录处理器
+     */
     private final LoginProcessor loginProcessor;
 
     public WebReactiveAuthenticationManager(DefaultUserImpl userDetailsService,
@@ -64,9 +70,12 @@ public class WebReactiveAuthenticationManager extends UserDetailsRepositoryReact
     public Mono<Authentication> authenticate(Authentication authentication) {
         String username = authentication.getName();
         return super.authenticate(authentication)
+                // 认证成功，删除用户锁定计数
                 .doOnNext(auth -> loginProcessor.removeLockRecord(username).subscribe())
                 .doOnError(BadCredentialsException.class, (ex) -> {
+                    // 打印认证失败日志
                     logger.info(LogMessage.format("%s Authentication failed: %s", username, ex.getMessage()));
+                    // 处理是否要锁定用户
                     loginProcessor.isLockUser(username).doOnNext(aBoolean -> {
                         if (aBoolean) {
                             userDetailsService.lockUser(username);

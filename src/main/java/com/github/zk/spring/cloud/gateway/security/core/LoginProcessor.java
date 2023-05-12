@@ -42,10 +42,19 @@ public class LoginProcessor {
      */
     private int maxSessions;
 
+    /**
+     * 密码错误存储 key
+     */
     private final String DEFAULT_NAMESPACE = "password:error";
 
+    /**
+     * 命名空间
+     */
     private final String namespace = DEFAULT_NAMESPACE + ":";
 
+    /**
+     * 允许密码输入错误次数
+     */
     private Integer allowPasswordErrorRecord = 3;
 
     public LoginProcessor(ReactiveStringRedisTemplate reactiveStringRedisTemplate,
@@ -76,7 +85,9 @@ public class LoginProcessor {
      */
     public Mono<Boolean> webSessionProcess(String hashKey, WebSession webSession) {
         return getSessionId(hashKey)
+                // session 存在，更新 session
                 .flatMap(sessionId -> changeSession(hashKey, sessionId, webSession.getId()))
+                // session 不存在 保存 session
                 .switchIfEmpty(Mono.defer(() -> saveSession(hashKey, webSession.getId())));
     }
 
@@ -97,7 +108,10 @@ public class LoginProcessor {
     public Mono<Boolean> sessionLimitProcess(String hashKey) {
         //判断是否超过允许最大登录人数
         return getSessionId(hashKey)
+                // 查询用户 session 是否存在，存在说明当前为登录状态，登录状态允许再次登录，
+                // 不受最大登录人数限制
                 .flatMap(this::userSessionExistBySessionId)
+                // 未登录用户，验证是否超过允许登录人数
                 .switchIfEmpty(onlineNum()
                         .map(aLong -> maxSessions != -1 && aLong >= maxSessions)
                         .flatMap(aBoolean -> {
@@ -133,9 +147,13 @@ public class LoginProcessor {
      * @return 更改 Session 状态
      */
     public Mono<Boolean> changeSession(String hashKey, String oldSessionId, String newSessionId) {
+        // 根据 sessionId 删除存储的 session 信息
         Mono<Void> delSession = sessionRepository.deleteById(oldSessionId);
+        // 删除登录时存储的用户信息
         Mono<Boolean> removeSession = removeSession(hashKey);
+        // 存储新的用户信息
         Mono<Boolean> saveSession = saveSession(hashKey, newSessionId);
+        // 依次执行响应式方法
         return delSession.then(removeSession).then(saveSession);
     }
 
@@ -184,10 +202,12 @@ public class LoginProcessor {
      * @return 用户存在状态
      */
     public Mono<Boolean> userSessionExistBySessionId(String sessionId) {
+        // 构建过滤条件
         ScanOptions options = ScanOptions
                 .scanOptions()
                 .match(ReactiveRedisSessionRepository.DEFAULT_NAMESPACE + ":sessions:" + sessionId)
                 .build();
+        // 根据查询数量
         return reactiveStringRedisTemplate.scan(options).count().flatMap(count -> {
             if (count > 0) {
                 return Mono.just(true);
@@ -196,18 +216,33 @@ public class LoginProcessor {
         });
     }
 
+    /**
+     * 是否锁定用户
+     *
+     * @param username 用户名
+     * @return 锁定是否成功
+     */
     public Mono<Boolean> isLockUser(String username) {
         return reactiveStringRedisTemplate
                 .opsForValue()
+                // 计数增加
                 .increment(namespace + username)
                 .flatMap(num -> {
+                    // 密码输入错误次数小于允许的次数，只计数，返回false
                     if (num < allowPasswordErrorRecord) {
                         return Mono.empty();
                     }
-                    return reactiveStringRedisTemplate.opsForValue().delete(namespace + username);
+                    // 锁定后删除计数
+                    return removeLockRecord(username);
                 });
     }
 
+    /**
+     * 删除锁定计数
+     *
+     * @param username 用户名
+     * @return 删除是否成功状态
+     */
     public Mono<Boolean> removeLockRecord(String username) {
         return reactiveStringRedisTemplate.opsForValue().delete(namespace + username);
     }

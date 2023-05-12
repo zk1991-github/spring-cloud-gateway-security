@@ -42,6 +42,7 @@ public class WebConfig implements WebFluxConfigurer {
     public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
         ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
         SimpleModule module = new SimpleModule();
+        // 添加序列化类型
         module.addSerializer(Long.class, ToStringSerializer.instance);
         module.addSerializer(Long.TYPE, ToStringSerializer.instance);
         objectMapper.registerModule(module);

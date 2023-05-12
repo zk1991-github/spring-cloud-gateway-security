@@ -54,22 +54,30 @@ public class WebLoginController {
     @GetMapping("/success")
     public Mono<Response> success(ServerWebExchange exchange) {
         return ReactiveSecurityContextHolder.getContext()
+                // session 中无数据时抛出异常
                 .switchIfEmpty(Mono.error(new IllegalStateException("ReactiveSecurityContext is empty")))
+                // 获取认证信息
                 .map(SecurityContext::getAuthentication)
+                // 获取用户信息
                 .map(Authentication::getPrincipal)
+                // 转换用户对象
                 .cast(UserInfo.class)
                 .flatMap(userInfo ->
                         exchange.getSession().flatMap(webSession ->
+                                // 登录处理
                                 loginProcessor
                                         .webSessionProcess(userInfo.getUsername(), webSession)
+                                        // 登录状态处理
                                         .map(loginStatus -> {
                                             Response response = Response.getInstance();
                                             if (loginStatus) {
+                                                // 记录日志
                                                 logHolder.loginLog(exchange, userInfo, 1, "登录成功");
                                                 response.setOk(Response.CodeEnum.SUCCESSED, null, "登录成功！", userInfo);
                                             } else {
+                                                // 记录日志
                                                 logHolder.loginLog(exchange, userInfo, 0, "登录失败");
-                                                response.setError(Response.CodeEnum.FAIL, null, "登录失败，超过最大登录人数");
+                                                response.setError(Response.CodeEnum.FAIL, null, "登录失败，Session存储失败！");
                                             }
                                             return response;
                                         })
@@ -81,8 +89,16 @@ public class WebLoginController {
     public Response fail(WebSession session) {
         Response response = Response.getInstance();
         String message = session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+        // message为空时，请求工具没有存储session， 因此跳转后session被重新创建
+        if (ObjectUtils.isEmpty(message)) {
+            response.setError(Response.CodeEnum.FAIL, null,
+                    "请求工具未能存储Cookies，请配置后重试！");
+            return response;
+        }
+
         if (ObjectUtils.nullSafeEquals(message, "Invalid Credentials")) {
             message = "密码错误";
+            // TODO 考虑是否增加登录失败日志， 应考虑日志过多问题，使用存在的用户进行记录
         }
         response.setError(Response.CodeEnum.FAIL, null, message);
         //使当前session失效

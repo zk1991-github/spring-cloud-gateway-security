@@ -36,6 +36,9 @@ public class DefaultUserImpl extends AbstractUserImpl {
 
     private final UserMapper userMapper;
 
+    /**
+     * 实例化密码编码器
+     */
     private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     public DefaultUserImpl(LoginProperties properties, UserMapper userMapper) {
@@ -50,6 +53,7 @@ public class DefaultUserImpl extends AbstractUserImpl {
         userInfo.setAccountNonLocked(false);
         UpdateWrapper<UserInfo> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("username", username);
+        // 根据用户名锁定用户
         int update = userMapper.update(userInfo, updateWrapper);
         return update > 0;
     }
@@ -69,6 +73,7 @@ public class DefaultUserImpl extends AbstractUserImpl {
             updateWrapper.eq("username", username);
             int update = userMapper.update(null, updateWrapper);
             return update > 0;
+
         }
         return false;
     }

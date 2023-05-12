@@ -82,10 +82,13 @@ public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticati
 
         return weChatRequest(weChatCode)
                 .filter(weChatResult ->
+                        // 过滤掉认证失败的请求
                         weChatResult.getErrcode() == null || weChatResult.getErrcode().equals(0))
+                // 返回空时抛出失败异常
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new BadCredentialsException("微信认证失败!"))))
                 .flatMap(weChatResult -> {
                     String openId = weChatResult.getOpenid();
+                    // 登录处理
                     return loginProcessor
                             .sessionLimitProcess(openId)
                             .filter(isAllow -> isAllow)
@@ -97,6 +100,7 @@ public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticati
                             }));
                 })
                 .doOnNext(weChatAuthenticationToken -> {
+                    // 登录成功存储认证信息
                     SecurityContextImpl securityContext = new SecurityContextImpl();
                     securityContext.setAuthentication(weChatAuthenticationToken);
                     this.securityContextRepository.save(exchange, securityContext)

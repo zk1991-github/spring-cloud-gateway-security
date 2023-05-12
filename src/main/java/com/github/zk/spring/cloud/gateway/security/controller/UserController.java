@@ -68,7 +68,7 @@ public class UserController {
     /**
      * post 请求方式获取用户
      *
-     * @return
+     * @return 用户信息
      */
     @PostMapping("/queryUser")
     public Mono<Response> queryUser() {
@@ -101,6 +101,12 @@ public class UserController {
         });
     }
 
+    /**
+     * 修改密码
+     *
+     * @param updatePasswordDTO 修改密码参数对象
+     * @return 修改成功
+     */
     @PostMapping("updatePassword")
     public Mono<Response> updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO) {
         Response response = Response.getInstance();

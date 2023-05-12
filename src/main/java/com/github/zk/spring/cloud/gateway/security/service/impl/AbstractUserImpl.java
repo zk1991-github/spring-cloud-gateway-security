@@ -36,7 +36,13 @@ import reactor.core.publisher.Mono;
  */
 public abstract class AbstractUserImpl implements IUser, ReactiveUserDetailsService {
 
+    /**
+     * 定义登录配置
+     */
     private final LoginProperties properties;
+    /**
+     * 用户 Mapper
+     */
     private final UserMapper userMapper;
 
     public AbstractUserImpl(LoginProperties properties, UserMapper userMapper) {
@@ -47,11 +53,13 @@ public abstract class AbstractUserImpl implements IUser, ReactiveUserDetailsServ
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         UserInfo userInfo = null;
+        // 如果是配置的超级管理员，直接返回用户信息，不用从数据库中查找
         if (ObjectUtils.nullSafeEquals(properties.getUser().getUsername(), username)) {
             //超级管理员
             userInfo = properties.getUser();
             return Mono.just(userInfo);
         }
+        // 从数据库中查找用户信息
         userInfo = customFindByUsername(username);
         if (userInfo == null) {
             throw new UsernameNotFoundException("用户不存在");

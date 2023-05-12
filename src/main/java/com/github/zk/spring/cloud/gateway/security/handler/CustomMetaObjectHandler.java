@@ -33,20 +33,33 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CustomMetaObjectHandler implements MetaObjectHandler {
+    /**
+     * 插入时填充
+     *
+     * @param metaObject 元数据
+     */
     @Override
     public void insertFill(MetaObject metaObject) {
         LocalDateTime localDateTime = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formatTime = localDateTime.format(dateTimeFormatter);
+        // 创建时间字段自动填充
         this.fillStrategy(metaObject, "createTime", formatTime);
+        // 修改时间字段自动填充
         this.fillStrategy(metaObject, "updateTime", formatTime);
     }
 
+    /**
+     * 修改时填充
+     *
+     * @param metaObject 元数据
+     */
     @Override
     public void updateFill(MetaObject metaObject) {
         LocalDateTime localDateTime = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formatTime = localDateTime.format(dateTimeFormatter);
+        // 修改时间字段自动填充
         this.fillStrategy(metaObject, "updateTime", formatTime);
     }
 }

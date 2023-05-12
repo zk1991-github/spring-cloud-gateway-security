@@ -20,12 +20,8 @@ package com.github.zk.spring.cloud.gateway.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zk.spring.cloud.gateway.security.jackson2.CustomCoreJackson2Module;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisPassword;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.session.data.redis.config.annotation.web.server.EnableRedisWebSession;
@@ -40,22 +36,24 @@ import org.springframework.session.data.redis.config.annotation.web.server.Enabl
 @EnableRedisWebSession
 public class RedisConfig {
 
-    /**
-     * 注入连接工厂 bean
-     * @param properties redis 配置
-     * @return 连接工厂
-     */
-    @Bean
-    public LettuceConnectionFactory connectionFactory(RedisProperties properties) {
-        RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
-        String hostName = properties.getHost();
-        int port = properties.getPort();
-        String password = properties.getPassword();
-        redisConfiguration.setPassword(RedisPassword.of(password));
-        redisConfiguration.setHostName(hostName);
-        redisConfiguration.setPort(port);
-        return new LettuceConnectionFactory(redisConfiguration);
-    }
+//    使用 redis 默认配置方式，内置 Sentinel、Cluster、Standalone三种模式
+//    @see org.springframework.boot.autoconfigure.data.redis.LettuceConnectionConfiguration
+//    /**
+//     * 注入连接工厂 bean
+//     * @param properties redis 配置
+//     * @return 连接工厂
+//     */
+//    @Bean
+//    public LettuceConnectionFactory connectionFactory(RedisProperties properties) {
+//        RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
+//        String hostName = properties.getHost();
+//        int port = properties.getPort();
+//        String password = properties.getPassword();
+//        redisConfiguration.setPassword(RedisPassword.of(password));
+//        redisConfiguration.setHostName(hostName);
+//        redisConfiguration.setPort(port);
+//        return new LettuceConnectionFactory(redisConfiguration);
+//    }
 
     /**
      * 注入序列化bean
