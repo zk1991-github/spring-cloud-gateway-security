@@ -23,6 +23,7 @@ import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.WeChatUserInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
+import com.github.zk.spring.cloud.gateway.security.util.IpUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import org.slf4j.Logger;
@@ -75,10 +76,16 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
 
     @Override
     public Mono<AuthorizationDecision> check(Mono<Authentication> authentication, AuthorizationContext authorizationContext) {
+        // 设置下游服务传递的头信息
+        ServerWebExchange exchange = authorizationContext.getExchange();
+        ServerHttpRequest newRequest = exchange.getRequest().mutate()
+                .header("XReal-IP", IpUtils.getIpAddr(exchange.getRequest()))
+                .build();
+        exchange.mutate().request(newRequest).build();
+
         return authentication
                 .flatMap(auth -> {
                     // 所有角色的公开权限匹配
-                    ServerWebExchange exchange = authorizationContext.getExchange();
                     String realRequestPath = getRealRequestPath(exchange);
                     return openPermissionMatch(auth, realRequestPath);
                 })
@@ -88,7 +95,6 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                         return new AuthorizationDecision(true);
                     }
                     // 非公开权限验证
-                    ServerWebExchange exchange = authorizationContext.getExchange();
                     String realRequestPath = getRealRequestPath(exchange);
                     logger.info("转发地址：{}", realRequestPath);
 //            Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
