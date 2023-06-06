@@ -18,8 +18,12 @@
 
 package com.github.zk.spring.cloud.gateway.security.authentication;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.WebAttributes;
+import org.springframework.security.web.server.DefaultServerRedirectStrategy;
+import org.springframework.security.web.server.ServerRedirectStrategy;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationFailureHandler;
 import reactor.core.publisher.Mono;
@@ -32,6 +36,9 @@ import reactor.core.publisher.Mono;
  */
 public class WebRedirectServerAuthenticationFailureHandler extends RedirectServerAuthenticationFailureHandler {
 
+    private final String location;
+
+    private ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
     /**
      * Creates an instance
@@ -40,40 +47,51 @@ public class WebRedirectServerAuthenticationFailureHandler extends RedirectServe
      */
     public WebRedirectServerAuthenticationFailureHandler(String location) {
         super(location);
+        this.location = location;
     }
 
     /**
      * 认证失败
+     * <p>
+     * 非跳转写法
      *
-     *     非跳转写法
-     *     @Override
-     *     public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException exception) {
-     *         Response response = Response.getInstance();
-     *         ServerHttpResponse serverHttpResponse = webFilterExchange.getExchange().getResponse();
-     *         serverHttpResponse.setStatusCode(HttpStatus.OK);
-     *         serverHttpResponse.getHeaders().set("Content-Type", "application/json");
-     *         response.setError(9000, null, exception.getMessage());
-     *         ObjectMapper objectMapper = new ObjectMapper();
-     *         String body = "";
-     *         try {
-     *             body = objectMapper.writeValueAsString(response);
-     *
-     *         } catch (JsonProcessingException e) {
-     *             e.printStackTrace();
-     *         }
-     *         DataBuffer dataBuffer = serverHttpResponse.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
-     *         return serverHttpResponse.writeWith(Mono.just(dataBuffer));
-     *     }
      * @param webFilterExchange web请求
-     * @param exception 异常
+     * @param exception         异常
      * @return
+     * @Override public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException exception) {
+     * Response response = Response.getInstance();
+     * ServerHttpResponse serverHttpResponse = webFilterExchange.getExchange().getResponse();
+     * serverHttpResponse.setStatusCode(HttpStatus.OK);
+     * serverHttpResponse.getHeaders().set("Content-Type", "application/json");
+     * response.setError(9000, null, exception.getMessage());
+     * ObjectMapper objectMapper = new ObjectMapper();
+     * String body = "";
+     * try {
+     * body = objectMapper.writeValueAsString(response);
+     * <p>
+     * } catch (JsonProcessingException e) {
+     * e.printStackTrace();
+     * }
+     * DataBuffer dataBuffer = serverHttpResponse.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
+     * return serverHttpResponse.writeWith(Mono.just(dataBuffer));
+     * }
      */
     @Override
     public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException exception) {
-        return webFilterExchange.getExchange().getSession().doOnNext(webSession -> {
-            // 将失败信息记录到 session 中， 由于使用的是失败跳转方式，只能通过session传递失败信息
-            webSession.getAttributes().put(WebAttributes.AUTHENTICATION_EXCEPTION, exception.getMessage());
-        }).then(super.onAuthenticationFailure(webFilterExchange, exception));
+//        return webFilterExchange.getExchange().getSession().doOnNext(webSession -> {
+//            // 将失败信息记录到 session 中， 由于使用的是失败跳转方式，只能通过session传递失败信息
+//            webSession.getAttributes().put(WebAttributes.AUTHENTICATION_EXCEPTION, exception.getMessage());
+//        }).then(super.onAuthenticationFailure(webFilterExchange, exception));
+        String encodeUrl = null;
+        try {
+            // 编码url参数，防止空格等特殊符号问题
+            encodeUrl = URLEncoder.encode(exception.getMessage(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        // 跳转增加参数，防止无session存储的请求工具，请求时造成redis存储大量session，无法清除
+        return redirectStrategy.sendRedirect(webFilterExchange.getExchange(),
+                URI.create(location + "?exception=" + encodeUrl));
     }
 
 

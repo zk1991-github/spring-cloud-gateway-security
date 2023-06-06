@@ -30,6 +30,7 @@ import org.springframework.security.web.WebAttributes;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
@@ -85,8 +86,8 @@ public class WebLoginController {
                 );
     }
 
-    @GetMapping("/fail")
-    public Response fail(WebSession session) {
+    @GetMapping("/failSession")
+    public Response failSession(WebSession session) {
         Response response = Response.getInstance();
         String message = session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
         // message为空时，请求工具没有存储session， 因此跳转后session被重新创建
@@ -103,6 +104,17 @@ public class WebLoginController {
         response.setError(Response.CodeEnum.FAIL, null, message);
         //使当前session失效
         session.invalidate().subscribe();
+        return response;
+    }
+
+    @GetMapping("/fail")
+    public Response fail(@RequestParam("exception") String exception) {
+        Response response = Response.getInstance();
+        if (ObjectUtils.nullSafeEquals(exception, "Invalid Credentials")) {
+            exception = "密码错误";
+            // TODO 考虑是否增加登录失败日志， 应考虑日志过多问题，使用存在的用户进行记录
+        }
+        response.setError(Response.CodeEnum.FAIL, null, exception);
         return response;
     }
 
