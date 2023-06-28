@@ -155,13 +155,10 @@ public class PermissionImpl implements IPermission {
     @Override
     public Page<PermissionInfo> queryPermission(PermissionInfo permissionInfo) {
         QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
-        String urlName = permissionInfo.getUrlName();
-        String url = permissionInfo.getUrl();
-        if (!ObjectUtils.isEmpty(urlName)) {
-            queryWrapper.like("url_name", urlName);
-        }
-        if (!ObjectUtils.isEmpty(url)) {
-            queryWrapper.like("url", url);
+        String keywords = permissionInfo.getKeywords();
+        if (!ObjectUtils.isEmpty(keywords)) {
+            queryWrapper.like("url_name", keywords)
+                    .or().like("url", keywords);
         }
         queryWrapper.orderByDesc("create_time");
         return permissionMapper.selectPage(permissionInfo.getPermissionInfoPage(), queryWrapper);

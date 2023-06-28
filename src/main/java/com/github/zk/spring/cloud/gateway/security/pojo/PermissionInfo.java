@@ -56,6 +56,9 @@ public class PermissionInfo implements Serializable {
     /** 分页对象 */
     @TableField(exist = false)
     private Page<PermissionInfo> permissionInfoPage;
+    /** 关键字 */
+    @TableField(exist = false)
+    private String keywords;
     /** 角色列表 */
     @TableField(exist = false)
     private List<RoleInfo> roleInfos;
@@ -114,6 +117,14 @@ public class PermissionInfo implements Serializable {
 
     public void setPermissionInfoPage(Page<PermissionInfo> permissionInfoPage) {
         this.permissionInfoPage = permissionInfoPage;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 
     public List<RoleInfo> getRoleInfos() {
