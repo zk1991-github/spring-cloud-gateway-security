@@ -68,11 +68,12 @@ public abstract class AbstractUserImpl implements IUser, ReactiveUserDetailsServ
     }
 
     /**
-     * 子类可覆盖
+     * 根据用户名查询用户信息
      * @param username 用户名
      * @return 用户对象
      */
-    protected UserInfo customFindByUsername(String username) {
+    @Override
+    public UserInfo customFindByUsername(String username) {
         UserInfo user = new UserInfo();
         user.setUsername(username);
         return userMapper.selectUser(user);

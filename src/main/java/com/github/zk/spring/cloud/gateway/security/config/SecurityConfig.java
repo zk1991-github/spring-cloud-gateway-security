@@ -195,7 +195,7 @@ public class SecurityConfig {
                         return chain.filter(exchange);
                     });
         }, SecurityWebFiltersOrder.FIRST);*/
-
+        http.anonymous();
         return http.build();
     }
 

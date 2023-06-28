@@ -43,7 +43,9 @@ public class MySpringApplicationRunListener implements SpringApplicationRunListe
     public void ready(ConfigurableApplicationContext context, Duration timeTaken) {
         logger.info("启动完成，开始加载公开权限。。。");
         IPermission iPermission = context.getBean("permissionImpl", IPermission.class);
-        int size = iPermission.cacheOpenPermissions();
-        logger.info("【{}】条公开权限加载完成。", size);
+        int anonymousPermissionsSize = iPermission.cacheAnonymousPermissions();
+        logger.info("【{}】条匿名权限加载完成。", anonymousPermissionsSize);
+        int openPermissionsSize = iPermission.cacheOpenPermissions();
+        logger.info("【{}】条公开权限加载完成。", openPermissionsSize);
     }
 }
