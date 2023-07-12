@@ -8,6 +8,7 @@
         <result column="url" property="url" jdbcType="VARCHAR"/>
         <result column="open" property="open" jdbcType="INTEGER"/>
         <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="fixed" property="fixed" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
         <collection property="roleInfos" ofType="map" column="id" select="selectRoles">
         </collection>
@@ -21,7 +22,7 @@
 
 
     <sql id="Base_Column_List">
-        id, url_name, url, open, description, create_time
+        id, url_name, url, open, description, fixed, create_time
     </sql>
 
     <select id="selectPage" resultMap="PermissionsResultMap">

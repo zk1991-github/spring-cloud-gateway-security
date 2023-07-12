@@ -50,6 +50,8 @@ public class PermissionInfo implements Serializable {
     private Integer open;
     /** 描述 */
     private String description;
+    /** 是否固定 */
+    private Integer fixed;
     /** 创建时间 */
     @TableField(fill = FieldFill.INSERT)
     private String createTime;
@@ -93,6 +95,14 @@ public class PermissionInfo implements Serializable {
 
     public void setOpen(Integer open) {
         this.open = open;
+    }
+
+    public Integer getFixed() {
+        return fixed;
+    }
+
+    public void setFixed(Integer fixed) {
+        this.fixed = fixed;
     }
 
     public String getDescription() {

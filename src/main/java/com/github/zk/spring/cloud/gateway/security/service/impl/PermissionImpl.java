@@ -61,6 +61,8 @@ public class PermissionImpl implements IPermission {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public int addPermission(PermissionInfo permissionInfo) {
+        // 新增权限是可编辑的
+        permissionInfo.setFixed(0);
         List<RoleInfo> roleInfos = permissionInfo.getRoleInfos();
         // 如果为私有权限，并且角色为空时，传入参数有误，不插入权限直接返回失败
         if (permissionInfo.getOpen() == IntfTypeEnum.PRIVATE_PERMISSION.getIndex() &&
