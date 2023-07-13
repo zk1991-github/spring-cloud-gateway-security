@@ -134,7 +134,7 @@ public class PermissionController {
         Response response = Response.getInstance();
         List<PermissionInfo> permissionInfo = iRole.queryPermissionsByRoleId(roleId);
         if (permissionInfo != null) {
-            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/queryPermissionsByRoleId", "查新成功！", permissionInfo);
+            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/queryPermissionsByRoleId", "查询成功！", permissionInfo);
         } else {
             response.setError(Response.CodeEnum.FAIL, "/gateway/queryPermissionsByRoleId", "查询失败！");
         }
