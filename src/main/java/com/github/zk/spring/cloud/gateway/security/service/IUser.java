@@ -18,6 +18,8 @@
 
 package com.github.zk.spring.cloud.gateway.security.service;
 
+import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
+
 /**
  * 用户接口
  *
@@ -26,6 +28,13 @@ package com.github.zk.spring.cloud.gateway.security.service;
  */
 public interface IUser {
 
+    /**
+     * 根据用户名查询用户信息
+     *
+     * @param username 用户名
+     * @return 用户信息
+     */
+    UserInfo customFindByUsername(String username);
     /**
      * 锁定用户
      * @param username 用户名

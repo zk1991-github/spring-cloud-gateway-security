@@ -42,7 +42,14 @@ import reactor.core.publisher.Mono;
  */
 @Service
 public class PermissionImpl implements IPermission {
+    /**
+     * 公开权限 key
+     */
     private final String PUBLIC_PERMISSION_KEY = "publicPermission";
+    /**
+     * 匿名权限 key
+     */
+    private final String ANONYMOUS_PERMISSION_KEY = "anonymousPermission";
 
     @Autowired
     private PermissionMapper permissionMapper;
@@ -54,6 +61,8 @@ public class PermissionImpl implements IPermission {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public int addPermission(PermissionInfo permissionInfo) {
+        // 新增权限是可编辑的
+        permissionInfo.setFixed(0);
         List<RoleInfo> roleInfos = permissionInfo.getRoleInfos();
         // 如果为私有权限，并且角色为空时，传入参数有误，不插入权限直接返回失败
         if (permissionInfo.getOpen() == IntfTypeEnum.PRIVATE_PERMISSION.getIndex() &&
@@ -66,6 +75,12 @@ public class PermissionImpl implements IPermission {
         if (permissionInfo.getOpen() == IntfTypeEnum.PUBLIC_PERMISSION.getIndex()) {
             // 刷新公开权限数据
             refreshOpenPermission();
+            return insert;
+        }
+        // 匿名权限只添加权限表
+        if (permissionInfo.getOpen() == IntfTypeEnum.ANONYMOUS_PERMISSION.getIndex()) {
+            // 刷新匿名权限
+            refreshAnonymousPermission();
             return insert;
         }
         // 角色绑定权限
@@ -81,20 +96,22 @@ public class PermissionImpl implements IPermission {
     public int delPermission(long id) {
         int del = permissionMapper.deleteById(id);
         boolean delRolePermission = iRolePermission.delRolePermissionByPermissionId(id);
-        // 角色关系删除成功表示此权限为公开权限，需要刷新公开权限
-        if (delRolePermission) {
+        // 角色关系删除失败表示此权限为公开或匿名权限，需要刷新公开和匿名权限
+        if (!delRolePermission) {
             refreshOpenPermission();
+            refreshAnonymousPermission();
         }
         return del;
     }
 
     @Override
     public int delPermissions(List<Long> ids) {
-        int del = permissionMapper.deleteBatchIds(ids);
         int delNum = iRolePermission.delRolePermissionByPermissionIds(ids);
-        // 角色关系删除数量与权限id数量不相等时，表示存在公开权限，需要刷新公开权限
+        int del = permissionMapper.deleteBatchIds(ids);
+        // 角色关系删除数量与权限id数量不相等时，表示存在公开或匿名权限，需要刷新公开和匿名权限
         if (delNum != ids.size()) {
             refreshOpenPermission();
+            refreshAnonymousPermission();
         }
         return del;
     }
@@ -111,11 +128,16 @@ public class PermissionImpl implements IPermission {
         int update = permissionMapper.updateById(permissionInfo);
         // 接口公开时，删除绑定此接口的角色关系
         if (permissionInfo.getOpen() == IntfTypeEnum.PUBLIC_PERMISSION.getIndex()) {
-            boolean delRolePermission = iRolePermission.delRolePermissionByPermissionId(permissionId);
-            // 删除成功，刷新公开权限
-            if (delRolePermission) {
-                refreshOpenPermission();
-            }
+            iRolePermission.delRolePermissionByPermissionId(permissionId);
+            // 刷新公开权限
+            refreshOpenPermission();
+            return update;
+        }
+        // 接口匿名时，删除绑定此接口的角色关系
+        if (permissionInfo.getOpen() == IntfTypeEnum.ANONYMOUS_PERMISSION.getIndex()) {
+            iRolePermission.delRolePermissionByPermissionId(permissionId);
+            // 刷新匿名权限
+            refreshAnonymousPermission();
             return update;
         }
 
@@ -124,6 +146,9 @@ public class PermissionImpl implements IPermission {
         // 绑定新权限
         boolean add = iRolePermission.addBatchPermissionRoles(permissionId, roleInfos);
         if (add) {
+            // 刷新公开和私有权限
+            refreshOpenPermission();
+            refreshAnonymousPermission();
             return update;
         }
         return 0;
@@ -131,14 +156,12 @@ public class PermissionImpl implements IPermission {
 
     @Override
     public Page<PermissionInfo> queryPermission(PermissionInfo permissionInfo) {
+        String keywords = permissionInfo.getKeywords();
         QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
-        String urlName = permissionInfo.getUrlName();
-        String url = permissionInfo.getUrl();
-        if (!ObjectUtils.isEmpty(urlName)) {
-            queryWrapper.like("url_name", urlName);
-        }
-        if (!ObjectUtils.isEmpty(url)) {
-            queryWrapper.like("url", url);
+        if (!ObjectUtils.isEmpty(keywords)) {
+            queryWrapper.like("url_name", keywords)
+                    .or().like("url", keywords)
+                    .or().like("gd.dict_name", keywords);
         }
         queryWrapper.orderByDesc("create_time");
         return permissionMapper.selectPage(permissionInfo.getPermissionInfoPage(), queryWrapper);
@@ -160,6 +183,14 @@ public class PermissionImpl implements IPermission {
     }
 
     @Override
+    public int cacheAnonymousPermissions() {
+        // 查询匿名接口权限列表
+        List<PermissionInfo> permissionInfos = queryPermissionByOpen(IntfTypeEnum.ANONYMOUS_PERMISSION.getIndex());
+        reactiveRedisTemplate.opsForValue().set(ANONYMOUS_PERMISSION_KEY, permissionInfos).subscribe();
+        return permissionInfos.size();
+    }
+
+    @Override
     public Mono<List<PermissionInfo>> getCacheOpenPermission() {
         return reactiveRedisTemplate.opsForValue().get(PUBLIC_PERMISSION_KEY);
     }
@@ -167,5 +198,15 @@ public class PermissionImpl implements IPermission {
     @Override
     public void refreshOpenPermission() {
         cacheOpenPermissions();
+    }
+
+    @Override
+    public Mono<List<PermissionInfo>> getCacheAnonymousPermission() {
+        return reactiveRedisTemplate.opsForValue().get(ANONYMOUS_PERMISSION_KEY);
+    }
+
+    @Override
+    public void refreshAnonymousPermission() {
+        cacheAnonymousPermissions();
     }
 }

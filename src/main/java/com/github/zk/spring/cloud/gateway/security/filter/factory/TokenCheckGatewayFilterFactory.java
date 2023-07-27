@@ -26,6 +26,9 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import reactor.core.publisher.Mono;
 
 /**
+ * 转发地址添加 -TokenCheck 配置后
+ * 公开接口也需要用户登录才能使用
+ *
  * @author zk
  * @date 2019/6/5 9:48
  */

@@ -26,6 +26,7 @@ import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import com.github.zk.spring.cloud.gateway.security.util.IpUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.config.GatewayProperties;
@@ -85,6 +86,20 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
 
         return authentication
                 .flatMap(auth -> {
+                    // 匿名权限匹配
+                    String realRequestPath = getRealRequestPath(exchange);
+                    return anonymousPermissionMatch(auth, realRequestPath);
+                })
+                .flatMap(authenticationHolder -> {
+                    // 匿名认证通过， 直接返回认证通过
+                    if (authenticationHolder.getAuthorizationDecision().isGranted()) {
+                        return Mono.just(authenticationHolder);
+                    }
+                    // 未通过匿名认证，如果是匿名状态，不进行其他权限匹配
+                    Authentication auth = authenticationHolder.getAuthentication();
+                    if (ObjectUtils.nullSafeEquals(auth.getPrincipal(), "anonymousUser")) {
+                        return Mono.just(authenticationHolder);
+                    }
                     // 所有角色的公开权限匹配
                     String realRequestPath = getRealRequestPath(exchange);
                     return openPermissionMatch(auth, realRequestPath);
@@ -94,7 +109,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                     if (authenticationHolder.getAuthorizationDecision().isGranted()) {
                         return new AuthorizationDecision(true);
                     }
-                    // 非公开权限验证
+                    // 私有权限验证
                     String realRequestPath = getRealRequestPath(exchange);
                     logger.info("转发地址：{}", realRequestPath);
 //            Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
@@ -123,18 +138,44 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
     }
 
     /**
+     * 匿名权限匹配
+     *
+     * @param auth 认证对象
+     * @param realRequestPath 真实访问地址
+     * @return 认证持有对象
+     */
+    private Mono<AuthenticationHolder> anonymousPermissionMatch(Authentication auth, String realRequestPath) {
+        Mono<List<PermissionInfo>> cacheAnonymousPermission = iPermission.getCacheAnonymousPermission();
+        return permissionMatch(cacheAnonymousPermission, auth, realRequestPath);
+    }
+
+    /**
      * 公开权限匹配
+     *
+     * @param auth 认证对象
+     * @param realRequestPath 真实访问地址
+     * @return 认证持有对象
+     */
+    private Mono<AuthenticationHolder> openPermissionMatch(Authentication auth, String realRequestPath) {
+        Mono<List<PermissionInfo>> cacheOpenPermission = iPermission.getCacheOpenPermission();
+        return permissionMatch(cacheOpenPermission, auth, realRequestPath);
+    }
+
+    /**
+     * 权限匹配
      *
      * @param requestPath 请求地址
      * @return 权限认证结果
      */
-    private Mono<AuthenticationHolder> openPermissionMatch(Authentication authentication, String requestPath) {
-        return iPermission.getCacheOpenPermission().map(permissionInfos -> {
+    private Mono<AuthenticationHolder> permissionMatch(Mono<List<PermissionInfo>> monoPermissions,
+                                                       Authentication authentication,
+                                                       String requestPath) {
+        return monoPermissions.map(permissionInfos -> {
             // 实例化认证持有对象
             AuthenticationHolder authenticationHolder = new AuthenticationHolder();
             // 存储认证后的信息（用户对象等）
             authenticationHolder.setAuthentication(authentication);
-            // 请求地址匹配公开权限
+            // 请求地址匹配权限
             for (PermissionInfo permissionInfo : permissionInfos) {
                 boolean matchUrl = ANT_PATH_MATCHER.match(permissionInfo.getUrl(), requestPath);
                 if (matchUrl) {
@@ -173,6 +214,10 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
         for (RoleInfo role : userInfo.getRoles()) {
             // 遍历角色下的权限
             for (PermissionInfo permissionInfo : role.getPermissionInfos()) {
+                if (permissionInfo == null) {
+                    logger.error("【{}】角色关联表中存在权限id，但权限表无相关权限", role.getRoleName());
+                    continue;
+                }
                 // 请求地址匹配权限地址
                 boolean match = ANT_PATH_MATCHER.match(permissionInfo.getUrl(), requestPath);
                 if (match) {

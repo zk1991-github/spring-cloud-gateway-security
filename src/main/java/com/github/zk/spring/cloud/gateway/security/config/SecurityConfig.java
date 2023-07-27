@@ -107,9 +107,10 @@ public class SecurityConfig {
 
     /**
      * 注入 Security 拦截链 bean
-     * @param http http对象
+     *
+     * @param http              http对象
      * @param gatewayProperties 网关配置
-     * @param loginProcessor 登录处理器
+     * @param loginProcessor    登录处理器
      * @return 拦截对象bean
      */
     @Bean
@@ -195,14 +196,15 @@ public class SecurityConfig {
                         return chain.filter(exchange);
                     });
         }, SecurityWebFiltersOrder.FIRST);*/
-
+        http.anonymous();
         return http.build();
     }
 
     /**
      * 注入登录处理器 bean
+     *
      * @param reactiveStringRedisTemplate 响应式 Redis 模板
-     * @param sessionRepository 会话仓储
+     * @param sessionRepository           会话仓储
      * @return 登录处理器 bean
      */
     @Bean
@@ -214,7 +216,8 @@ public class SecurityConfig {
     }
 
     /**
-     *  Security 跨域处理
+     * Security 跨域处理
+     *
      * @return 跨域配置对象
      */
     @Bean
@@ -240,12 +243,13 @@ public class SecurityConfig {
     @Bean
     @ConditionalOnMissingBean
     public DefaultUserImpl userDetailsService(LoginProperties properties,
-                                                      UserMapper userMapper) {
+                                              UserMapper userMapper) {
         return new DefaultUserImpl(properties, userMapper);
     }
 
     /**
      * 创建登出成功跳转处理器
+     *
      * @return 跳转成功处理器对象
      */
     private RedirectServerLogoutSuccessHandler createRedirectServerLogoutSuccessHandler() {

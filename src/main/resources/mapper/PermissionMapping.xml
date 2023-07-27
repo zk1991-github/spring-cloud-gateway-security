@@ -8,6 +8,7 @@
         <result column="url" property="url" jdbcType="VARCHAR"/>
         <result column="open" property="open" jdbcType="INTEGER"/>
         <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="fixed" property="fixed" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
         <collection property="roleInfos" ofType="map" column="id" select="selectRoles">
         </collection>
@@ -21,13 +22,17 @@
 
 
     <sql id="Base_Column_List">
-        id, url_name, url, open, description, create_time
+        id, url_name, url, open, description, fixed, create_time
     </sql>
 
     <select id="selectPage" resultMap="PermissionsResultMap">
         select
         <include refid="Base_Column_List"/>
-        from gateway_permission ${ew.customSqlSegment}
+        from gateway_permission gp
+            left join
+            (select dict_name, dict_val from gateway_dict where dict_type_id = 1) gd
+                on gp.open = gd.dict_val
+            ${ew.customSqlSegment}
     </select>
 
     <select id="selectRoles" resultMap="RolesResultMap">

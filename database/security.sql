@@ -30,7 +30,7 @@ CREATE TABLE `gateway_dict` (
 
 /*Data for the table `gateway_dict` */
 
-insert  into `gateway_dict`(`id`,`dict_type_id`,`dict_val`,`dict_name`) values (1,1,'0','私有'),(2,1,'1','公开');
+insert  into `gateway_dict`(`id`,`dict_type_id`,`dict_val`,`dict_name`) values (1,1,'0','私有'),(2,1,'1','公开'),(3,1,'2','匿名');
 
 /*Table structure for table `gateway_dict_type` */
 
@@ -54,15 +54,16 @@ CREATE TABLE `gateway_permission` (
   `id` bigint(32) NOT NULL AUTO_INCREMENT,
   `url_name` varchar(255) DEFAULT NULL COMMENT '功能名称',
   `url` varchar(255) NOT NULL COMMENT '功能请求地址',
-  `open` tinyint(1) NOT NULL COMMENT '是否公开；0：不公开；1：公开',
+  `open` tinyint(1) NOT NULL COMMENT '是否公开；0：私有；1：公开；2：匿名',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
+  `fixed` tinyint(1) NOT NULL COMMENT '是否固定；0：非固定；1：固定',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1499320522679283715 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1679307475678957570 DEFAULT CHARSET=utf8;
 
 /*Data for the table `gateway_permission` */
 
-insert  into `gateway_permission`(`id`,`url_name`,`url`,`open`,`description`,`create_time`) values (1495637399244447746,'分页查询权限','/queryPermission',0,'分页查询权限','2022-02-21 13:51:59'),(1495637567519924225,'新增权限','/addPermission',0,'新增权限','2022-02-21 13:52:39'),(1495637664693559298,'删除权限','/delPermission',0,'删除权限','2022-02-21 13:53:02'),(1495637762299207682,'修改权限','/updatePermission',0,'修改权限','2022-02-21 13:53:25'),(1495637865344868354,'查询所有角色','/queryAllRoles',0,'查询所有角色','2022-02-21 13:53:50'),(1495637948090097665,'根据角色绑定权限','/bindPermissionByRole',0,'根据角色绑定权限','2022-02-21 13:54:09'),(1495638064385564674,'根据角色id，查询权限','/queryPermissionsByRoleId',0,'根据角色id，查询权限','2022-02-21 13:54:37'),(1495638486122831873,'根据字典类型id，查询字典信息','/queryDictByDictTypeId',1,'根据字典类型id，查询字典信息','2022-02-21 13:56:18'),(1499320522679283714,'批量删除权限','/delPermission',0,'根据权限id，批量删除权限','2022-03-03 17:47:23');
+insert  into `gateway_permission`(`id`,`url_name`,`url`,`open`,`description`,`fixed`,`create_time`) values (1495637399244447746,'分页查询权限','/queryPermission',0,'分页查询权限',1,'2022-02-21 13:51:59'),(1495637567519924225,'新增权限','/addPermission',0,'新增权限',1,'2022-02-21 13:52:39'),(1495637664693559298,'删除权限','/delPermission',0,'删除权限',1,'2022-02-21 13:53:02'),(1495637762299207682,'修改权限','/updatePermission',0,'修改权限',1,'2022-02-21 13:53:25'),(1495637865344868354,'查询所有角色','/queryAllRoles',0,'查询所有角色',1,'2022-02-21 13:53:50'),(1495637948090097665,'根据角色绑定权限','/bindPermissionByRole',0,'根据角色绑定权限',1,'2022-02-21 13:54:09'),(1495638064385564674,'根据角色id，查询权限','/queryPermissionsByRoleId',0,'根据角色id，查询权限',1,'2022-02-21 13:54:37'),(1495638486122831873,'根据字典类型id，查询字典信息','/queryDictByDictTypeId',1,'根据字典类型id，查询字典信息',1,'2022-02-21 13:56:18'),(1499320522679283714,'批量删除权限','/delPermission',0,'根据权限id，批量删除权限',1,'2022-03-03 17:47:23');
 
 /*Table structure for table `gateway_role_permission` */
 
@@ -73,11 +74,11 @@ CREATE TABLE `gateway_role_permission` (
   `role_id` bigint(32) NOT NULL COMMENT '角色id',
   `permission_id` bigint(32) NOT NULL COMMENT '权限id',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1501446451589382146 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1679307475704123395 DEFAULT CHARSET=utf8;
 
 /*Data for the table `gateway_role_permission` */
 
-insert  into `gateway_role_permission`(`id`,`role_id`,`permission_id`) values (1499321834665979905,1,1495637948090097665),(1499321834678562818,1,1495638064385564674),(1499321834686951426,1,1495637865344868354),(1499321834686951427,1,1495637664693559298),(1499321834686951428,1,1495637762299207682),(1499321834686951429,1,1495637567519924225),(1499321834695340034,1,1499320522679283714),(1499321834695340035,1,1495637399244447746);
+insert  into `gateway_role_permission`(`id`,`role_id`,`permission_id`) values (1499321834665979905,1,1495637948090097665),(1499321834678562818,1,1495638064385564674),(1499321834686951426,1,1495637865344868354),(1499321834686951427,1,1495637664693559298),(1499321834686951428,1,1495637762299207682),(1499321834686951429,1,1495637567519924225),(1499321834695340034,1,1499320522679283714),(1499321834695340035,1,1495637399244447746),(1678750836995424257,1,1678750836987035649),(1678750836995424258,2,1678750836987035649),(1678750917530255362,1,1678750917521866754);
 
 /*Table structure for table `t_log` */
 

@@ -50,12 +50,17 @@ public class PermissionInfo implements Serializable {
     private Integer open;
     /** 描述 */
     private String description;
+    /** 是否固定 */
+    private Integer fixed;
     /** 创建时间 */
     @TableField(fill = FieldFill.INSERT)
     private String createTime;
     /** 分页对象 */
     @TableField(exist = false)
     private Page<PermissionInfo> permissionInfoPage;
+    /** 关键字 */
+    @TableField(exist = false)
+    private String keywords;
     /** 角色列表 */
     @TableField(exist = false)
     private List<RoleInfo> roleInfos;
@@ -92,6 +97,14 @@ public class PermissionInfo implements Serializable {
         this.open = open;
     }
 
+    public Integer getFixed() {
+        return fixed;
+    }
+
+    public void setFixed(Integer fixed) {
+        this.fixed = fixed;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -114,6 +127,14 @@ public class PermissionInfo implements Serializable {
 
     public void setPermissionInfoPage(Page<PermissionInfo> permissionInfoPage) {
         this.permissionInfoPage = permissionInfoPage;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 
     public List<RoleInfo> getRoleInfos() {

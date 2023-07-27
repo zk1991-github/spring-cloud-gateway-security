@@ -75,8 +75,15 @@ public interface IPermission {
 
     /**
      * 缓存公开权限
+     * @return 公开权限数量
      */
     int cacheOpenPermissions();
+
+    /**
+     * 缓存匿名权限
+     * @return 匿名权限数量
+     */
+    int cacheAnonymousPermissions();
 
     /**
      * 获取缓存中的公开权限
@@ -89,4 +96,14 @@ public interface IPermission {
      */
     void refreshOpenPermission();
 
+    /**
+     * 获取缓存中的匿名权限
+     * @return 权限列表
+     */
+    Mono<List<PermissionInfo>> getCacheAnonymousPermission();
+
+    /**
+     * 刷新匿名权限
+     */
+    void refreshAnonymousPermission();
 }

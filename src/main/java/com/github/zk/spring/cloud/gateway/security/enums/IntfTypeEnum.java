@@ -26,13 +26,18 @@ package com.github.zk.spring.cloud.gateway.security.enums;
  */
 public enum IntfTypeEnum {
     /**
-     * 公开接口
+     * 私有权限
      */
     PRIVATE_PERMISSION(0),
     /**
-     * 私有接口
+     * 公开权限
      */
-    PUBLIC_PERMISSION(1);
+    PUBLIC_PERMISSION(1),
+
+    /**
+     * 匿名权限
+     */
+    ANONYMOUS_PERMISSION(2);
 
     private final int index;
 
