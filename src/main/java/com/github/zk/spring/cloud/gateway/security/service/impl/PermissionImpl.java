@@ -44,7 +44,7 @@ import reactor.core.publisher.Mono;
 public class PermissionImpl implements IPermission {
     /**
      * 公开权限 key
-      */
+     */
     private final String PUBLIC_PERMISSION_KEY = "publicPermission";
     /**
      * 匿名权限 key
@@ -156,11 +156,12 @@ public class PermissionImpl implements IPermission {
 
     @Override
     public Page<PermissionInfo> queryPermission(PermissionInfo permissionInfo) {
-        QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
         String keywords = permissionInfo.getKeywords();
+        QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
         if (!ObjectUtils.isEmpty(keywords)) {
             queryWrapper.like("url_name", keywords)
-                    .or().like("url", keywords);
+                    .or().like("url", keywords)
+                    .or().like("gd.dict_name", keywords);
         }
         queryWrapper.orderByDesc("create_time");
         return permissionMapper.selectPage(permissionInfo.getPermissionInfoPage(), queryWrapper);

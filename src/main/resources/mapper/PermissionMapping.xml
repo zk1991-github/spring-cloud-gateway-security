@@ -28,7 +28,11 @@
     <select id="selectPage" resultMap="PermissionsResultMap">
         select
         <include refid="Base_Column_List"/>
-        from gateway_permission ${ew.customSqlSegment}
+        from gateway_permission gp
+            left join
+            (select dict_name, dict_val from gateway_dict where dict_type_id = 1) gd
+                on gp.open = gd.dict_val
+            ${ew.customSqlSegment}
     </select>
 
     <select id="selectRoles" resultMap="RolesResultMap">
