@@ -30,7 +30,7 @@ CREATE TABLE `gateway_dict` (
 
 /*Data for the table `gateway_dict` */
 
-insert  into `gateway_dict`(`id`,`dict_type_id`,`dict_val`,`dict_name`) values (1,1,'0','私有'),(2,1,'1','公开');
+insert  into `gateway_dict`(`id`,`dict_type_id`,`dict_val`,`dict_name`) values (1,1,'0','私有'),(2,1,'1','公开'),(3,1,'2','匿名');
 
 /*Table structure for table `gateway_dict_type` */
 
@@ -59,7 +59,7 @@ CREATE TABLE `gateway_permission` (
   `fixed` tinyint(1) NOT NULL COMMENT '是否固定；0：非固定；1：固定',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1678750917521866755 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1679307475678957570 DEFAULT CHARSET=utf8;
 
 /*Data for the table `gateway_permission` */
 
@@ -74,7 +74,7 @@ CREATE TABLE `gateway_role_permission` (
   `role_id` bigint(32) NOT NULL COMMENT '角色id',
   `permission_id` bigint(32) NOT NULL COMMENT '权限id',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1678750917530255363 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1679307475704123395 DEFAULT CHARSET=utf8;
 
 /*Data for the table `gateway_role_permission` */
 
