@@ -4,7 +4,7 @@
 
     <delete id="delRolePermissionByPermissions">
         delete from gateway_role_permission
-        where id in
+        where permission_id in
         <foreach collection="list" index="index" item="ids" separator="," open="(" close=")">
             #{ids}
         </foreach>
