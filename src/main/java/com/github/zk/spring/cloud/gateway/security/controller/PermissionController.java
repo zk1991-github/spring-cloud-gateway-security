@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2022 the original author or authors.
+ *  * Copyright 2021-2023 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -84,10 +84,10 @@ public class PermissionController {
         Response response = Response.getInstance();
         int update = iPermission.updatePermission(permissionInfo);
         if (update > 0) {
-            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/queryPermission", "修改成功！",
+            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/updatePermission", "修改成功！",
                     update);
         } else {
-            response.setError(Response.CodeEnum.FAIL, "/gateway/queryPermission", "修改失败！");
+            response.setError(Response.CodeEnum.FAIL, "/gateway/updatePermission", "修改失败！");
         }
         return response;
     }
@@ -117,7 +117,7 @@ public class PermissionController {
         return response;
     }
 
-    @PostMapping("/queryAllRoles")
+    @GetMapping("/queryAllRoles")
     public Response queryAllRoles() {
         Response response = Response.getInstance();
         List<RoleInfo> roleInfos = iRole.queryAllRoles();

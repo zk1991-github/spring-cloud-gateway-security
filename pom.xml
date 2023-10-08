@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.github.zk</groupId>
     <artifactId>spring-cloud-gateway-security</artifactId>
-    <version>v4.1.6</version>
+    <version>v4.2.0</version>
     <name>spring-cloud-gateway-security</name>
     <description>Spring Cloud gateway 整合 Spring Security</description>
     <properties>
@@ -88,6 +88,15 @@
     </dependencyManagement>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                    <exclude>**/*.yml</exclude>
+                </excludes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
