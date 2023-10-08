@@ -8,6 +8,7 @@ spring:
         maxSessions: 10000
       default-filters:
         - Session
+        - Monitor
       routes:
         - id: server_route
           # 转发地址
@@ -24,7 +25,7 @@ spring:
                 # 此处 key 必须为 “parts”
                 parts: 1
 #            - StripPrefix=1
-            # token身份认证 JwtCheckGatewayFilterFactory
+            # token身份认证 TokenCheckGatewayFilterFactory
             - TokenCheck
             # 请求流量限制，默认5MB
             - name: RequestSize

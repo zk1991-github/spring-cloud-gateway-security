@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2022 the original author or authors.
+ *  * Copyright 2021-2023 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@
 
 package com.github.zk.spring.cloud.gateway.security.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -50,8 +48,12 @@ public class UserInfo implements UserDetails {
     private transient String password;
     /** 电话号码 */
     private String phone;
-
+    /** 是否未锁定 */
     private boolean accountNonLocked;
+    /** 创建时间 */
+    @TableField(fill = FieldFill.INSERT)
+    private String createTime;
+
     /**角色列表 */
     private List<RoleInfo> roles;
 
@@ -85,6 +87,14 @@ public class UserInfo implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 
     @Override
