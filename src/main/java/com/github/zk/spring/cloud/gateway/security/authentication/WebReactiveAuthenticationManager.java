@@ -20,6 +20,7 @@ package com.github.zk.spring.cloud.gateway.security.authentication;
 
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
+import java.time.Duration;
 import org.springframework.core.log.LogMessage;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
@@ -74,11 +75,18 @@ public class WebReactiveAuthenticationManager extends UserDetailsRepositoryReact
                 .doOnNext(auth -> loginProcessor.removeLockRecord(username).subscribe())
                 .doOnError(BadCredentialsException.class, (ex) -> {
                     // 打印认证失败日志
-                    logger.info(LogMessage.format("%s Authentication failed: %s", username, ex.getMessage()));
+                    logger.debug(LogMessage.format("%s Authentication failed: %s", username, ex.getMessage()));
+                    Duration lockedTime = loginProcessor.getLockedTime();
+                    if (lockedTime.getSeconds() == 0) {
+                        return;
+                    }
                     // 处理是否要锁定用户
                     loginProcessor.isLockUser(username).doOnNext(aBoolean -> {
                         if (aBoolean) {
-                            userDetailsService.lockUser(username);
+                            boolean lock = userDetailsService.lockUser(username);
+                            if (lock) {
+                                userDetailsService.unLockUser(username, lockedTime);
+                            }
                         }
                     }).subscribe();
                 });

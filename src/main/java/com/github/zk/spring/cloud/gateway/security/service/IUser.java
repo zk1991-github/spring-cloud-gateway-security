@@ -19,6 +19,7 @@
 package com.github.zk.spring.cloud.gateway.security.service;
 
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
+import java.time.Duration;
 
 /**
  * 用户接口
@@ -41,6 +42,15 @@ public interface IUser {
      * @return 是否锁定成功
      */
     boolean lockUser(String username);
+
+    /**
+     * 解锁用户
+     *
+     * @param username 用户名
+     * @param time 解锁时间
+     * @return 是否解锁成功
+     */
+    void unLockUser(String username, Duration time);
 
     /**
      * 修改密码
