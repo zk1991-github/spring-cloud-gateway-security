@@ -22,6 +22,9 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
+import io.netty.util.concurrent.DefaultThreadFactory;
+import java.time.Duration;
+import java.util.concurrent.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,6 +59,23 @@ public class DefaultUserImpl extends AbstractUserImpl {
         // 根据用户名锁定用户
         int update = userMapper.update(userInfo, updateWrapper);
         return update > 0;
+    }
+
+    @Override
+    public void unLockUser(String username, Duration time) {
+        ScheduledThreadPoolExecutor executor =
+                new ScheduledThreadPoolExecutor(1, new DefaultThreadFactory(DefaultUserImpl.class));
+        // 延迟执行任务
+        executor.schedule(() -> {
+            UserInfo userInfo = new UserInfo();
+            userInfo.setAccountNonLocked(true);
+            UpdateWrapper<UserInfo> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.eq("username", username);
+            // 根据用户名锁定用户
+            userMapper.update(userInfo, updateWrapper);
+            // 关闭线程池
+            executor.shutdown();
+        }, time.getSeconds(), TimeUnit.SECONDS);
     }
 
     @Override

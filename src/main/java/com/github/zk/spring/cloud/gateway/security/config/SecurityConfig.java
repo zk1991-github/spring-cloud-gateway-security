@@ -27,6 +27,7 @@ import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
 import java.net.URI;
+import java.time.Duration;
 import java.util.Collections;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -66,6 +67,10 @@ public class SecurityConfig {
     private String proxyUrl;
     @Value("${spring.static.antpatterns:#{null }}")
     private String[] antPatterns;
+    @Value("${spring.cloud.gateway.session.lockRecord:#{null }}")
+    private Integer lockRecord;
+    @Value("${spring.cloud.gateway.session.lockedTime:PT10S}")
+    private Duration lockedTime;
 
     @PostConstruct
     public void init() {
@@ -212,6 +217,10 @@ public class SecurityConfig {
                                          ReactiveRedisSessionRepository sessionRepository) {
         LoginProcessor loginProcessor = new LoginProcessor(reactiveStringRedisTemplate, sessionRepository);
         loginProcessor.setMaxSessions(maxSessions);
+        if (lockRecord != null) {
+            loginProcessor.setAllowPasswordErrorRecord(lockRecord);
+        }
+        loginProcessor.setLockedTime(lockedTime);
         return loginProcessor;
     }
 

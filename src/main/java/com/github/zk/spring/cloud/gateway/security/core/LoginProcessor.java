@@ -18,6 +18,7 @@
 
 package com.github.zk.spring.cloud.gateway.security.core;
 
+import java.time.Duration;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.security.web.authentication.session.SessionAuthenticationException;
@@ -43,6 +44,16 @@ public class LoginProcessor {
     private int maxSessions;
 
     /**
+     * 允许密码输入错误次数
+     */
+    private Integer allowPasswordErrorRecord = 3;
+
+    /**
+     * 锁定时长
+     */
+    private Duration lockedTime;
+
+    /**
      * 密码错误存储 key
      */
     private final String DEFAULT_NAMESPACE = "password:error";
@@ -51,11 +62,6 @@ public class LoginProcessor {
      * 命名空间
      */
     private final String namespace = DEFAULT_NAMESPACE + ":";
-
-    /**
-     * 允许密码输入错误次数
-     */
-    private Integer allowPasswordErrorRecord = 3;
 
     public LoginProcessor(ReactiveStringRedisTemplate reactiveStringRedisTemplate,
                           ReactiveRedisSessionRepository sessionRepository) {
@@ -74,6 +80,14 @@ public class LoginProcessor {
 
     public void setAllowPasswordErrorRecord(Integer allowPasswordErrorRecord) {
         this.allowPasswordErrorRecord = allowPasswordErrorRecord;
+    }
+
+    public void setLockedTime(Duration lockedTime) {
+        this.lockedTime = lockedTime;
+    }
+
+    public Duration getLockedTime() {
+        return lockedTime;
     }
 
     /**
@@ -229,7 +243,7 @@ public class LoginProcessor {
                 .increment(namespace + username)
                 .flatMap(num -> {
                     // 密码输入错误次数小于允许的次数，只计数，返回false
-                    if (num < allowPasswordErrorRecord) {
+                    if (allowPasswordErrorRecord == -1 || num < allowPasswordErrorRecord) {
                         return Mono.empty();
                     }
                     // 锁定后删除计数

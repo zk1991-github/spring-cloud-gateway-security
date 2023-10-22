@@ -11,6 +11,16 @@
       "description": "最大允许同时登录用户数，-1代表不限制."
     },
     {
+      "name": "spring.cloud.gateway.session.lockRecord",
+      "type": "java.lang.String",
+      "description": "锁定账户，密码输入错误次数，默认3次."
+    },
+    {
+      "name": "spring.cloud.gateway.session.lockedTime",
+      "type": "java.lang.String",
+      "description": "账户锁定时间，默认5分钟即5M."
+    },
+    {
       "name": "login.user.username",
       "type": "java.lang.String",
       "description": "系统默认用户名."
