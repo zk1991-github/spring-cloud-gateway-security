@@ -12,7 +12,7 @@
    (1) package包中是编译后的部署软件，将jar包和config文件夹拷贝至服务器，注意层级保持一致。 <br>
    (2) 将database中的security.sql导入到数据库中。<br>
    (3) 修改`application-datasource.yml`中的数据库和redis连接地址。<br>
-   (4) `application-datasource.yml`中添加代理配置，详见`4 注意事项 的 4.1 跨域问题`章节。<br>
+   (4) `application-gateway.yml`中添加代理配置，详见`4 注意事项 的 4.1 跨域问题`章节。<br>
    (5) 通过命令`nohup java -jar spring-cloud-gateway-security-vx.x.x.jar &`启动服务。
 3. 成功验证
 
