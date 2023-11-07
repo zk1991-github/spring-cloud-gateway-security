@@ -352,3 +352,7 @@ spring:
 |    1 |   0   | 成功              |
 |    2 | 9000  | 需要跳转到登录界面   |
 |    3 | 10000 | 失败              |
+
+#### 4.8 websocket测试
+访问 `http://IP:PORT/web/websocket.html` 界面，websocket测试访问地址为`ws://localhost:8888/websocket`，通过网关转发至目标服务。
+目标websocket服务需要暴露端点为websocket。
