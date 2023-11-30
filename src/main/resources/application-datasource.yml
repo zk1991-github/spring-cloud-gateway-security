@@ -39,6 +39,7 @@ spring:
         test-on-return: false
         # 打开PSCache，并且指定每个连接上PSCache的大小  如果用Oracle，则把poolPreparedStatements配置为true，mysql可以配置为false。
         pool-prepared-statements: false
+        # 使用 sqlite 需要把值设置为小于 0
         max-open-prepared-statements: 20
 
   redis:

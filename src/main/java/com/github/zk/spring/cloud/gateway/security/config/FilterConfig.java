@@ -23,7 +23,7 @@ import com.github.zk.spring.cloud.gateway.security.filter.factory.RequestBodyOpe
 import com.github.zk.spring.cloud.gateway.security.filter.factory.SessionGatewayFilterFactory;
 import com.github.zk.spring.cloud.gateway.security.filter.factory.TokenCheckGatewayFilterFactory;
 import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -68,7 +68,8 @@ public class FilterConfig {
      * @return 监控拦截工厂
      */
     @Bean
-    public MonitorGatewayFilterFactory monitorGatewayFilterFactory(@Qualifier("requestMonitorToDB") RequestMonitor requestMonitor) {
+    @ConditionalOnBean(RequestMonitor.class)
+    public MonitorGatewayFilterFactory monitorGatewayFilterFactory(RequestMonitor requestMonitor) {
         return new MonitorGatewayFilterFactory(requestMonitor);
     }
 }

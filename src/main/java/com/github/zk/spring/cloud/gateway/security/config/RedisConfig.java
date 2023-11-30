@@ -20,6 +20,7 @@ package com.github.zk.spring.cloud.gateway.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zk.spring.cloud.gateway.security.jackson2.CustomCoreJackson2Module;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -33,6 +34,7 @@ import org.springframework.session.data.redis.config.annotation.web.server.Enabl
  * @date 2021/2/7 11:13
  */
 @Configuration
+@ConditionalOnClass(RedisSerializer.class)
 @EnableRedisWebSession
 public class RedisConfig {
 
@@ -59,6 +61,7 @@ public class RedisConfig {
      * 注入序列化bean
      * @return 序列化对象
      */
+
     @Bean
     public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
         ObjectMapper objectMapper = new ObjectMapper();

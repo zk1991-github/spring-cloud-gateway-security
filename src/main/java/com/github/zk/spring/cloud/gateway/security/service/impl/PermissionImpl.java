@@ -20,6 +20,7 @@ package com.github.zk.spring.cloud.gateway.security.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCache;
 import com.github.zk.spring.cloud.gateway.security.dao.PermissionMapper;
 import com.github.zk.spring.cloud.gateway.security.enums.IntfTypeEnum;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
@@ -28,7 +29,6 @@ import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import com.github.zk.spring.cloud.gateway.security.service.IRolePermission;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -56,7 +56,7 @@ public class PermissionImpl implements IPermission {
     @Autowired
     private IRolePermission iRolePermission;
     @Autowired
-    private ReactiveRedisTemplate reactiveRedisTemplate;
+    private GatewaySecurityCache gatewaySecurityCache;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -178,7 +178,7 @@ public class PermissionImpl implements IPermission {
     public int cacheOpenPermissions() {
         // 查询公开接口权限列表
         List<PermissionInfo> permissionInfos = queryPermissionByOpen(IntfTypeEnum.PUBLIC_PERMISSION.getIndex());
-        reactiveRedisTemplate.opsForValue().set(PUBLIC_PERMISSION_KEY, permissionInfos).subscribe();
+        gatewaySecurityCache.cachePermissions(PUBLIC_PERMISSION_KEY, permissionInfos).subscribe();
         return permissionInfos.size();
     }
 
@@ -186,13 +186,13 @@ public class PermissionImpl implements IPermission {
     public int cacheAnonymousPermissions() {
         // 查询匿名接口权限列表
         List<PermissionInfo> permissionInfos = queryPermissionByOpen(IntfTypeEnum.ANONYMOUS_PERMISSION.getIndex());
-        reactiveRedisTemplate.opsForValue().set(ANONYMOUS_PERMISSION_KEY, permissionInfos).subscribe();
+        gatewaySecurityCache.cachePermissions(ANONYMOUS_PERMISSION_KEY, permissionInfos).subscribe();
         return permissionInfos.size();
     }
 
     @Override
     public Mono<List<PermissionInfo>> getCacheOpenPermission() {
-        return reactiveRedisTemplate.opsForValue().get(PUBLIC_PERMISSION_KEY);
+        return gatewaySecurityCache.getCachePermission(PUBLIC_PERMISSION_KEY);
     }
 
     @Override
@@ -202,7 +202,7 @@ public class PermissionImpl implements IPermission {
 
     @Override
     public Mono<List<PermissionInfo>> getCacheAnonymousPermission() {
-        return reactiveRedisTemplate.opsForValue().get(ANONYMOUS_PERMISSION_KEY);
+        return gatewaySecurityCache.getCachePermission(ANONYMOUS_PERMISSION_KEY);
     }
 
     @Override

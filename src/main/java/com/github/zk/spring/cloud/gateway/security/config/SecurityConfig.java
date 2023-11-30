@@ -27,7 +27,6 @@ import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
 import java.net.URI;
-import java.time.Duration;
 import java.util.Collections;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -37,7 +36,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -45,7 +43,6 @@ import org.springframework.security.web.server.authentication.RedirectServerAuth
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.RedirectServerLogoutSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.WebSessionServerLogoutHandler;
-import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -61,16 +58,10 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
     private final static Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
-    @Value("${spring.cloud.gateway.session.maxSessions}")
-    private int maxSessions;
     @Value("${spring.web.proxy.url:#{null}}")
     private String proxyUrl;
     @Value("${spring.static.antpatterns:#{null }}")
     private String[] antPatterns;
-    @Value("${spring.cloud.gateway.session.lockRecord:#{null }}")
-    private Integer lockRecord;
-    @Value("${spring.cloud.gateway.session.lockedTime:PT10S}")
-    private Duration lockedTime;
 
     @PostConstruct
     public void init() {
@@ -203,25 +194,6 @@ public class SecurityConfig {
         }, SecurityWebFiltersOrder.FIRST);*/
         http.anonymous();
         return http.build();
-    }
-
-    /**
-     * 注入登录处理器 bean
-     *
-     * @param reactiveStringRedisTemplate 响应式 Redis 模板
-     * @param sessionRepository           会话仓储
-     * @return 登录处理器 bean
-     */
-    @Bean
-    public LoginProcessor loginProcessor(ReactiveStringRedisTemplate reactiveStringRedisTemplate,
-                                         ReactiveRedisSessionRepository sessionRepository) {
-        LoginProcessor loginProcessor = new LoginProcessor(reactiveStringRedisTemplate, sessionRepository);
-        loginProcessor.setMaxSessions(maxSessions);
-        if (lockRecord != null) {
-            loginProcessor.setAllowPasswordErrorRecord(lockRecord);
-        }
-        loginProcessor.setLockedTime(lockedTime);
-        return loginProcessor;
     }
 
     /**

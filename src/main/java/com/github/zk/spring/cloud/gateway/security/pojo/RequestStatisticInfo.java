@@ -36,6 +36,7 @@ public class RequestStatisticInfo {
     /** 平均响应时间 */
     private Integer responseDurationAvg;
 
+    public RequestStatisticInfo() {}
     public RequestStatisticInfo(String urlPath, Long successNum, Long failNum, String successRate, Integer responseDurationAvg) {
         this.urlPath = urlPath;
         this.successNum = successNum;
