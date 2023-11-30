@@ -108,7 +108,8 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <!-- 单机无 Redis 版本时需要此配置 -->
-                <configuration>
+                <!-- 使用集群版本时需要注释此配置 -->
+                <!--<configuration>
                     <excludes>
                         <exclude>
                             <groupId>org.springframework.session</groupId>
@@ -123,7 +124,7 @@
                             <artifactId>spring-data-redis</artifactId>
                         </exclude>
                     </excludes>
-                </configuration>
+                </configuration>-->
             </plugin>
         </plugins>
     </build>
