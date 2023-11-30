@@ -19,15 +19,13 @@
 package com.github.zk.spring.cloud.gateway.security.controller;
 
 import com.github.zk.spring.cloud.gateway.security.common.Response;
+import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.pojo.UpdatePasswordDTO;
 import com.github.zk.spring.cloud.gateway.security.service.IUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -42,10 +40,9 @@ import reactor.core.publisher.Mono;
 public class UserController {
 
     @Autowired
-    private ReactiveStringRedisTemplate redisTemplate;
-
-    @Autowired
     private IUser iUser;
+    @Autowired
+    private LoginProcessor loginProcessor;
 
     /**
      * get请求方式获取用户
@@ -90,11 +87,7 @@ public class UserController {
      */
     @GetMapping("/getOnlineNums")
     public Mono<Response> getOnlineNums() {
-        ScanOptions options = ScanOptions
-                .scanOptions()
-                .match(ReactiveRedisSessionRepository.DEFAULT_NAMESPACE + ":*")
-                .build();
-        return redisTemplate.scan(options).count().map(aLong -> {
+        return loginProcessor.onlineNum().map(aLong -> {
             Response response = Response.getInstance();
             response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/getOnlineNums", "查询成功！", aLong);
             return response;

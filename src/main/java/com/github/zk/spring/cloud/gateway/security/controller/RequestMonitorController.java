@@ -23,7 +23,6 @@ import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitor;
 import com.github.zk.spring.cloud.gateway.security.pojo.RequestStatisticInfo;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,7 +39,6 @@ import reactor.core.publisher.Mono;
 public class RequestMonitorController {
 
     @Autowired
-    @Qualifier("requestMonitorToDB")
     private RequestMonitor requestMonitor;
 
     @GetMapping("/queryRequestStatistic")

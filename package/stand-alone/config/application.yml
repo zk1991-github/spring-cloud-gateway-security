@@ -1,0 +1,18 @@
+server:
+  port: 8888
+login:
+  user:
+    id: 0
+    username: superadmin
+    # 123456
+    password: "{bcrypt}$2a$10$0EQexC0XYw58x.ys.Ym8QO3H2Llr0G4wEAFddm8PkOUGy6hQraaui"
+    accountNonLocked: true
+    roles:
+      - id: 0
+        roleName: 超级管理员
+        permissionInfos:
+          - urlName: 所有权限
+            url: /**
+spring:
+  profiles:
+    active: datasource, gateway, wechat, release

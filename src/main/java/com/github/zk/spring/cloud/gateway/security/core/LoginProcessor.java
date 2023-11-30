@@ -19,11 +19,9 @@
 package com.github.zk.spring.cloud.gateway.security.core;
 
 import java.time.Duration;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.security.web.authentication.session.SessionAuthenticationException;
-import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
 import org.springframework.web.server.WebSession;
+import org.springframework.web.server.session.WebSessionStore;
 import reactor.core.publisher.Mono;
 
 /**
@@ -34,9 +32,9 @@ import reactor.core.publisher.Mono;
  */
 public class LoginProcessor {
 
-    private final ReactiveStringRedisTemplate reactiveStringRedisTemplate;
+    private final GatewaySecurityCache gatewaySecurityCache;
 
-    private final ReactiveRedisSessionRepository sessionRepository;
+    private final WebSessionStore webSessionStore;
 
     /**
      * 同时在线最大用户数
@@ -63,10 +61,10 @@ public class LoginProcessor {
      */
     private final String namespace = DEFAULT_NAMESPACE + ":";
 
-    public LoginProcessor(ReactiveStringRedisTemplate reactiveStringRedisTemplate,
-                          ReactiveRedisSessionRepository sessionRepository) {
-        this.reactiveStringRedisTemplate = reactiveStringRedisTemplate;
-        this.sessionRepository = sessionRepository;
+    public LoginProcessor(GatewaySecurityCache gatewaySecurityCache,
+                          WebSessionStore webSessionStore) {
+        this.gatewaySecurityCache = gatewaySecurityCache;
+        this.webSessionStore = webSessionStore;
     }
 
     /**
@@ -125,6 +123,7 @@ public class LoginProcessor {
                 // 查询用户 session 是否存在，存在说明当前为登录状态，登录状态允许再次登录，
                 // 不受最大登录人数限制
                 .flatMap(this::userSessionExistBySessionId)
+                .filter(logined -> logined)
                 // 未登录用户，验证是否超过允许登录人数
                 .switchIfEmpty(onlineNum()
                         .map(aLong -> maxSessions != -1 && aLong >= maxSessions)
@@ -145,11 +144,7 @@ public class LoginProcessor {
      * @return SessionId
      */
     public Mono<String> getSessionId(String hashKey) {
-        return reactiveStringRedisTemplate
-                .opsForHash()
-                .get("sessions", hashKey)
-                .switchIfEmpty(Mono.empty())
-                .cast(String.class);
+        return gatewaySecurityCache.getSessionId(hashKey);
     }
 
     /**
@@ -162,11 +157,11 @@ public class LoginProcessor {
      */
     public Mono<Boolean> changeSession(String hashKey, String oldSessionId, String newSessionId) {
         // 根据 sessionId 删除存储的 session 信息
-        Mono<Void> delSession = sessionRepository.deleteById(oldSessionId);
+        Mono<Void> delSession = webSessionStore.removeSession(oldSessionId);
         // 删除登录时存储的用户信息
-        Mono<Boolean> removeSession = removeSession(hashKey);
+        Mono<Boolean> removeSession = gatewaySecurityCache.removeSession(hashKey);
         // 存储新的用户信息
-        Mono<Boolean> saveSession = saveSession(hashKey, newSessionId);
+        Mono<Boolean> saveSession = gatewaySecurityCache.saveSession(hashKey, newSessionId);
         // 依次执行响应式方法
         return delSession.then(removeSession).then(saveSession);
     }
@@ -179,21 +174,7 @@ public class LoginProcessor {
      * @return 保存 Session 状态
      */
     public Mono<Boolean> saveSession(String hashKey, String sessionId) {
-        return reactiveStringRedisTemplate
-                .opsForHash()
-                .put("sessions", hashKey, sessionId);
-    }
-
-    /**
-     * 删除会话
-     *
-     * @param hashKey 用户缓存key
-     * @return 删除 Session 状态
-     */
-    public Mono<Boolean> removeSession(String hashKey) {
-        return reactiveStringRedisTemplate
-                .opsForHash()
-                .remove("sessions", hashKey).map(delNum -> delNum > 0);
+        return gatewaySecurityCache.saveSession(hashKey, sessionId);
     }
 
     /**
@@ -202,11 +183,7 @@ public class LoginProcessor {
      * @return 在线用户数
      */
     public Mono<Long> onlineNum() {
-        ScanOptions options = ScanOptions
-                .scanOptions()
-                .match(ReactiveRedisSessionRepository.DEFAULT_NAMESPACE + ":*")
-                .build();
-        return reactiveStringRedisTemplate.scan(options).count();
+        return gatewaySecurityCache.onlineNum();
     }
 
     /**
@@ -216,18 +193,7 @@ public class LoginProcessor {
      * @return 用户存在状态
      */
     public Mono<Boolean> userSessionExistBySessionId(String sessionId) {
-        // 构建过滤条件
-        ScanOptions options = ScanOptions
-                .scanOptions()
-                .match(ReactiveRedisSessionRepository.DEFAULT_NAMESPACE + ":sessions:" + sessionId)
-                .build();
-        // 根据查询数量
-        return reactiveStringRedisTemplate.scan(options).count().flatMap(count -> {
-            if (count > 0) {
-                return Mono.just(true);
-            }
-            return Mono.empty();
-        });
+        return gatewaySecurityCache.userSessionExistBySessionId(sessionId);
     }
 
     /**
@@ -237,18 +203,7 @@ public class LoginProcessor {
      * @return 锁定是否成功
      */
     public Mono<Boolean> isLockUser(String username) {
-        return reactiveStringRedisTemplate
-                .opsForValue()
-                // 计数增加
-                .increment(namespace + username)
-                .flatMap(num -> {
-                    // 密码输入错误次数小于允许的次数，只计数，返回false
-                    if (allowPasswordErrorRecord == -1 || num < allowPasswordErrorRecord) {
-                        return Mono.empty();
-                    }
-                    // 锁定后删除计数
-                    return removeLockRecord(username);
-                });
+        return gatewaySecurityCache.isLockUser(username, namespace, allowPasswordErrorRecord);
     }
 
     /**
@@ -258,7 +213,7 @@ public class LoginProcessor {
      * @return 删除是否成功状态
      */
     public Mono<Boolean> removeLockRecord(String username) {
-        return reactiveStringRedisTemplate.opsForValue().delete(namespace + username);
+        return gatewaySecurityCache.removeLockRecord(username, namespace);
     }
 
 }

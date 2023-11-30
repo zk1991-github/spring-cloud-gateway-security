@@ -20,18 +20,19 @@ package com.github.zk.spring.cloud.gateway.security.controller;
 
 import com.github.zk.spring.cloud.gateway.security.authentication.exception.SessionStoreAuthenticationException;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
+import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCache;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.pojo.WeChatDTO;
 import com.github.zk.spring.cloud.gateway.security.service.IWeChatAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.session.DefaultWebSessionManager;
+import org.springframework.web.server.session.WebSessionManager;
 import reactor.core.publisher.Mono;
 
 /**
@@ -51,8 +52,8 @@ public class WeChatLoginController extends LoginProcessor {
 
     public final static String WECHAT_LOGIN_URL = "/weChatLogin";
 
-    public WeChatLoginController(ReactiveStringRedisTemplate reactiveStringRedisTemplate, ReactiveRedisSessionRepository sessionRepository) {
-        super(reactiveStringRedisTemplate, sessionRepository);
+    public WeChatLoginController(GatewaySecurityCache gatewaySecurityCache, WebSessionManager webSessionManager) {
+        super(gatewaySecurityCache, ((DefaultWebSessionManager) webSessionManager).getSessionStore());
     }
 
     /**

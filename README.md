@@ -1,17 +1,26 @@
 # 网关鉴权说明文档
   网关鉴权是将服务与外部请求隔离，通过网关转发请求，达到服务统一入口。在网关层进行登录认证以及接口权限控制，对各服务统一认证。 
 ## 版本更新说明
-  v4.2.1 版本增加了锁定账户输入密码错误次数配置，并支持配置自动解锁时间。
+  - v4.2.1 版本增加了锁定账户输入密码错误次数配置，并支持配置自动解锁时间。
+  - v4.3.0 版本支持单机(无Redis)和集群(有Redis)两种方式部署
 ## 快速开始
 1. 部署架构
 
 网关鉴权软件一般是在Nginx等负载软件下层，通过负载软件使网关鉴权软件达到高可用，部署架构如图所示：
    ![](网关鉴权部署架构.jpg)
 2. 软件部署
-   
-   (1) package包中是编译后的部署软件，将jar包和config文件夹拷贝至服务器，注意层级保持一致。 <br>
+
+2.1. 集群版部署（推荐）<br>
+   (1) package包中cluster是编译后的集群版软件，将jar包和config文件夹拷贝至服务器，注意层级保持一致。 <br>
    (2) 将database中的security.sql导入到数据库中。<br>
    (3) 修改`application-datasource.yml`中的数据库和redis连接地址。<br>
+   (4) `application-gateway.yml`中添加代理配置，详见`4 注意事项 的 4.1 跨域问题`章节。<br>
+   (5) 通过命令`nohup java -jar spring-cloud-gateway-security-vx.x.x.jar &`启动服务。
+   
+2.2. 单机版部署 <br>
+   (1) package包中stand-alone是编译后的单机版软件，将jar包和config文件夹拷贝至服务器，注意层级保持一致。 <br>
+   (2) 将database中的security.sql导入到数据库中。<br>
+   (3) 修改`application-datasource.yml`中的数据库连接地址。<br>
    (4) `application-gateway.yml`中添加代理配置，详见`4 注意事项 的 4.1 跨域问题`章节。<br>
    (5) 通过命令`nohup java -jar spring-cloud-gateway-security-vx.x.x.jar &`启动服务。
 3. 成功验证
@@ -356,3 +365,6 @@ spring:
 #### 4.8 websocket测试
 访问 `http://IP:PORT/web/websocket.html` 界面，websocket测试访问地址为`ws://localhost:8888/websocket`，通过网关转发至目标服务。
 目标websocket服务需要暴露端点为websocket。
+
+#### 4.9 源码编译
+如需源码编译单机版本，需要注意`pom.xml`中的插件配置排除redis相关jar包，打包后自动使用本地内存。
