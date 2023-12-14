@@ -5,18 +5,21 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.1</version>
+        <version>2.7.18</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.github.zk</groupId>
     <artifactId>spring-cloud-gateway-security</artifactId>
-    <version>v4.3.0</version>
+    <version>v4.3.1</version>
     <name>spring-cloud-gateway-security</name>
     <description>Spring Cloud gateway 整合 Spring Security</description>
     <properties>
         <java.version>1.8</java.version>
-        <spring-cloud.version>2021.0.0</spring-cloud.version>
+        <spring-cloud.version>2021.0.8</spring-cloud.version>
         <druid.version>1.1.9</druid.version>
+        <mysql.version>8.0.33</mysql.version>
+        <sqlit.version>3.44.1.0</sqlit.version>
+        <mybatis-plus.version>3.5.4.1</mybatis-plus.version>
     </properties>
     <dependencies>
         <dependency>
@@ -30,11 +33,12 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.4.2</version>
+            <version>${mybatis-plus.version}</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -66,7 +70,7 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.34.0</version>
+            <version>${sqlit.version}</version>
         </dependency>
 
         <dependency>
