@@ -41,7 +41,6 @@ import org.springframework.web.server.session.WebSessionManager;
 public class AutoConfigurationMapCache {
 
     @Bean
-    @ConditionalOnMissingBean
     public GatewaySecurityCache gatewaySecurityCacheMap(WebSessionManager webSessionManager) {
         DefaultWebSessionManager defaultWebSessionManager = (DefaultWebSessionManager) webSessionManager;
         InMemoryWebSessionStore webSessionStore = (InMemoryWebSessionStore) defaultWebSessionManager.getSessionStore();
@@ -49,7 +48,6 @@ public class AutoConfigurationMapCache {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public RequestMonitor requestMonitorMap(RequestMonitorMapper requestMonitorMapper) {
         return new RequestMonitorMap(requestMonitorMapper);
     }
