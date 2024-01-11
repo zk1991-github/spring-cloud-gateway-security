@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 
 package com.github.zk.spring.cloud.gateway.security.listener;
 
+import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCache;
+import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCacheMap;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import java.time.Duration;
 import org.slf4j.Logger;
@@ -41,7 +43,11 @@ public class MySpringApplicationRunListener implements SpringApplicationRunListe
 
     @Override
     public void ready(ConfigurableApplicationContext context, Duration timeTaken) {
-        logger.info("启动完成，开始加载公开权限。。。");
+        GatewaySecurityCache gatewaySecurityCache =
+                context.getBean(GatewaySecurityCache.class);
+        String cacheType =
+                gatewaySecurityCache instanceof GatewaySecurityCacheMap ? "单机版本" : "集群版本";
+        logger.info("【{}】启动完成，开始加载公开权限。。。", cacheType);
         IPermission iPermission = context.getBean("permissionImpl", IPermission.class);
         int anonymousPermissionsSize = iPermission.cacheAnonymousPermissions();
         logger.info("【{}】条匿名权限加载完成。", anonymousPermissionsSize);
