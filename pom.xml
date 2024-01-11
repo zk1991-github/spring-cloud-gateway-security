@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.github.zk</groupId>
     <artifactId>spring-cloud-gateway-security</artifactId>
-    <version>v4.3.1</version>
+    <version>v4.3.2</version>
     <name>spring-cloud-gateway-security</name>
     <description>Spring Cloud gateway 整合 Spring Security</description>
     <properties>
@@ -21,6 +21,7 @@
         <sqlit.version>3.44.1.0</sqlit.version>
         <mybatis-plus.version>3.5.4.1</mybatis-plus.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -46,6 +47,7 @@
             <artifactId>druid-spring-boot-starter</artifactId>
             <version>${druid.version}</version>
         </dependency>
+
         <!-- Spring-Session Session共享 -->
         <dependency>
             <groupId>org.springframework.session</groupId>
@@ -55,22 +57,12 @@
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
         </dependency>
+
         <!-- yml 配置提示，需要在项目中打包（package）后才有提示信息 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
-        </dependency>
-        <!-- 引入spring-cloud-loadbalancer -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
-        </dependency>
-        <!-- 引入 sqlite 驱动 -->
-        <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>${sqlit.version}</version>
         </dependency>
 
         <dependency>
@@ -97,6 +89,62 @@
         </dependencies>
     </dependencyManagement>
 
+    <profiles>
+        <profile>
+            <id>cluster</id>
+            <dependencies>
+                <!-- 引入spring-cloud-loadbalancer 负载均衡-->
+                <dependency>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>stand-alone</id>
+            <dependencies>
+                <!-- 引入 sqlite 驱动 -->
+                <dependency>
+                    <groupId>org.xerial</groupId>
+                    <artifactId>sqlite-jdbc</artifactId>
+                    <version>${sqlit.version}</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>
+                                    <groupId>org.springframework.session</groupId>
+                                    <artifactId>spring-session-data-redis</artifactId>
+                                </exclude>
+                                <exclude>
+                                    <groupId>org.springframework.session</groupId>
+                                    <artifactId>spring-session-core</artifactId>
+                                </exclude>
+                                <exclude>
+                                    <groupId>org.springframework.data</groupId>
+                                    <artifactId>spring-data-redis</artifactId>
+                                </exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
         <resources>
             <resource>
@@ -107,30 +155,6 @@
                 </excludes>
             </resource>
         </resources>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <!-- 单机无 Redis 版本时需要此配置 -->
-                <!-- 使用集群版本时需要注释此配置 -->
-                <!--<configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.springframework.session</groupId>
-                            <artifactId>spring-session-data-redis</artifactId>
-                        </exclude>
-                        <exclude>
-                            <groupId>org.springframework.session</groupId>
-                            <artifactId>spring-session-core</artifactId>
-                        </exclude>
-                        <exclude>
-                            <groupId>org.springframework.data</groupId>
-                            <artifactId>spring-data-redis</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>-->
-            </plugin>
-        </plugins>
     </build>
 
 </project>
