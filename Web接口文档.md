@@ -908,3 +908,38 @@ GET http://<IP>:<PORT>/gateway/queryPermissionsByRoleId?roleId=<param>
     "code": 10000
 }
 ```
+## 16. 生成加密密码
+
+请求接口
+
+```http request
+GET http://<IP>:<PORT>/gateway/passwordGenerator?password=<param>
+```
+
+| 序号 | 参数       | 描述   | 类型 | 说明  |
+| ---- |----------| ---- | ---- |-----|
+| 1    | password | 密码 | 字符串 | 必填  |
+
+返回结构
+
+- 成功样例
+
+```json
+{
+  "data": "{bcrypt}$2a$10$A6he6KCgCnvtq2IS6hOWY.cNXbwzSo5eBJyVuonSFVztPIJXznRXq",
+  "api": "/gateway/passwordGenerator",
+  "msg": "生成成功！",
+  "code": 0
+}
+```
+
+- 失败样例
+
+```json
+{
+    "api": "/gateway/passwordGenerator",
+    "msg": "查询失败！",
+    "code": 10000
+}
+```
+> 需要登录系统后才可使用此接口
