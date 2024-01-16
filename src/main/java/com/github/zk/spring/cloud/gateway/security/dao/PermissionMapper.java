@@ -18,8 +18,11 @@
 
 package com.github.zk.spring.cloud.gateway.security.dao;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -30,4 +33,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface PermissionMapper extends BaseMapper<PermissionInfo> {
+
+    Page<PermissionInfo> selectPage(Page<PermissionInfo> page, @Param("ew") Wrapper<PermissionInfo> queryWrapper);
 }
