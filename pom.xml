@@ -124,6 +124,7 @@
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
+                            <!-- 排除 Redis 相关 jar 包 -->
                             <excludes>
                                 <exclude>
                                     <groupId>org.springframework.session</groupId>
@@ -146,15 +147,23 @@
     </profiles>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>**/*.properties</exclude>
-                    <exclude>**/*.yml</exclude>
-                </excludes>
-            </resource>
-        </resources>
+        <plugins>
+            <!-- 排除静态配置资源 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <resources>
+                        <resource>
+                            <directory>src/main/resources</directory>
+                            <excludes>
+                                <exclude>**/*.properties</exclude>
+                                <exclude>**/*.yml</exclude>
+                            </excludes>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
-
 </project>
