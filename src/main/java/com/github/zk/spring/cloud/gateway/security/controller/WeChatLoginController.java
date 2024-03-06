@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import reactor.core.publisher.Mono;
  * 微信登录 请求控制
  *
  * @author zk
- * @date 2021/11/30 14:47
+ * @since 3.0
  */
 @RestController
 @RequestMapping("/login")
@@ -70,19 +70,14 @@ public class WeChatLoginController extends LoginProcessor {
                             exchange.getSession().flatMap(webSession ->
                             webSessionProcess(weChatUserInfo.getOpenid(), webSession))
                             .map(flag -> {
-                                Response response = Response.getInstance();
                                 if (flag) {
-                                    response.setOk(Response.CodeEnum.SUCCESSED, null, "登录成功！", weChatUserInfo);
+                                    return Response.setOk(weChatUserInfo);
                                 } else {
                                     throw new SessionStoreAuthenticationException("会话存储失败");
                                 }
-                                return response;
                             })
                 )
-                .onErrorResume(AuthenticationException.class, (ex) -> {
-                    Response response = Response.getInstance();
-                    response.setError(Response.CodeEnum.FAIL, null, ex.getMessage());
-                    return Mono.just(response);
-                });
+                .onErrorResume(AuthenticationException.class, (ex) ->
+                        Mono.just(Response.setError(ex.getMessage())));
     }
 }

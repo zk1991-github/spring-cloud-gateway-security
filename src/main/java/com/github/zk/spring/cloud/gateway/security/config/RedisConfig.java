@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -31,31 +31,12 @@ import org.springframework.session.data.redis.config.annotation.web.server.Enabl
  * Redis 配置
  *
  * @author zk
- * @date 2021/2/7 11:13
+ * @since 3.0
  */
 @Configuration
 @ConditionalOnClass(RedisSerializer.class)
 @EnableRedisWebSession
 public class RedisConfig {
-
-//    使用 redis 默认配置方式，内置 Sentinel、Cluster、Standalone三种模式
-//    @see org.springframework.boot.autoconfigure.data.redis.LettuceConnectionConfiguration
-//    /**
-//     * 注入连接工厂 bean
-//     * @param properties redis 配置
-//     * @return 连接工厂
-//     */
-//    @Bean
-//    public LettuceConnectionFactory connectionFactory(RedisProperties properties) {
-//        RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
-//        String hostName = properties.getHost();
-//        int port = properties.getPort();
-//        String password = properties.getPassword();
-//        redisConfiguration.setPassword(RedisPassword.of(password));
-//        redisConfiguration.setHostName(hostName);
-//        redisConfiguration.setPort(port);
-//        return new LettuceConnectionFactory(redisConfiguration);
-//    }
 
     /**
      * 注入序列化bean

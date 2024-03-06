@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ package com.github.zk.spring.cloud.gateway.security.autoconfigure;
 
 import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCache;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
-import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,11 +27,13 @@ import org.springframework.web.server.session.DefaultWebSessionManager;
 import org.springframework.web.server.session.WebSessionManager;
 import org.springframework.web.server.session.WebSessionStore;
 
+import java.time.Duration;
+
 /**
  * 缓存自动配置
  *
  * @author zk
- * @date 2023/11/17 9:36
+ * @since 4.3.0
  */
 @Configuration
 public class AutoConfigurationCache {

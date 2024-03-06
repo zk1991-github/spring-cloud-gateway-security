@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -24,9 +24,6 @@ import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.WeChatUserInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import com.github.zk.spring.cloud.gateway.security.util.IpUtils;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.config.GatewayProperties;
@@ -44,12 +41,16 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.List;
+
 /**
  * 授权管理处理器
  * 处理每一个请求是否具备权限
  *
  * @author zk
- * @date 2021/7/13 14:38
+ * @since 3.0
  */
 public class CustomReactiveAuthorizationManager implements ReactiveAuthorizationManager<AuthorizationContext> {
 

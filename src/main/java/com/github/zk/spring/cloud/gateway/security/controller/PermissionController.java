@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -19,20 +19,23 @@
 package com.github.zk.spring.cloud.gateway.security.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.zk.spring.cloud.gateway.security.common.CodeEnum;
+import com.github.zk.spring.cloud.gateway.security.common.PageEntity;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import com.github.zk.spring.cloud.gateway.security.service.IRole;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 权限请求控制
  *
  * @author zk
- * @date 2022/2/14 14:40
+ * @since 4.0
  */
 @RestController
 @RequestMapping("/gateway")
@@ -45,99 +48,86 @@ public class PermissionController {
 
     @PostMapping("/addPermission")
     public Response addPermission(@RequestBody PermissionInfo permissionInfo) {
-        Response response = Response.getInstance();
         int addPermissionCount = iPermission.addPermission(permissionInfo);
         if (addPermissionCount > 0) {
-            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/addPermission", "添加成功！", addPermissionCount);
+            return Response.setOk(addPermissionCount);
         } else {
-            response.setError(Response.CodeEnum.FAIL, "/gateway/addPermission", "添加失败!");
+            return Response.setError(CodeEnum.SAVE_FAIL);
         }
-        return response;
     }
 
     @GetMapping("/delPermission")
     public Response delPermission(@RequestParam Long id) {
-        Response response = Response.getInstance();
         int del = iPermission.delPermission(id);
         if (del > 0) {
-            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/delPermission", "删除成功！", del);
+            return Response.setOk();
         } else {
-            response.setError(Response.CodeEnum.FAIL, "/gateway/delPermission", "删除失败！");
+            return Response.setError(CodeEnum.REMOVE_FAIL);
         }
-        return response;
     }
 
     @GetMapping("delPermissions")
     public Response delPermissions(@RequestParam List<Long> ids) {
-        Response response = Response.getInstance();
         int del = iPermission.delPermissions(ids);
         if (del > 0) {
-            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/delPermissions", "删除成功！", del);
+            return Response.setOk();
         } else {
-            response.setError(Response.CodeEnum.FAIL, "/gateway/delPermissions", "删除失败！");
+            return Response.setError(CodeEnum.REMOVE_FAIL);
         }
-        return response;
     }
 
     @PostMapping("/updatePermission")
     public Response updatePermission(@RequestBody PermissionInfo permissionInfo) {
-        Response response = Response.getInstance();
         int update = iPermission.updatePermission(permissionInfo);
         if (update > 0) {
-            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/updatePermission", "修改成功！",
-                    update);
+            return Response.setOk();
         } else {
-            response.setError(Response.CodeEnum.FAIL, "/gateway/updatePermission", "修改失败！");
+            return Response.setError(CodeEnum.UPDATE_FAIL);
         }
-        return response;
     }
 
     @PostMapping("/queryPermission")
     public Response queryPermission(@RequestBody PermissionInfo permissionInfo) {
-        Response response = Response.getInstance();
         Page<PermissionInfo> permissionInfoPage = iPermission.queryPermission(permissionInfo);
         if (permissionInfoPage != null) {
-            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/queryPermission", "查询成功！",
-                    permissionInfoPage.getRecords(), permissionInfoPage.getTotal());
+            PageEntity<PermissionInfo> pageEntity = new PageEntity<>();
+            pageEntity.setCurrent(permissionInfoPage.getCurrent());
+            pageEntity.setSize(permissionInfoPage.getSize());
+            pageEntity.setTotal(permissionInfoPage.getTotal());
+            pageEntity.setRecords(permissionInfoPage.getRecords());
+            return Response.setOk(pageEntity);
         } else {
-            response.setError(Response.CodeEnum.FAIL, "/gateway/queryPermission", "查询失败！");
+            return Response.setError(CodeEnum.QUERY_FAIL);
         }
-        return response;
     }
 
     @PostMapping("/bindPermissionByRole")
     public Response bindPermissionByRole(@RequestBody RoleInfo roleInfo) {
-        Response response = Response.getInstance();
         boolean b = iRole.bindPermissionsByRole(roleInfo);
         if (b) {
-            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/bindPermissionByRole", "绑定成功！", b);
+            return Response.setOk();
         } else {
-            response.setError(Response.CodeEnum.FAIL, "/gateway/bindPermissionByRole", "绑定失败！");
+            return Response.setError(CodeEnum.BIND_FAIL);
         }
-        return response;
     }
 
     @GetMapping("/queryAllRoles")
     public Response queryAllRoles() {
-        Response response = Response.getInstance();
         List<RoleInfo> roleInfos = iRole.queryAllRoles();
         if (roleInfos != null) {
-            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/queryAllRoles", "查询成功！", roleInfos);
+            return Response.setOk(roleInfos);
         } else {
-            response.setError(Response.CodeEnum.FAIL, "/gateway/queryAllRoles", "查询失败！");
+            return Response.setError(CodeEnum.QUERY_FAIL);
         }
-        return response;
     }
 
     @GetMapping("/queryPermissionsByRoleId")
     public Response queryPermissionsByRoleId(@RequestParam Long roleId) {
-        Response response = Response.getInstance();
         List<PermissionInfo> permissionInfo = iRole.queryPermissionsByRoleId(roleId);
         if (permissionInfo != null) {
-            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/queryPermissionsByRoleId", "查询成功！", permissionInfo);
+            return Response.setOk(permissionInfo);
         } else {
-            response.setError(Response.CodeEnum.FAIL, "/gateway/queryPermissionsByRoleId", "查询失败！");
+            return Response.setError(CodeEnum.QUERY_FAIL);
         }
-        return response;
     }
 }

@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package com.github.zk.spring.cloud.gateway.security.pojo;
  * 请求统计信息 实体
  *
  * @author zk
- * @date 2023/9/15 9:48
+ * @since 4.2.0
  */
 public class RequestStatisticInfo {
     /** 请求路径 */

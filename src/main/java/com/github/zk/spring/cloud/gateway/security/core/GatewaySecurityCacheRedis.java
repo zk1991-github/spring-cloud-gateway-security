@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -19,18 +19,19 @@
 package com.github.zk.spring.cloud.gateway.security.core;
 
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
-import java.util.List;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 /**
  * 使用redis缓存实现
  *
  * @author zk
- * @date 2023/11/8 10:37
+ * @since 4.3.0
  */
 public class GatewaySecurityCacheRedis implements GatewaySecurityCache {
 

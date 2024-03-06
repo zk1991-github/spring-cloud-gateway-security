@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -19,20 +19,21 @@
 package com.github.zk.spring.cloud.gateway.security.core;
 
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
+import org.springframework.web.server.WebSession;
+import org.springframework.web.server.session.InMemoryWebSessionStore;
+import reactor.core.publisher.Mono;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.springframework.web.server.WebSession;
-import org.springframework.web.server.session.InMemoryWebSessionStore;
-import reactor.core.publisher.Mono;
 
 /**
  * 使用本地缓存实现
  *
  * @author zk
- * @date 2023/11/8 10:32
+ * @since 4.3.0
  */
 public class GatewaySecurityCacheMap implements GatewaySecurityCache {
 

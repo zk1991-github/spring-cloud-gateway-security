@@ -21,18 +21,19 @@ package com.github.zk.spring.cloud.gateway.security.listener;
 import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCache;
 import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCacheMap;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
-import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringApplicationRunListener;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.time.Duration;
+
 /**
  * 应用启动监听
  *
  * @author zk
- * @date 2022/2/17 19:09
+ * @since 4.0
  */
 public class MySpringApplicationRunListener implements SpringApplicationRunListener {
 

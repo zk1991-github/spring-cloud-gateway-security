@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import com.github.zk.spring.cloud.gateway.security.pojo.LogInfo;
  * 日志接口
  *
  * @author zk
- * @date 2022/1/5 14:03
+ * @since 3.5
  */
 public interface Log {
 

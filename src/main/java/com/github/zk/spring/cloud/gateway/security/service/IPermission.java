@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -20,14 +20,15 @@ package com.github.zk.spring.cloud.gateway.security.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
-import java.util.List;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * 权限接口
  *
  * @author zk
- * @date 2022/2/14 10:43
+ * @since 4.0
  */
 public interface IPermission {
 

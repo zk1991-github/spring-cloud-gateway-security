@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -25,15 +25,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.github.zk.spring.cloud.gateway.security.authentication.WeChatAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+
 import java.io.IOException;
 import java.util.List;
-import org.springframework.security.core.GrantedAuthority;
 
 /**
  * 微信认证token 序列化器
  *
  * @author zk
- * @date 2021/12/7 15:14
+ * @since 3.0
  */
 class WeChatAuthenticationTokenDeserializer extends JsonDeserializer<WeChatAuthenticationToken> {
     private static final TypeReference<List<GrantedAuthority>> GRANTED_AUTHORITY_LIST = new TypeReference<List<GrantedAuthority>>() {

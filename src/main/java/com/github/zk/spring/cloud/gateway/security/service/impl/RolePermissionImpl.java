@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -25,16 +25,17 @@ import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RolePermission;
 import com.github.zk.spring.cloud.gateway.security.service.IRolePermission;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 角色权限关联实现
  *
  * @author zk
- * @date 2022/2/15 14:56
+ * @since 4.0
  */
 @Service
 public class RolePermissionImpl extends ServiceImpl<RolePermissionMapper, RolePermission> implements IRolePermission {

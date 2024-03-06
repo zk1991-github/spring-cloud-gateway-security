@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package com.github.zk.spring.cloud.gateway.security.enums;
  * 接口类型枚举
  *
  * @author zk
- * @date 2022/2/18 17:35
+ * @since 4.0
  */
 public enum IntfTypeEnum {
     /**
