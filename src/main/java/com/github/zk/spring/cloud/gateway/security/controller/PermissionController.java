@@ -48,7 +48,7 @@ public class PermissionController {
     private IRole iRole;
 
     @PostMapping("/addPermission")
-    public Response addPermission(@RequestBody @Validated PermissionInfo permissionInfo) {
+    public Response addPermission(@RequestBody @Validated(PermissionInfo.AddPermission.class) PermissionInfo permissionInfo) {
         int addPermissionCount = iPermission.addPermission(permissionInfo);
         if (addPermissionCount > 0) {
             return Response.setOk(addPermissionCount);
@@ -78,7 +78,7 @@ public class PermissionController {
     }
 
     @PostMapping("/updatePermission")
-    public Response updatePermission(@RequestBody @Validated PermissionInfo permissionInfo) {
+    public Response updatePermission(@RequestBody @Validated(PermissionInfo.UpdatePermission.class) PermissionInfo permissionInfo) {
         int update = iPermission.updatePermission(permissionInfo);
         if (update > 0) {
             return Response.setOk();
@@ -103,7 +103,7 @@ public class PermissionController {
     }
 
     @PostMapping("/bindPermissionByRole")
-    public Response bindPermissionByRole(@RequestBody @Validated RoleInfo roleInfo) {
+    public Response bindPermissionByRole(@RequestBody RoleInfo roleInfo) {
         boolean b = iRole.bindPermissionsByRole(roleInfo);
         if (b) {
             return Response.setOk();
