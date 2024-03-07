@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -90,7 +91,7 @@ public class UserController {
      * @return 修改成功
      */
     @PostMapping("updatePassword")
-    public Mono<Response> updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO) {
+    public Mono<Response> updatePassword(@RequestBody @Validated UpdatePasswordDTO updatePasswordDTO) {
         boolean b = iUser.updatePassword(updatePasswordDTO.getUsername(),
                 updatePasswordDTO.getOldPassword(),
                 updatePasswordDTO.getNewPassword());

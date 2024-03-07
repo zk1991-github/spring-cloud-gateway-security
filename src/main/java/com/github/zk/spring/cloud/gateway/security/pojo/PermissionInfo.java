@@ -25,6 +25,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 
@@ -43,17 +46,22 @@ public class PermissionInfo implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     /** 地址名称 */
+    @NotEmpty
     private String urlName;
     /** 地址 */
+    @NotEmpty
     private String url;
     /** 是否公开 0：不公开；1：公开；2：匿名 */
+    @NotNull
     private Integer open;
     /** 描述 */
     private String description;
     /** 是否固定 */
+    @NotNull
     private Integer fixed;
     /** 创建时间 */
     @TableField(fill = FieldFill.INSERT)
+    @NotEmpty
     private String createTime;
     /** 分页对象 */
     @TableField(exist = false)

@@ -147,6 +147,14 @@ public class Response {
         return response;
     }
 
+    public static Response setError(String msg, Object data) {
+        Response response = new Response();
+        response.setCode(CodeEnum.ERROR.getCode());
+        response.setMsg(msg);
+        response.setData(data);
+        return response;
+    }
+
     /**
      * 失败返回
      *

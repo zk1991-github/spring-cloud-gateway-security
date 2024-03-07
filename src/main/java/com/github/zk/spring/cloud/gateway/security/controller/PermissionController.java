@@ -27,6 +27,7 @@ import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import com.github.zk.spring.cloud.gateway.security.service.IRole;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,7 +48,7 @@ public class PermissionController {
     private IRole iRole;
 
     @PostMapping("/addPermission")
-    public Response addPermission(@RequestBody PermissionInfo permissionInfo) {
+    public Response addPermission(@RequestBody @Validated PermissionInfo permissionInfo) {
         int addPermissionCount = iPermission.addPermission(permissionInfo);
         if (addPermissionCount > 0) {
             return Response.setOk(addPermissionCount);
@@ -77,7 +78,7 @@ public class PermissionController {
     }
 
     @PostMapping("/updatePermission")
-    public Response updatePermission(@RequestBody PermissionInfo permissionInfo) {
+    public Response updatePermission(@RequestBody @Validated PermissionInfo permissionInfo) {
         int update = iPermission.updatePermission(permissionInfo);
         if (update > 0) {
             return Response.setOk();
@@ -87,7 +88,7 @@ public class PermissionController {
     }
 
     @PostMapping("/queryPermission")
-    public Response queryPermission(@RequestBody PermissionInfo permissionInfo) {
+    public Response queryPermission(@RequestBody @Validated PermissionInfo permissionInfo) {
         Page<PermissionInfo> permissionInfoPage = iPermission.queryPermission(permissionInfo);
         if (permissionInfoPage != null) {
             PageEntity<PermissionInfo> pageEntity = new PageEntity<>();
@@ -102,7 +103,7 @@ public class PermissionController {
     }
 
     @PostMapping("/bindPermissionByRole")
-    public Response bindPermissionByRole(@RequestBody RoleInfo roleInfo) {
+    public Response bindPermissionByRole(@RequestBody @Validated RoleInfo roleInfo) {
         boolean b = iRole.bindPermissionsByRole(roleInfo);
         if (b) {
             return Response.setOk();

@@ -18,6 +18,8 @@
 
 package com.github.zk.spring.cloud.gateway.security.pojo;
 
+import javax.validation.constraints.NotEmpty;
+
 /**
  * 修改密码实体类
  *
@@ -26,10 +28,13 @@ package com.github.zk.spring.cloud.gateway.security.pojo;
  */
 public class UpdatePasswordDTO {
     /** 用户名 */
+    @NotEmpty
     private String username;
     /** 旧密码 */
+    @NotEmpty
     private String oldPassword;
     /** 新密码 */
+    @NotEmpty
     private String newPassword;
 
     public String getUsername() {
