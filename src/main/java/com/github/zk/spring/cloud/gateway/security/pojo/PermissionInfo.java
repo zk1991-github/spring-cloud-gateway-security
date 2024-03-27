@@ -40,36 +40,61 @@ import java.util.List;
 @TableName("gateway_permission")
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
 public class PermissionInfo implements Serializable {
+
+    public interface AddPermission {
+    }
+
+    public interface UpdatePermission {
+    }
+
     private static final long serialVersionUID = 874671003093440548L;
 
-    /** 权限id */
+    /**
+     * 权限id
+     */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
-    /** 地址名称 */
-    @NotEmpty
+    /**
+     * 地址名称
+     */
+    @NotEmpty(groups = {AddPermission.class, UpdatePermission.class})
     private String urlName;
-    /** 地址 */
-    @NotEmpty
+    /**
+     * 地址
+     */
+    @NotEmpty(groups = {AddPermission.class, UpdatePermission.class})
     private String url;
-    /** 是否公开 0：不公开；1：公开；2：匿名 */
-    @NotNull
+    /**
+     * 是否公开 0：不公开；1：公开；2：匿名
+     */
+    @NotNull(groups = {AddPermission.class, UpdatePermission.class})
     private Integer open;
-    /** 描述 */
+    /**
+     * 描述
+     */
     private String description;
-    /** 是否固定 */
-    @NotNull
+    /**
+     * 是否固定
+     */
     private Integer fixed;
-    /** 创建时间 */
+    /**
+     * 创建时间
+     */
     @TableField(fill = FieldFill.INSERT)
-    @NotEmpty
     private String createTime;
-    /** 分页对象 */
+    /**
+     * 分页对象
+     */
     @TableField(exist = false)
     private Page<PermissionInfo> permissionInfoPage;
-    /** 关键字 */
+    /**
+     * 关键字
+     */
     @TableField(exist = false)
     private String keywords;
-    /** 角色列表 */
+    /**
+     * 角色列表
+     */
     @TableField(exist = false)
     private List<RoleInfo> roleInfos;
 

@@ -24,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
-import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.List;
 
@@ -43,7 +42,6 @@ public class RoleInfo implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     /** 角色名称 */
-    @NotEmpty
     private String roleName;
     /** 角色描述 */
     private String description;
