@@ -34,7 +34,7 @@ public enum CodeEnum {
     NOT_LOGIN(706, "未登录或登录超时"),
     UNKNOWN_ACCOUNT(707, "用户不存在"),
     PASSWORD_ERROR(708, "密码错误"),
-    ACCOUNT_LOCKED(709, "用户账号已被锁定"),
+    ACCOUNT_LOCKED(709, "用户帐号已被锁定"),
     FORMAT_ERROR(710,"请求格式错误"),
     TOKEN_INVALID(711,"token值无效，请重新登录"),
     ERROR(712, "");
