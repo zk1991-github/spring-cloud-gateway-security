@@ -44,15 +44,15 @@ public class MySpringApplicationRunListener implements SpringApplicationRunListe
 
     @Override
     public void ready(ConfigurableApplicationContext context, Duration timeTaken) {
-        GatewaySecurityCache gatewaySecurityCache =
-                context.getBean(GatewaySecurityCache.class);
-        String cacheType =
-                gatewaySecurityCache instanceof GatewaySecurityCacheMap ? "单机版本" : "集群版本";
-        logger.info("【{}】启动完成，开始加载公开权限。。。", cacheType);
         IPermission iPermission = context.getBean("permissionImpl", IPermission.class);
         int anonymousPermissionsSize = iPermission.cacheAnonymousPermissions();
         logger.info("【{}】条匿名权限加载完成。", anonymousPermissionsSize);
         int openPermissionsSize = iPermission.cacheOpenPermissions();
         logger.info("【{}】条公开权限加载完成。", openPermissionsSize);
+        GatewaySecurityCache gatewaySecurityCache =
+                context.getBean(GatewaySecurityCache.class);
+        String cacheType =
+                gatewaySecurityCache instanceof GatewaySecurityCacheMap ? "单机版本" : "集群版本";
+        logger.info("【{}】启动完成", cacheType);
     }
 }
