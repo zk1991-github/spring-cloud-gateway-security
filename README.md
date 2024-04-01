@@ -5,6 +5,7 @@
   - v4.3.0 版本支持单机(无Redis)和集群(有Redis)两种方式部署
   - v4.3.1 修复三方依赖漏洞
   - v4.3.2 增加密码加密生成接口,修复权限批量删除Bug
+  - v4.3.3 增加参数校验，规范化注释
 ## 快速开始
 1. 部署架构
 
@@ -331,7 +332,7 @@ spring:
 Nginx代理后，也需要配置如上所示代理路径，Nginx中配置应注意末尾"/"，详细配置如下：
 ```text
 location /proxy/ {
-  proxy_pass  http://127.0.0.1:8080/;
+  proxy_pass  http://127.0.0.1:8888/;
 }
 ```
 
@@ -368,7 +369,15 @@ spring:
 访问 `http://IP:PORT/web/websocket.html` 界面，websocket测试访问地址为`ws://localhost:8888/websocket`，通过网关转发至目标服务。
 目标websocket服务需要暴露端点为websocket。
 
-#### 4.9 源码编译
+#### 4.9 下游获取用户等信息
+网关鉴权软件通过将用户id和用户名以及真实源IP存入请求头（header）中，下游服务可通过请求头获取相应数据。
+```text
+用户ID key: userId
+用户名 key: username
+源IP key: XReal-IP
+```
+
+#### 4.10 源码编译
 如需源码编译单机版本
 - 单机版本，在maven的`profiles`选择`stand-alone`进行package打包
 - 集群版本，在maven的`profiles`选择`cluster`进行package打包

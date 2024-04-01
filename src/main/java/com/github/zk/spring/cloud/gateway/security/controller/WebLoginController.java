@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 package com.github.zk.spring.cloud.gateway.security.controller;
 
+import com.github.zk.spring.cloud.gateway.security.common.CodeEnum;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.log.LogHolder;
@@ -40,7 +41,7 @@ import reactor.core.publisher.Mono;
  * 登录 请求控制
  *
  * @author zk
- * @date 2021/7/14 15:39
+ * @since 1.0
  */
 @RestController
 @RequestMapping("/login")
@@ -70,17 +71,15 @@ public class WebLoginController {
                                         .webSessionProcess(userInfo.getUsername(), webSession)
                                         // 登录状态处理
                                         .map(loginStatus -> {
-                                            Response response = Response.getInstance();
                                             if (loginStatus) {
                                                 // 记录日志
                                                 logHolder.loginLog(exchange, userInfo, 1, "登录成功");
-                                                response.setOk(Response.CodeEnum.SUCCESSED, null, "登录成功！", userInfo);
+                                                return Response.setOk(userInfo);
                                             } else {
                                                 // 记录日志
                                                 logHolder.loginLog(exchange, userInfo, 0, "登录失败");
-                                                response.setError(Response.CodeEnum.FAIL, null, "登录失败，Session存储失败！");
+                                                return Response.setError(CodeEnum.FAIL);
                                             }
-                                            return response;
                                         })
                         )
                 );
@@ -88,49 +87,39 @@ public class WebLoginController {
 
     @GetMapping("/failSession")
     public Response failSession(WebSession session) {
-        Response response = Response.getInstance();
         String message = session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+        //使当前session失效
+        session.invalidate().subscribe();
         // message为空时，请求工具没有存储session， 因此跳转后session被重新创建
         if (ObjectUtils.isEmpty(message)) {
-            response.setError(Response.CodeEnum.FAIL, null,
-                    "请求工具未能存储Cookies，请配置后重试！");
-            return response;
+            return Response.setError("请求工具未能存储Cookies，请配置后重试！");
         }
 
         if (ObjectUtils.nullSafeEquals(message, "Invalid Credentials")) {
-            message = "密码错误";
             // TODO 考虑是否增加登录失败日志， 应考虑日志过多问题，使用存在的用户进行记录
+            return Response.setError(CodeEnum.PASSWORD_ERROR);
         }
-        response.setError(Response.CodeEnum.FAIL, null, message);
-        //使当前session失效
-        session.invalidate().subscribe();
-        return response;
+        return Response.setError(message);
     }
 
     @GetMapping("/fail")
     public Response fail(@RequestParam("exception") String exception) {
-        Response response = Response.getInstance();
         if (ObjectUtils.nullSafeEquals(exception, "Invalid Credentials")) {
-            exception = "密码错误";
             // TODO 考虑是否增加登录失败日志， 应考虑日志过多问题，使用存在的用户进行记录
+            return Response.setError(CodeEnum.PASSWORD_ERROR);
         }
-        response.setError(Response.CodeEnum.FAIL, null, exception);
-        return response;
+        return Response.setError(CodeEnum.getByMsg(exception));
     }
 
     @GetMapping("/invalid")
     public Response invalid(WebSession session) {
-        Response response = Response.getInstance();
-        response.setError(Response.CodeEnum.INVALID, null, "未登录或登录超时");
         //使当前session失效
         session.invalidate().subscribe();
-        return response;
+        return Response.setError(CodeEnum.NOT_LOGIN);
     }
 
     @GetMapping("/logout")
     public Response logout() {
-        Response response = Response.getInstance();
-        response.setOk(Response.CodeEnum.SUCCESSED, null, "登出成功！", null);
-        return response;
+        return Response.setOk();
     }
 }

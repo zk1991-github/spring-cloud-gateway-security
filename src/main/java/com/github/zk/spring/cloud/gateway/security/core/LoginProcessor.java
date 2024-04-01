@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -18,17 +18,18 @@
 
 package com.github.zk.spring.cloud.gateway.security.core;
 
-import java.time.Duration;
 import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.web.server.WebSession;
 import org.springframework.web.server.session.WebSessionStore;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 /**
  * 基础登录
  *
  * @author zk
- * @date 2021/11/30 15:06
+ * @since 3.0
  */
 public class LoginProcessor {
 

@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -17,56 +17,24 @@
  */
 
 /*
- * Response.java
- * @version 1.0
- * 2018年4月24日
- * 北京航天宏图信息技术股份有限公司
+ * 统一响应
+ *
+ * @since 1.0
  */
 package com.github.zk.spring.cloud.gateway.security.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Web统一返回格式
  *
  * @author zk
- * @date 2018/8/16 10:44
+ * @since 1.0
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"data", "api", "msg", "code"})
+@JsonPropertyOrder({"data", "msg", "code"})
 public class Response {
-
-    /**
-     * 返回枚举类
-     */
-    public enum CodeEnum {
-        /**
-         * 成功返回
-         */
-        SUCCESSED(0),
-        /**
-         * 登录失效
-         */
-        INVALID(9000),
-        /**
-         * 失败返回
-         */
-        FAIL(10000);
-
-        private final Integer code;
-
-        CodeEnum(Integer code) {
-            this.code = code;
-        }
-
-        public Integer getCode() {
-            return code;
-        }
-    }
 
     /**
      * 状态码
@@ -76,140 +44,129 @@ public class Response {
      * 提示信息
      */
     private String msg;
-    /**
-     * 网关地址
-     */
-    private String api;
+
     /**
      * 数据
      */
     private Object data;
-    /**
-     * 详细信息
-     */
-    private Map<String, Object> detailsMap;
 
     private Response() {
     }
 
-    public static Response getInstance() {
-        return new Response();
-    }
-
     /**
-     * 设置成功返回
+     * 成功返回
      *
-     * @param code 状态码
-     * @param api 网关地址
-     * @param msg 提示信息
-     * @param data 数据
      * @return 响应对象
      */
-    public Response setOk(int code, String api, String msg, Object data) {
-        this.setCode(code);
-        this.setApi(api);
-        this.setMsg(msg);
-        this.setData(data);
-        return this;
+    public static Response setOk() {
+        return setOk(CodeEnum.SUCCESS, null);
     }
 
     /**
-     * 设置成功返回
+     * 成功返回
      *
-     * @param codeEnum 状态码枚举
-     * @param api 网关地址
-     * @param msg 提示信息
-     * @param data 数据
+     * @param codeEnum 状态码
      * @return 响应对象
      */
-    public Response setOk(CodeEnum codeEnum, String api, String msg, Object data) {
-        this.setCode(codeEnum.getCode());
-        this.setApi(api);
-        this.setMsg(msg);
-        this.setData(data);
-        return this;
+    public static Response setOk(CodeEnum codeEnum) {
+        return setOk(codeEnum, null);
     }
 
     /**
-     * 设置成功返回
+     * 成功返回
      *
-     * @param code 状态码
-     * @param api 网关地址
-     * @param msg 提示信息
-     * @param data 数据
-     * @param total 数据总条数
+     * @param data     数据
      * @return 响应对象
      */
-    public Response setOk(int code, String api, String msg, Object data, long total) {
-        detailsMap = new HashMap<String, Object>(16);
-        detailsMap.put("details", data);
-        detailsMap.put("total", total);
-
-        this.setCode(code);
-        this.setApi(api);
-        this.setMsg(msg);
-        this.setData(detailsMap);
-        return this;
+    public static Response setOk(Object data) {
+        return Response.setOk(CodeEnum.SUCCESS, data);
     }
 
     /**
-     * 设置成功返回
+     * 成功返回
      *
      * @param codeEnum 状态码枚举
-     * @param api 网关地址
-     * @param msg 提示信息
-     * @param data 数据
-     * @param total 数据总条数
+     * @param data     数据
      * @return 响应对象
      */
-    public Response setOk(CodeEnum codeEnum, String api, String msg, Object data, long total) {
-        detailsMap = new HashMap<String, Object>(16);
-        detailsMap.put("details", data);
-        detailsMap.put("total", total);
-
-        this.setCode(codeEnum.getCode());
-        this.setApi(api);
-        this.setMsg(msg);
-        this.setData(detailsMap);
-        return this;
+    public static Response setOk(CodeEnum codeEnum, Object data) {
+        Response response = new Response();
+        response.setCode(codeEnum.getCode());
+        response.setMsg(codeEnum.getMsg());
+        response.setData(data);
+        return response;
     }
 
     /**
-     * 设置失败返回
+     * 成功返回
      *
      * @param code 状态码
-     * @param api 网关地址
      * @param msg 提示信息
+     * @param data 数据
      * @return 响应对象
      */
-    public Response setError(int code, String api, String msg) {
-        this.setCode(code);
-        this.setApi(api);
-        this.setMsg(msg);
-        return this;
+    public static Response setOk(int code, String msg, Object data) {
+        Response response = new Response();
+        response.setCode(code);
+        response.setMsg(msg);
+        response.setData(data);
+        return response;
+    }
+
+
+    /**
+     * 失败返回
+     *
+     * @return 响应对象
+     */
+    public static Response setError() {
+        return setError(CodeEnum.FAIL);
+    }
+    /**
+     * 失败返回
+     *
+     * @param codeEnum 状态码
+     */
+    public static Response setError(CodeEnum codeEnum) {
+        Response response = new Response();
+        response.setCode(codeEnum.getCode());
+        response.setMsg(codeEnum.getMsg());
+        return response;
     }
 
     /**
-     * 设置失败返回
+     * 错误返回
      *
-     * @param codeEnum 状态码枚举
-     * @param api 网关地址
      * @param msg 提示信息
      * @return 响应对象
      */
-    public Response setError(CodeEnum codeEnum, String api, String msg) {
-        this.setCode(codeEnum.getCode());
-        this.setApi(api);
-        this.setMsg(msg);
-        return this;
+    public static Response setError(String msg) {
+        Response response = new Response();
+        response.setCode(CodeEnum.ERROR.getCode());
+        response.setMsg(msg);
+        return response;
     }
 
-    public String getApi() {
-        return api;
+    public static Response setError(String msg, Object data) {
+        Response response = new Response();
+        response.setCode(CodeEnum.ERROR.getCode());
+        response.setMsg(msg);
+        response.setData(data);
+        return response;
     }
 
-    private void setApi(String api) {
-        this.api = api;
+    /**
+     * 失败返回
+     *
+     * @param code 状态码
+     * @param msg 提示信息
+     * @return 响应对象
+     */
+    public static Response setError(int code, String msg) {
+        Response response = new Response();
+        response.setCode(code);
+        response.setMsg(msg);
+        return response;
     }
 
     public Object getData() {
@@ -241,7 +198,6 @@ public class Response {
         return "Response{" +
                 "code=" + code +
                 ", msg='" + msg + '\'' +
-                ", api='" + api + '\'' +
                 '}';
     }
 }

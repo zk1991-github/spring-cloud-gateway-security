@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import java.time.Duration;
  * 用户接口
  *
  * @author zk
- * @date 2021/1/15 14:35
+ * @since 1.0
  */
 public interface IUser {
 
@@ -48,7 +48,6 @@ public interface IUser {
      *
      * @param username 用户名
      * @param time 解锁时间
-     * @return 是否解锁成功
      */
     void unLockUser(String username, Duration time);
 

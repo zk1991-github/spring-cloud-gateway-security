@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -21,15 +21,16 @@ package com.github.zk.spring.cloud.gateway.security.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
-import java.util.List;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * 角色仓储
  *
  * @author zk
- * @date 2021/12/7 10:45
+ * @since 2.0
  */
 @Repository
 public interface RoleMapper extends BaseMapper<RoleInfo> {

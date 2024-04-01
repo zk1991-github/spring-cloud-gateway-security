@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ import reactor.core.publisher.Mono;
  * 微信登录认证管理器
  *
  * @author zk
- * @date 2021/11/15 10:35
+ * @since 3.0
  */
 public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticationManager {
     private final Logger logger = LoggerFactory.getLogger(WeChatReactiveAuthenticationManager.class);

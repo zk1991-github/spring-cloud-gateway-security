@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -26,9 +26,6 @@ import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
 import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
-import java.net.URI;
-import java.util.Collections;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,11 +44,15 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
+import javax.annotation.PostConstruct;
+import java.net.URI;
+import java.util.Collections;
+
 /**
  * Security 配置
  *
  * @author zk
- * @date 2021/7/10 9:43
+ * @since 1.0
  */
 @Configuration
 @EnableWebFluxSecurity
@@ -155,43 +156,9 @@ public class SecurityConfig {
                 .csrf().disable()
                 // 启用跨域拦截
                 .cors()
-//                .and()
-//                .exceptionHandling().accessDeniedHandler(new HttpStatusServerAccessDeniedHandler(HttpStatus.FORBIDDEN))
         ;
 
-        /* 此处代码暂时注释。主要解决服务增加spring.webflux.base-path时，转发步成功问题
-         * 将来如果需要加入服务名称时，使用此处代码
-        // 添加过滤器，将网关需要转发的地址，去掉contextPath中的名称
-        http.addFilterAt((WebFilter) (exchange, chain) -> {
-            // 获取处理器映射 Bean
-            // 参照源码org.springframework.web.reactive.DispatcherHandler#initStrategies(ApplicationContext) 方法
-            Map<String, HandlerMapping> mappingBeans = BeanFactoryUtils.beansOfTypeIncludingAncestors(
-                    context, HandlerMapping.class, true, false);
 
-            ArrayList<HandlerMapping> mappings = new ArrayList<>(mappingBeans.values());
-            AnnotationAwareOrderComparator.sort(mappings);
-            List<HandlerMapping> handlerMappings = Collections.unmodifiableList(mappings);
-
-            // 遍历处理器映射
-            // 参考源码 org.springframework.web.reactive.DispatcherHandler#handle(ServerWebExchange) 方法
-            return Flux.fromIterable(handlerMappings)
-                    .concatMap(mapping -> mapping.getHandler(exchange))
-                    .next()
-                    .switchIfEmpty(Mono.defer(() -> {
-                        Exception ex = new ResponseStatusException(HttpStatus.NOT_FOUND, "No matching handler");
-                        return Mono.error(ex);
-                    }))
-                    .flatMap(handler -> {
-                        // 如果属于处理转发到下游的类，去掉 ContextPath 中的名称
-                        if (handler instanceof FilteringWebHandler) {
-                            ServerHttpRequest newRequest = exchange.getRequest().mutate().contextPath("/").build();
-                            ServerWebExchange newExchange = exchange.mutate().request(newRequest).build();
-                            return chain.filter(newExchange);
-                        }
-                        // 其他情况将请求正常转发到下游
-                        return chain.filter(exchange);
-                    });
-        }, SecurityWebFiltersOrder.FIRST);*/
         http.anonymous();
         return http.build();
     }

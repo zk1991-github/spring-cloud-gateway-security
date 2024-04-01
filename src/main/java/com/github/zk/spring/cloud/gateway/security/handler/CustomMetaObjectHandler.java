@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -19,17 +19,18 @@
 package com.github.zk.spring.cloud.gateway.security.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * 自定义 元对象处理器
  * 用于处理新增和修改时，自动填充数据
  *
  * @author zk
- * @date 2023/4/22 15:15
+ * @since 1.0
  */
 @Component
 public class CustomMetaObjectHandler implements MetaObjectHandler {

@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -18,21 +18,23 @@
 
 package com.github.zk.spring.cloud.gateway.security.controller;
 
+import com.github.zk.spring.cloud.gateway.security.common.CodeEnum;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitor;
 import com.github.zk.spring.cloud.gateway.security.pojo.RequestStatisticInfo;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 /**
  * 请求监控 控制
  *
  * @author zk
- * @date 2023/9/15 9:41
+ * @since 4.2.0
  */
 @RestController
 @RequestMapping("/gateway")
@@ -45,15 +47,11 @@ public class RequestMonitorController {
     public Mono<Response> queryRequestStatistic() {
         Mono<List<RequestStatisticInfo>> monoList = requestMonitor.queryRequestStatistic();
         return monoList.map(requestStatisticInfos -> {
-            Response response = Response.getInstance();
             if (requestStatisticInfos != null) {
-                response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/queryRequestStatistic",
-                        "查询成功！", requestStatisticInfos);
+                return Response.setOk(requestStatisticInfos);
             } else {
-                response.setError(Response.CodeEnum.FAIL,"/gateway/queryRequestStatistic",
-                        "查询失败！");
+                return Response.setError(CodeEnum.FAIL);
             }
-            return response;
         });
 
     }

@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@
 
 package com.github.zk.spring.cloud.gateway.security.authentication;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLEncoder;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.server.DefaultServerRedirectStrategy;
 import org.springframework.security.web.server.ServerRedirectStrategy;
@@ -28,17 +25,21 @@ import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationFailureHandler;
 import reactor.core.publisher.Mono;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
+
 /**
  * 自定义登录失败处理器
  *
  * @author zk
- * @date 2021/9/7 11:33
+ * @since 3.0
  */
 public class WebRedirectServerAuthenticationFailureHandler extends RedirectServerAuthenticationFailureHandler {
 
     private final String location;
 
-    private ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
+    private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
     /**
      * Creates an instance
@@ -50,38 +51,8 @@ public class WebRedirectServerAuthenticationFailureHandler extends RedirectServe
         this.location = location;
     }
 
-    /**
-     * 认证失败
-     * <p>
-     * 非跳转写法
-     *
-     * @param webFilterExchange web请求
-     * @param exception         异常
-     * @return
-     * @Override public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException exception) {
-     * Response response = Response.getInstance();
-     * ServerHttpResponse serverHttpResponse = webFilterExchange.getExchange().getResponse();
-     * serverHttpResponse.setStatusCode(HttpStatus.OK);
-     * serverHttpResponse.getHeaders().set("Content-Type", "application/json");
-     * response.setError(9000, null, exception.getMessage());
-     * ObjectMapper objectMapper = new ObjectMapper();
-     * String body = "";
-     * try {
-     * body = objectMapper.writeValueAsString(response);
-     * <p>
-     * } catch (JsonProcessingException e) {
-     * e.printStackTrace();
-     * }
-     * DataBuffer dataBuffer = serverHttpResponse.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
-     * return serverHttpResponse.writeWith(Mono.just(dataBuffer));
-     * }
-     */
     @Override
     public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException exception) {
-//        return webFilterExchange.getExchange().getSession().doOnNext(webSession -> {
-//            // 将失败信息记录到 session 中， 由于使用的是失败跳转方式，只能通过session传递失败信息
-//            webSession.getAttributes().put(WebAttributes.AUTHENTICATION_EXCEPTION, exception.getMessage());
-//        }).then(super.onAuthenticationFailure(webFilterExchange, exception));
         String encodeUrl = null;
         try {
             // 编码url参数，防止空格等特殊符号问题

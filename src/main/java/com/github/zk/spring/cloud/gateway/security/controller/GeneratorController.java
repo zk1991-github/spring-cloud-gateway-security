@@ -18,6 +18,7 @@
 
 package com.github.zk.spring.cloud.gateway.security.controller;
 
+import com.github.zk.spring.cloud.gateway.security.common.CodeEnum;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.util.PasswordGeneratorUtils;
 import org.springframework.util.ObjectUtils;
@@ -30,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 生成器 请求控制
  *
  * @author zk
- * @date 2023/12/25 10:27
+ * @since 4.3.2
  */
 @RestController
 @RequestMapping("/gateway")
@@ -38,14 +39,11 @@ public class GeneratorController {
 
     @GetMapping("/passwordGenerator")
     public Response passwordGenerator(@RequestParam("password") String password) {
-        Response response = Response.getInstance();
         if (ObjectUtils.isEmpty(password)) {
-            response.setError(Response.CodeEnum.FAIL, "/generator/password", "生成失败！");
+            return Response.setError();
         } else {
             String encodePassword = PasswordGeneratorUtils.encodePassword(password);
-            response.setOk(Response.CodeEnum.SUCCESSED, "/generator/password", "生成成功！", encodePassword);
+            return Response.setOk(CodeEnum.SUCCESS, encodePassword);
         }
-
-        return response;
     }
 }

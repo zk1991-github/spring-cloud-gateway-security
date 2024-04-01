@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -25,13 +25,14 @@ import java.util.List;
  * 字典接口
  *
  * @author zk
- * @date 2022/2/17 11:09
+ * @since 4.0
  */
 public interface IDict {
     /**
      * 根据字典类型id，查询字典信息
-     * @param dictTypeId
-     * @return
+     *
+     * @param dictTypeId 字典类型id
+     * @return 字典集合
      */
     List<DictInfo> queryDictByDictTypeId(long dictTypeId);
 }

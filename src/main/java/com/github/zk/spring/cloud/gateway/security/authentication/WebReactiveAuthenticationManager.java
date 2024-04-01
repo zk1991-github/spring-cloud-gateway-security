@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -20,19 +20,21 @@ package com.github.zk.spring.cloud.gateway.security.authentication;
 
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
-import java.time.Duration;
 import org.springframework.core.log.LogMessage;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
+import java.time.Duration;
 
 /**
  * 自定义认证管理器
  *
  * @author zk
- * @date 2021/9/3 10:48
+ * @since 3.0
  */
 public class WebReactiveAuthenticationManager extends UserDetailsRepositoryReactiveAuthenticationManager {
 
@@ -71,8 +73,10 @@ public class WebReactiveAuthenticationManager extends UserDetailsRepositoryReact
     public Mono<Authentication> authenticate(Authentication authentication) {
         String username = authentication.getName();
         return super.authenticate(authentication)
+                .publishOn(Schedulers.boundedElastic())
                 // 认证成功，删除用户锁定计数
                 .doOnNext(auth -> loginProcessor.removeLockRecord(username).subscribe())
+                .publishOn(Schedulers.boundedElastic())
                 .doOnError(BadCredentialsException.class, (ex) -> {
                     // 打印认证失败日志
                     logger.debug(LogMessage.format("%s Authentication failed: %s", username, ex.getMessage()));

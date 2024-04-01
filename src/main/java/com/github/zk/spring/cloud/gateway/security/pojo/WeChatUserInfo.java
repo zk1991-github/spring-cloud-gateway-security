@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -19,15 +19,16 @@
 package com.github.zk.spring.cloud.gateway.security.pojo;
 
 import com.github.zk.spring.cloud.gateway.security.core.WeChatUserDetails;
+import org.springframework.security.core.GrantedAuthority;
+
 import java.util.Collection;
 import java.util.List;
-import org.springframework.security.core.GrantedAuthority;
 
 /**
  * 微信传参实体
  *
  * @author zk
- * @date 2021/11/16 16:53
+ * @since 3.0
  */
 public class WeChatUserInfo implements WeChatUserDetails {
     public WeChatUserInfo() {

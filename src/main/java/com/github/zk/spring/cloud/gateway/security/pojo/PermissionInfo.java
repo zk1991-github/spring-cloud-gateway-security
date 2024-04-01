@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -25,6 +25,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 
@@ -32,36 +35,66 @@ import java.util.List;
  * 权限信息
  *
  * @author zk
- * @date 2021/1/21 10:41
+ * @since 1.0
  */
 @TableName("gateway_permission")
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
 public class PermissionInfo implements Serializable {
+
+    public interface AddPermission {
+    }
+
+    public interface UpdatePermission {
+    }
+
     private static final long serialVersionUID = 874671003093440548L;
 
-    /** 权限id */
+    /**
+     * 权限id
+     */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
-    /** 地址名称 */
+    /**
+     * 地址名称
+     */
+    @NotEmpty(groups = {AddPermission.class, UpdatePermission.class})
     private String urlName;
-    /** 地址 */
+    /**
+     * 地址
+     */
+    @NotEmpty(groups = {AddPermission.class, UpdatePermission.class})
     private String url;
-    /** 是否公开 0：不公开；1：公开；2：匿名 */
+    /**
+     * 是否公开 0：不公开；1：公开；2：匿名
+     */
+    @NotNull(groups = {AddPermission.class, UpdatePermission.class})
     private Integer open;
-    /** 描述 */
+    /**
+     * 描述
+     */
     private String description;
-    /** 是否固定 */
+    /**
+     * 是否固定
+     */
     private Integer fixed;
-    /** 创建时间 */
+    /**
+     * 创建时间
+     */
     @TableField(fill = FieldFill.INSERT)
     private String createTime;
-    /** 分页对象 */
+    /**
+     * 分页对象
+     */
     @TableField(exist = false)
     private Page<PermissionInfo> permissionInfoPage;
-    /** 关键字 */
+    /**
+     * 关键字
+     */
     @TableField(exist = false)
     private String keywords;
-    /** 角色列表 */
+    /**
+     * 角色列表
+     */
     @TableField(exist = false)
     private List<RoleInfo> roleInfos;
 

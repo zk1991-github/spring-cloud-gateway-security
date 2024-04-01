@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -18,21 +18,23 @@
 
 package com.github.zk.spring.cloud.gateway.security.controller;
 
+import com.github.zk.spring.cloud.gateway.security.common.CodeEnum;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.pojo.DictInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IDict;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * 字典请求控制
  *
  * @author zk
- * @date 2022/2/17 11:14
+ * @since 4.0
  */
 @RestController
 @RequestMapping("/gateway")
@@ -42,13 +44,11 @@ public class DictController {
 
     @GetMapping("/queryDictByDictTypeId")
     public Response queryDictByDictTypeId(@RequestParam Long dictTypeId) {
-        Response response = Response.getInstance();
         List<DictInfo> dictInfos = iDict.queryDictByDictTypeId(dictTypeId);
         if (dictInfos != null) {
-            response.setOk(Response.CodeEnum.SUCCESSED, "/gateway/queryDictByDictTypeId", "查询成功！", dictInfos);
+            return Response.setOk(dictInfos);
         } else {
-            response.setError(Response.CodeEnum.FAIL, "/gateway/queryDictByDictTypeId", "查询失败！");
+            return Response.setError(CodeEnum.QUERY_FAIL);
         }
-        return response;
     }
 }

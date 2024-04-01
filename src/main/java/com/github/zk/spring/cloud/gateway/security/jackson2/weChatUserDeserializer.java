@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2023 the original author or authors.
+ *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -28,15 +28,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.WeChatUserInfo;
+import org.springframework.security.core.userdetails.User;
+
 import java.io.IOException;
 import java.util.List;
-import org.springframework.security.core.userdetails.User;
 
 /**
  * 微信序列化
  *
  * @author zk
- * @date 2021/12/7 15:35
+ * @since 3.0
  */
 class weChatUserDeserializer extends JsonDeserializer<WeChatUserInfo> {
 
