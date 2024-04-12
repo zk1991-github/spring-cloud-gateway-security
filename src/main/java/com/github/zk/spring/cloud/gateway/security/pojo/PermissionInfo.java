@@ -21,7 +21,6 @@ package com.github.zk.spring.cloud.gateway.security.pojo;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -82,11 +81,7 @@ public class PermissionInfo implements Serializable {
      */
     @TableField(fill = FieldFill.INSERT)
     private String createTime;
-    /**
-     * 分页对象
-     */
-    @TableField(exist = false)
-    private Page<PermissionInfo> permissionInfoPage;
+
     /**
      * 关键字
      */
@@ -152,14 +147,6 @@ public class PermissionInfo implements Serializable {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
-    }
-
-    public Page<PermissionInfo> getPermissionInfoPage() {
-        return permissionInfoPage;
-    }
-
-    public void setPermissionInfoPage(Page<PermissionInfo> permissionInfoPage) {
-        this.permissionInfoPage = permissionInfoPage;
     }
 
     public String getKeywords() {

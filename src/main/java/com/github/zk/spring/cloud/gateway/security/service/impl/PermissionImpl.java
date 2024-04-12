@@ -147,7 +147,7 @@ public class PermissionImpl implements IPermission {
         // 绑定新权限
         boolean add = iRolePermission.addBatchPermissionRoles(permissionId, roleInfos);
         if (add) {
-            // 刷新公开和私有权限
+            // 刷新公开和匿名权限
             refreshOpenPermission();
             refreshAnonymousPermission();
             return update;
@@ -156,8 +156,7 @@ public class PermissionImpl implements IPermission {
     }
 
     @Override
-    public Page<PermissionInfo> queryPermission(PermissionInfo permissionInfo) {
-        String keywords = permissionInfo.getKeywords();
+    public Page<PermissionInfo> queryPermission(String keywords, Page<PermissionInfo> page) {
         QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
         if (!ObjectUtils.isEmpty(keywords)) {
             queryWrapper.like("url_name", keywords)
@@ -165,7 +164,14 @@ public class PermissionImpl implements IPermission {
                     .or().like("gd.dict_name", keywords);
         }
         queryWrapper.orderByDesc("create_time");
-        return permissionMapper.selectPage(permissionInfo.getPermissionInfoPage(), queryWrapper);
+        return permissionMapper.selectPage(page, queryWrapper);
+    }
+
+    @Override
+    public Page<PermissionInfo> queryPagePermissionByOpen(int open, Page<PermissionInfo> page) {
+        QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("open", open);
+        return permissionMapper.selectPage(page, queryWrapper);
     }
 
     @Override

@@ -62,10 +62,18 @@ public interface IPermission {
 
     /**
      * 分页查询权限
-     * @param permissionInfo 查询条件
+     * @param keywords 查询条件
      * @return 权限列表
      */
-    Page<PermissionInfo> queryPermission(PermissionInfo permissionInfo);
+    Page<PermissionInfo> queryPermission(String keywords, Page<PermissionInfo> page);
+
+    /**
+     * 根据公开类型，分页查询权限
+     * @param open
+     * @param page
+     * @return
+     */
+    Page<PermissionInfo> queryPagePermissionByOpen(int open, Page<PermissionInfo> page);
 
     /**
      * 根据公开状态查询权限列表
