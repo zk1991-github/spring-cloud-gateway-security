@@ -137,8 +137,8 @@ public class PermissionController {
      * @return 无返回
      * @since 4.3.4
      */
-    @GetMapping("/clearAllSession")
-    public Mono<Void> clearAllSession(WebSession webSession) {
+    @GetMapping("/clearAllSessions")
+    public Mono<Void> clearAllSessions(WebSession webSession) {
         return webSession.invalidate().then(gatewaySecurityCache.removeAllSessions().then());
     }
 
