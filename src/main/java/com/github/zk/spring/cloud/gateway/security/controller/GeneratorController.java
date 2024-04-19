@@ -43,7 +43,7 @@ public class GeneratorController {
             return Response.setError();
         } else {
             String encodePassword = PasswordGeneratorUtils.encodePassword(password);
-            return Response.setOk(CodeEnum.SUCCESS, encodePassword);
+            return Response.setOk(encodePassword);
         }
     }
 }
