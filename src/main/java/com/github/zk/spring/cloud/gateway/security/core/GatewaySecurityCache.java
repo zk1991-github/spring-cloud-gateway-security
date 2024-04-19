@@ -46,7 +46,7 @@ public interface GatewaySecurityCache {
      * @param sessionId 会话id
      * @return 保存 Session 状态
      */
-    Mono<Boolean> saveSession(String hashKey, String sessionId);
+    Mono<Boolean> saveSessionId(String hashKey, String sessionId);
 
     /**
      * 删除会话
@@ -54,7 +54,9 @@ public interface GatewaySecurityCache {
      * @param hashKey 用户缓存key
      * @return 删除 Session 状态
      */
-    Mono<Boolean> removeSession(String hashKey);
+    Mono<Boolean> removeSessionId(String hashKey);
+
+    Mono<Boolean> removeAllSessions();
 
     /**
      * 根据 SessionId， 查询用户 Session 是否存在

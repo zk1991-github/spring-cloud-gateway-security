@@ -168,9 +168,15 @@ public class PermissionImpl implements IPermission {
     }
 
     @Override
-    public Page<PermissionInfo> queryPagePermissionByOpen(int open, Page<PermissionInfo> page) {
+    public Page<PermissionInfo> queryPagePermissionByOpen(int open, String keywords, Page<PermissionInfo> page) {
         QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
+        if (!ObjectUtils.isEmpty(keywords)) {
+            queryWrapper.like("url_name", keywords)
+                    .or().like("url", keywords)
+                    .or().like("gd.dict_name", keywords);
+        }
         queryWrapper.eq("open", open);
+        queryWrapper.orderByDesc("create_time");
         return permissionMapper.selectPage(page, queryWrapper);
     }
 

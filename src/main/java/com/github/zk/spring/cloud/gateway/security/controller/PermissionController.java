@@ -21,6 +21,7 @@ package com.github.zk.spring.cloud.gateway.security.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.zk.spring.cloud.gateway.security.common.CodeEnum;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
+import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCache;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
@@ -28,6 +29,8 @@ import com.github.zk.spring.cloud.gateway.security.service.IRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.WebSession;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -45,6 +48,8 @@ public class PermissionController {
     private IPermission iPermission;
     @Autowired
     private IRole iRole;
+    @Autowired
+    private GatewaySecurityCache gatewaySecurityCache;
 
     @PostMapping("/addPermission")
     public Response addPermission(@RequestBody @Validated(PermissionInfo.AddPermission.class) PermissionInfo permissionInfo) {
@@ -97,10 +102,10 @@ public class PermissionController {
     }
 
     @GetMapping("/queryPrivatePermission")
-    public Response queryPrivatePermission(Page<PermissionInfo> page) {
+    public Response queryPrivatePermission(@RequestParam("keywords") String keywords, Page<PermissionInfo> page) {
         //私有权限
         int open = 0;
-        Page<PermissionInfo> permissionInfoPage = iPermission.queryPagePermissionByOpen(open, page);
+        Page<PermissionInfo> permissionInfoPage = iPermission.queryPagePermissionByOpen(open, keywords, page);
         if (permissionInfoPage != null) {
             return Response.setOk(permissionInfoPage);
         } else {
@@ -116,6 +121,11 @@ public class PermissionController {
         } else {
             return Response.setError(CodeEnum.BIND_FAIL);
         }
+    }
+
+    @GetMapping("/updateSecurityContext")
+    public Mono<Void> updateSecurityContext(WebSession webSession) {
+        return webSession.invalidate().then(gatewaySecurityCache.removeAllSessions().then());
     }
 
     @GetMapping("/queryAllRoles")

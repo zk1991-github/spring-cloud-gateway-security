@@ -160,9 +160,9 @@ public class LoginProcessor {
         // 根据 sessionId 删除存储的 session 信息
         Mono<Void> delSession = webSessionStore.removeSession(oldSessionId);
         // 删除登录时存储的用户信息
-        Mono<Boolean> removeSession = gatewaySecurityCache.removeSession(hashKey);
+        Mono<Boolean> removeSession = gatewaySecurityCache.removeSessionId(hashKey);
         // 存储新的用户信息
-        Mono<Boolean> saveSession = gatewaySecurityCache.saveSession(hashKey, newSessionId);
+        Mono<Boolean> saveSession = gatewaySecurityCache.saveSessionId(hashKey, newSessionId);
         // 依次执行响应式方法
         return delSession.then(removeSession).then(saveSession);
     }
@@ -175,7 +175,7 @@ public class LoginProcessor {
      * @return 保存 Session 状态
      */
     public Mono<Boolean> saveSession(String hashKey, String sessionId) {
-        return gatewaySecurityCache.saveSession(hashKey, sessionId);
+        return gatewaySecurityCache.saveSessionId(hashKey, sessionId);
     }
 
     /**

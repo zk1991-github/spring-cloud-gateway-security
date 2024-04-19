@@ -26,6 +26,8 @@ import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitorRedis;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.ReactiveRedisConnection;
+import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 
@@ -41,8 +43,10 @@ public class AutoConfigurationRedisCache {
 
     @Bean
     public GatewaySecurityCache gatewaySecurityCacheRedis(ReactiveStringRedisTemplate reactiveStringRedisTemplate,
-                                                          ReactiveRedisTemplate<Object, Object> reactiveRedisTemplate) {
-        return new GatewaySecurityCacheRedis(reactiveStringRedisTemplate, reactiveRedisTemplate);
+                                                          ReactiveRedisTemplate<Object, Object> reactiveRedisTemplate,
+                                                          ReactiveRedisConnectionFactory connectionFactory) {
+        ReactiveRedisConnection reactiveRedisConnection = connectionFactory.getReactiveConnection();
+        return new GatewaySecurityCacheRedis(reactiveStringRedisTemplate, reactiveRedisTemplate, reactiveRedisConnection);
     }
 
     @Bean

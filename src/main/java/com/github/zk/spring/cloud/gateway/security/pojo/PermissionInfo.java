@@ -83,11 +83,6 @@ public class PermissionInfo implements Serializable {
     private String createTime;
 
     /**
-     * 关键字
-     */
-    @TableField(exist = false)
-    private String keywords;
-    /**
      * 角色列表
      */
     @TableField(exist = false)
@@ -147,14 +142,6 @@ public class PermissionInfo implements Serializable {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
-    }
-
-    public String getKeywords() {
-        return keywords;
-    }
-
-    public void setKeywords(String keywords) {
-        this.keywords = keywords;
     }
 
     public List<RoleInfo> getRoleInfos() {

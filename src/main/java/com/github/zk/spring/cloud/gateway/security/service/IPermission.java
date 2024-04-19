@@ -73,7 +73,7 @@ public interface IPermission {
      * @param page
      * @return
      */
-    Page<PermissionInfo> queryPagePermissionByOpen(int open, Page<PermissionInfo> page);
+    Page<PermissionInfo> queryPagePermissionByOpen(int open, String keywords, Page<PermissionInfo> page);
 
     /**
      * 根据公开状态查询权限列表
