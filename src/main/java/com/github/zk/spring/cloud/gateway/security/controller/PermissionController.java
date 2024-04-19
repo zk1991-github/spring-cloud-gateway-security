@@ -101,6 +101,14 @@ public class PermissionController {
         }
     }
 
+    /**
+     * 分页查询私有权限
+     *
+     * @param keywords 关键字
+     * @param page 分页对象
+     * @return 响应体
+     * @since 4.3.4
+     */
     @GetMapping("/queryPrivatePermission")
     public Response queryPrivatePermission(@RequestParam("keywords") String keywords, Page<PermissionInfo> page) {
         //私有权限
@@ -123,8 +131,14 @@ public class PermissionController {
         }
     }
 
-    @GetMapping("/updateSecurityContext")
-    public Mono<Void> updateSecurityContext(WebSession webSession) {
+    /**
+     * 清空所有用户会话
+     * @param webSession 用户会话
+     * @return 无返回
+     * @since 4.3.4
+     */
+    @GetMapping("/clearAllSession")
+    public Mono<Void> clearAllSession(WebSession webSession) {
         return webSession.invalidate().then(gatewaySecurityCache.removeAllSessions().then());
     }
 

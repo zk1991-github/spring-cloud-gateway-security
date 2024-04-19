@@ -56,6 +56,12 @@ public interface GatewaySecurityCache {
      */
     Mono<Boolean> removeSessionId(String hashKey);
 
+    /**
+     * 移除所有 Session
+     *
+     * @return 成功状态
+     * @since 4.3.4
+     */
     Mono<Boolean> removeAllSessions();
 
     /**
