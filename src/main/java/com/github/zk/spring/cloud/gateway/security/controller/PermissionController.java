@@ -20,8 +20,8 @@ package com.github.zk.spring.cloud.gateway.security.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.zk.spring.cloud.gateway.security.common.CodeEnum;
-import com.github.zk.spring.cloud.gateway.security.common.PageEntity;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
+import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCache;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
@@ -29,6 +29,8 @@ import com.github.zk.spring.cloud.gateway.security.service.IRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.WebSession;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -46,6 +48,8 @@ public class PermissionController {
     private IPermission iPermission;
     @Autowired
     private IRole iRole;
+    @Autowired
+    private GatewaySecurityCache gatewaySecurityCache;
 
     @PostMapping("/addPermission")
     public Response addPermission(@RequestBody @Validated(PermissionInfo.AddPermission.class) PermissionInfo permissionInfo) {
@@ -87,16 +91,31 @@ public class PermissionController {
         }
     }
 
-    @PostMapping("/queryPermission")
-    public Response queryPermission(@RequestBody @Validated PermissionInfo permissionInfo) {
-        Page<PermissionInfo> permissionInfoPage = iPermission.queryPermission(permissionInfo);
+    @GetMapping("/queryPermission")
+    public Response queryPermission(@RequestParam("keywords") String keywords, Page<PermissionInfo> page) {
+        Page<PermissionInfo> permissionInfoPage = iPermission.queryPermission(keywords, page);
         if (permissionInfoPage != null) {
-            PageEntity<PermissionInfo> pageEntity = new PageEntity<>();
-            pageEntity.setCurrent(permissionInfoPage.getCurrent());
-            pageEntity.setSize(permissionInfoPage.getSize());
-            pageEntity.setTotal(permissionInfoPage.getTotal());
-            pageEntity.setRecords(permissionInfoPage.getRecords());
-            return Response.setOk(pageEntity);
+            return Response.setOk(permissionInfoPage);
+        } else {
+            return Response.setError(CodeEnum.QUERY_FAIL);
+        }
+    }
+
+    /**
+     * 分页查询私有权限
+     *
+     * @param keywords 关键字
+     * @param page 分页对象
+     * @return 响应体
+     * @since 4.3.4
+     */
+    @GetMapping("/queryPrivatePermission")
+    public Response queryPrivatePermission(@RequestParam("keywords") String keywords, Page<PermissionInfo> page) {
+        //私有权限
+        int open = 0;
+        Page<PermissionInfo> permissionInfoPage = iPermission.queryPagePermissionByOpen(open, keywords, page);
+        if (permissionInfoPage != null) {
+            return Response.setOk(permissionInfoPage);
         } else {
             return Response.setError(CodeEnum.QUERY_FAIL);
         }
@@ -110,6 +129,17 @@ public class PermissionController {
         } else {
             return Response.setError(CodeEnum.BIND_FAIL);
         }
+    }
+
+    /**
+     * 清空所有用户会话
+     * @param webSession 用户会话
+     * @return 无返回
+     * @since 4.3.4
+     */
+    @GetMapping("/clearAllSessions")
+    public Mono<Void> clearAllSessions(WebSession webSession) {
+        return webSession.invalidate().then(gatewaySecurityCache.removeAllSessions().then());
     }
 
     @GetMapping("/queryAllRoles")

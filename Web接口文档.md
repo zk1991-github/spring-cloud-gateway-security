@@ -47,8 +47,8 @@ username=superadmin&password=123456
         "accountNonExpired": true,
         "authorities": null
     },
-    "msg": "登录成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 | 序号 | 参数                  | 描述           | 类型    | 说明 |
@@ -88,15 +88,24 @@ permissionInfos对象
 ```json
 {
     "msg": "用户不存在",
-    "code": 10000
+    "code": 707
 }
 ```
 ```json
 {
     "msg": "密码错误",
-    "code": 10000
+    "code": 708
 }
 ```
+
+```json
+{
+    "msg": "用户帐号已被锁定",
+    "code": 709
+}
+```
+
+
 
 ## 2. 登出
 
@@ -112,8 +121,8 @@ GET http://<IP>:<PORT>/login/logout
 
 ```json
 {
-    "msg": "登出成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 
@@ -168,20 +177,15 @@ GET http://<IP>:<PORT>/gateway/getUser
         "credentialsNonExpired": true,
         "authorities": null
     },
-    "api": "/gateway/getUser",
-    "msg": "查询成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 
 - 失败样例
 
 ```json
-{
-    "msg": "查询失败",
-    "api": "/gateway/getUser",
-    "code": 10000
-}
+无
 ```
 
 ## 4. 查询在线用户数
@@ -199,20 +203,15 @@ GET http://<IP>:<PORT>/gateway/getOnlineNums
 ```json
 {
     "data": 1,
-    "api": "/gateway/getOnlineNums",
-    "msg": "查询成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 
 - 失败样例
 
 ```json
-{
-    "msg": "查询失败",
-    "api": "/gateway/getOnlineNums",
-    "code": 10000
-}
+无
 ```
 
 ## 5. 修改密码
@@ -243,9 +242,8 @@ Content-Type: application/json
 ```json
 {
     "data": true,
-    "api": "/gateway/updatePassword",
-    "msg": "密码修改成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 
@@ -253,9 +251,8 @@ Content-Type: application/json
 
 ```json
 {
-    "api": "/gateway/updatePassword",
-    "msg": "密码修改失败！",
-    "code": 10000
+    "msg": "修改失败",
+    "code": 703
 }
 ```
 
@@ -303,9 +300,8 @@ GET http://<IP>:<PORT>/gateway/queryRequestStatistic
             "responseDurationAvg": 812
         }
     ],
-    "api": "/gateway/queryRequestStatistic",
-    "msg": "查询成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 
@@ -321,9 +317,8 @@ GET http://<IP>:<PORT>/gateway/queryRequestStatistic
 
 ```json
 {
-    "api": "/gateway/queryRequestStatistic",
-    "msg": "查询失败！",
-    "code": 10000
+    "msg": "后台出现异常错误",
+    "code": 500
 }
 ```
 
@@ -365,9 +360,8 @@ GET http://<IP>:<PORT>/gateway/queryDictByDictTypeId?dictTypeId=<param>
             "dictName": "匿名"
         }
     ],
-    "api": "/gateway/queryDictByDictTypeId",
-    "msg": "查询成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 
@@ -382,9 +376,8 @@ GET http://<IP>:<PORT>/gateway/queryDictByDictTypeId?dictTypeId=<param>
 
 ```json
 {
-    "api": "/gateway/queryDictByDictTypeId",
-    "msg": "查询失败！",
-    "code": 10000
+    "msg": "查询失败",
+    "code": 704
 }
 ```
 
@@ -420,9 +413,8 @@ Content-Type: application/json
 ```json
 {
     "data": 1,
-    "api": "/gateway/addPermission",
-    "msg": "添加成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 
@@ -430,9 +422,8 @@ Content-Type: application/json
 
 ```json
 {
-    "api": "/gateway/addPermission",
-    "msg": "添加失败！",
-    "code": 10000
+    "msg": "添加失败",
+    "code": 701
 }
 ```
 
@@ -455,9 +446,8 @@ GET http://<IP>:<PORT>/gateway/delPermission?id=<param>
 ```json
 {
     "data": 1,
-    "api": "/gateway/delPermission",
-    "msg": "删除成功！",
-    "code": 0
+    "msg": "删除成功",
+    "code": 200
 }
 ```
 
@@ -465,9 +455,8 @@ GET http://<IP>:<PORT>/gateway/delPermission?id=<param>
 
 ```json
 {
-    "api": "/gateway/delPermission",
-    "msg": "删除失败！",
-    "code": 10000
+    "msg": "删除失败",
+    "code": 702
 }
 ```
 
@@ -490,9 +479,8 @@ GET http://<IP>:<PORT>/gateway/delPermissions?ids=<param1>,<param2>
 ```json
 {
     "data": 2,
-    "api": "/gateway/delPermissions",
-    "msg": "删除成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 
@@ -500,9 +488,8 @@ GET http://<IP>:<PORT>/gateway/delPermissions?ids=<param1>,<param2>
 
 ```json
 {
-    "api": "/gateway/delPermissions",
-    "msg": "删除失败！",
-    "code": 10000
+    "msg": "删除失败",
+    "code": 702
 }
 ```
 
@@ -540,9 +527,8 @@ Content-Type: application/json
 ```json
 {
     "data": 1,
-    "api": "/gateway/updatePermission",
-    "msg": "修改成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 
@@ -550,9 +536,8 @@ Content-Type: application/json
 
 ```json
 {
-    "api": "/gateway/updatePermission",
-    "msg": "修改失败！",
-    "code": 10000
+    "msg": "修改失败",
+    "code": 703
 }
 ```
 
@@ -561,26 +546,14 @@ Content-Type: application/json
 请求接口
 
 ```http request
-POST http://<IP>:<PORT>/gateway/queryPermission
-Content-Type: application/json
-
-{
-    "keywords": "权限",
-    "permissionInfoPage": {"current": 1,"size": 10}
-}
+GET http://<IP>:<PORT>/gateway/queryPermission?keywords=<param1>&current=<param2>&size=<param3>
 ```
 
-| 序号 | 参数               | 描述     | 类型   | 说明 |
-| ---- | ------------------ | -------- | ------ | ---- |
-| 1    | keywords           | 关键字   | 字符串 |      |
-| 2    | permissionInfoPage | 分页对象 | Object |      |
-
-permissionInfoPage对象
-
-| 序号 | 参数    | 描述         | 类型 | 说明 |
-| ---- | ------- | ------------ | ---- | ---- |
-| 1    | current | 页码         | 数字 | 必填 |
-| 2    | size    | 每页显示条数 | 数字 | 必填 |
+| 序号 | 参数     | 描述         | 类型   | 说明 |
+| ---- | -------- | ------------ | ------ | ---- |
+| 1    | keywords | 关键字       | 字符串 |      |
+| 2    | current  | 页码         | 数字   | 必填 |
+| 3    | size     | 每页显示条数 | 数字   | 必填 |
 
 返回结构
 
@@ -726,9 +699,8 @@ permissionInfoPage对象
             }
         ]
     },
-    "api": "/gateway/queryPermission",
-    "msg": "查询成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 
@@ -736,9 +708,8 @@ permissionInfoPage对象
 
 ```json
 {
-    "api": "/gateway/queryPermission",
-    "msg": "查询失败！",
-    "code": 10000
+    "msg": "查询失败",
+    "code": 704
 }
 ```
 
@@ -774,9 +745,8 @@ permissionInfos对象
 ```json
 {
     "data": true,
-    "api": "/gateway/bindPermissionByRole",
-    "msg": "绑定成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 
@@ -784,9 +754,8 @@ permissionInfos对象
 
 ```json
 {
-    "api": "/gateway/bindPermissionByRole",
-    "msg": "绑定失败！",
-    "code": 10000
+    "msg": "绑定失败",
+    "code": 705
 }
 ```
 
@@ -819,8 +788,8 @@ GET http://<IP>:<PORT>/gateway/queryAllRoles
         }
     ],
     "api": "/gateway/queryAllRoles",
-    "msg": "查询成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 
@@ -833,9 +802,8 @@ GET http://<IP>:<PORT>/gateway/queryAllRoles
 
 ```json
 {
-    "api": "/gateway/queryAllRoles",
-    "msg": "查询失败！",
-    "code": 10000
+    "msg": "查询失败",
+    "code": 704
 }
 ```
 
@@ -883,9 +851,8 @@ GET http://<IP>:<PORT>/gateway/queryPermissionsByRoleId?roleId=<param>
             "roleInfos": null
         }
     ],
-    "api": "/gateway/queryPermissionsByRoleId",
-    "msg": "查询成功！",
-    "code": 0
+    "msg": "成功",
+    "code": 200
 }
 ```
 
@@ -903,9 +870,8 @@ GET http://<IP>:<PORT>/gateway/queryPermissionsByRoleId?roleId=<param>
 
 ```json
 {
-    "api": "/gateway/queryPermissionsByRoleId",
-    "msg": "查询失败！",
-    "code": 10000
+    "msg": "查询失败",
+    "code": 704
 }
 ```
 ## 16. 生成加密密码
@@ -927,9 +893,8 @@ GET http://<IP>:<PORT>/gateway/passwordGenerator?password=<param>
 ```json
 {
   "data": "{bcrypt}$2a$10$A6he6KCgCnvtq2IS6hOWY.cNXbwzSo5eBJyVuonSFVztPIJXznRXq",
-  "api": "/gateway/passwordGenerator",
-  "msg": "生成成功！",
-  "code": 0
+  "msg": "成功",
+  "code": 200
 }
 ```
 
@@ -937,9 +902,122 @@ GET http://<IP>:<PORT>/gateway/passwordGenerator?password=<param>
 
 ```json
 {
-    "api": "/gateway/passwordGenerator",
-    "msg": "查询失败！",
-    "code": 10000
+    "msg": "后台出现异常错误",
+    "code": 500
 }
 ```
-> 需要登录系统后才可使用此接口
+## 17. 私有权限分页查询
+
+请求接口
+
+```http request
+GET http://<IP>:<PORT>/gateway/queryPrivatePermission?keywords=<param1>&current=<param2>&size=<param3>
+```
+
+| 序号 | 参数     | 描述         | 类型   | 说明 |
+| ---- | -------- | ------------ | ------ | ---- |
+| 1    | current  | 页码         | 数字   | 必填 |
+| 2    | size     | 每页显示条数 | 数字   | 必填 |
+| 3    | keywords | 关键字       | 字符串 |      |
+
+返回结构
+
+- 成功样例
+
+```json
+{
+  "data": {
+    "records": [
+      {
+        "id": "1778708514361913345",
+        "urlName": "刷新权限",
+        "url": "/updateSecurityContext",
+        "open": 0,
+        "description": "",
+        "fixed": 1,
+        "createTime": "2024-04-12 16:55:31",
+        "roleInfos": [
+          {
+            "id": "2",
+            "roleName": "普通用户",
+            "description": null,
+            "permissionInfos": null
+          },
+          {
+            "id": "1",
+            "roleName": "管理员",
+            "description": null,
+            "permissionInfos": null
+          }
+        ]
+      },
+      {
+        "id": "1778621402404941825",
+        "urlName": "分页查询私有权限",
+        "url": "/queryPrivatePermission",
+        "open": 0,
+        "description": "",
+        "fixed": 1,
+        "createTime": "2024-04-12 11:09:22",
+        "roleInfos": [
+          {
+            "id": "2",
+            "roleName": "普通用户",
+            "description": null,
+            "permissionInfos": null
+          },
+          {
+            "id": "1",
+            "roleName": "管理员",
+            "description": null,
+            "permissionInfos": null
+          }
+        ]
+      }
+    ],
+    "total": 11,
+    "size": 10,
+    "current": 1,
+    "orders": [],
+    "optimizeCountSql": true,
+    "searchCount": true,
+    "maxLimit": null,
+    "countId": null,
+    "pages": 2
+  },
+  "msg": "成功",
+  "code": 200
+}
+```
+
+- 失败样例
+
+```json
+{
+    "msg": "查询失败！",
+    "code": 704
+}
+```
+
+## 18. 清空所有用户会话
+
+请求接口
+
+```http request
+GET http://<IP>:<PORT>/gateway/clearAllSession
+```
+
+返回结构
+
+- 成功样例
+
+```json
+无
+```
+
+- 失败样例
+
+```json
+无
+```
+

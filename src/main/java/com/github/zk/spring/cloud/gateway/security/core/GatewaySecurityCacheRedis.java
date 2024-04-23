@@ -19,12 +19,15 @@
 package com.github.zk.spring.cloud.gateway.security.core;
 
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
+import org.springframework.data.redis.connection.ReactiveRedisConnection;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
 import reactor.core.publisher.Mono;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -39,12 +42,16 @@ public class GatewaySecurityCacheRedis implements GatewaySecurityCache {
 
     private final ReactiveRedisTemplate<Object, Object> reactiveRedisTemplate;
 
+    private final ReactiveRedisConnection reactiveRedisConnection;
+
     private final static String SESSION_KEY = "sessions";
 
     public GatewaySecurityCacheRedis(ReactiveStringRedisTemplate reactiveStringRedisTemplate,
-                                     ReactiveRedisTemplate<Object, Object> reactiveRedisTemplate) {
+                                     ReactiveRedisTemplate<Object, Object> reactiveRedisTemplate,
+                                     ReactiveRedisConnection reactiveRedisConnection) {
         this.reactiveStringRedisTemplate = reactiveStringRedisTemplate;
         this.reactiveRedisTemplate = reactiveRedisTemplate;
+        this.reactiveRedisConnection = reactiveRedisConnection;
     }
     @Override
     public Mono<String> getSessionId(String hashKey) {
@@ -56,17 +63,31 @@ public class GatewaySecurityCacheRedis implements GatewaySecurityCache {
     }
 
     @Override
-    public Mono<Boolean> saveSession(String hashKey, String sessionId) {
+    public Mono<Boolean> saveSessionId(String hashKey, String sessionId) {
         return reactiveStringRedisTemplate
                 .opsForHash()
                 .put(SESSION_KEY, hashKey, sessionId);
     }
 
     @Override
-    public Mono<Boolean> removeSession(String hashKey) {
+    public Mono<Boolean> removeSessionId(String hashKey) {
         return reactiveStringRedisTemplate
                 .opsForHash()
                 .remove(SESSION_KEY, hashKey).map(delNum -> delNum > 0);
+    }
+
+    @Override
+    public Mono<Boolean> removeAllSessions() {
+        return reactiveRedisConnection.keyCommands()
+                .scan()
+                .map(ByteBuffer::array)
+                .map(keyBytes -> new String(keyBytes, StandardCharsets.UTF_8))
+                .filter(key -> key.matches(ReactiveRedisSessionRepository.DEFAULT_NAMESPACE + ":.*"))
+                .flatMap(key -> reactiveStringRedisTemplate.delete(key).map(count -> count > 0))
+                // 如果有一个删除成功，则返回true
+                .reduce((previous, current) -> previous || current)
+                // 如果没有找到匹配的 key，则返回false
+                .defaultIfEmpty(false);
     }
 
     @Override

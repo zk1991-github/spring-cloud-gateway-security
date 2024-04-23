@@ -90,7 +90,7 @@ public class UserController {
      * @param updatePasswordDTO 修改密码参数对象
      * @return 修改成功
      */
-    @PostMapping("updatePassword")
+    @PostMapping("/updatePassword")
     public Mono<Response> updatePassword(@RequestBody @Validated UpdatePasswordDTO updatePasswordDTO) {
         boolean b = iUser.updatePassword(updatePasswordDTO.getUsername(),
                 updatePasswordDTO.getOldPassword(),

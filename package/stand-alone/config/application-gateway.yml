@@ -8,11 +8,10 @@ spring:
         maxSessions: 10000
       default-filters:
         - Session
-        - Monitor
       routes:
         - id: server_route
           # 转发地址
-          uri: http://127.0.0.1:8081
+          uri: http://localhost:8080
           predicates:
             # 拦截请求路径
             - name: Path
@@ -24,7 +23,6 @@ spring:
               args:
                 # 此处 key 必须为 “parts”
                 parts: 1
-#            - StripPrefix=1
             # token身份认证 TokenCheckGatewayFilterFactory
             - TokenCheck
             # 请求流量限制，默认5MB
@@ -46,7 +44,6 @@ spring:
               args:
                 # 此处 key 必须为 “parts”
                 parts: 1
-            #            - StripPrefix=1
             # token身份认证 JwtCheckGatewayFilterFactory
             - TokenCheck
             # 请求流量限制，默认5MB
@@ -55,11 +52,11 @@ spring:
                 maxSize: 5000000
         # sockJS路由需要与websocket路由结合使用
         - id: sockJS_route
-          uri: http://10.1.7.81:8081
+          uri: http://localhost:8080
           predicates:
             - Path=/websocket/**
         - id: websocket_route
-          uri: ws://localhost:8081
+          uri: ws://localhost:8080
           predicates:
             - Path=/websocket/**
       # 开启/关闭网关
@@ -69,4 +66,4 @@ spring:
   application:
     name: gateway
   static:
-    antpatterns: "/web/dist/**"
+    antpatterns: "/web/dist/**,/web/websocket.html"

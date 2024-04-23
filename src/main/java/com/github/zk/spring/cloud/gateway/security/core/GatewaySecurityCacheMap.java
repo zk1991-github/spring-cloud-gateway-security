@@ -21,11 +21,13 @@ package com.github.zk.spring.cloud.gateway.security.core;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import org.springframework.web.server.WebSession;
 import org.springframework.web.server.session.InMemoryWebSessionStore;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -64,7 +66,7 @@ public class GatewaySecurityCacheMap implements GatewaySecurityCache {
     }
 
     @Override
-    public Mono<Boolean> saveSession(String hashKey, String sessionId) {
+    public Mono<Boolean> saveSessionId(String hashKey, String sessionId) {
         return Mono.fromCallable(() -> {
             sessionCache.put(hashKey, sessionId);
             return true;
@@ -72,11 +74,21 @@ public class GatewaySecurityCacheMap implements GatewaySecurityCache {
     }
 
     @Override
-    public Mono<Boolean> removeSession(String hashKey) {
+    public Mono<Boolean> removeSessionId(String hashKey) {
         return Mono.fromCallable(() -> {
             sessionCache.remove(hashKey);
             return true;
         }).onErrorReturn(false);
+    }
+
+    @Override
+    public Mono<Boolean> removeAllSessions() {
+        Map<String, WebSession> sessions = webSessionStore.getSessions();
+        Set<String> sessionIds = sessions.keySet();
+        return Flux.fromIterable(sessionIds)
+                .flatMap(webSessionStore::removeSession)
+                .all(v -> true)
+                .defaultIfEmpty(true);
     }
 
     @Override

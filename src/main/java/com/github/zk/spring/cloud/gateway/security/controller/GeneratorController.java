@@ -18,7 +18,6 @@
 
 package com.github.zk.spring.cloud.gateway.security.controller;
 
-import com.github.zk.spring.cloud.gateway.security.common.CodeEnum;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.util.PasswordGeneratorUtils;
 import org.springframework.util.ObjectUtils;
@@ -43,7 +42,7 @@ public class GeneratorController {
             return Response.setError();
         } else {
             String encodePassword = PasswordGeneratorUtils.encodePassword(password);
-            return Response.setOk(CodeEnum.SUCCESS, encodePassword);
+            return Response.setOk(encodePassword);
         }
     }
 }
