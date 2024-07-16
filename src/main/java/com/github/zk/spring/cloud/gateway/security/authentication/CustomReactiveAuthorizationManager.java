@@ -18,6 +18,7 @@
 
 package com.github.zk.spring.cloud.gateway.security.authentication;
 
+import com.github.zk.spring.cloud.gateway.security.enums.IntfTypeEnum;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
@@ -133,7 +134,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
     /**
      * 匿名权限匹配
      *
-     * @param auth 认证对象
+     * @param auth            认证对象
      * @param realRequestPath 真实访问地址
      * @return 认证持有对象
      */
@@ -145,7 +146,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
     /**
      * 公开权限匹配
      *
-     * @param auth 认证对象
+     * @param auth            认证对象
      * @param realRequestPath 真实访问地址
      * @return 认证持有对象
      */
@@ -177,20 +178,23 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                 if (matchUrl) {
                     logger.info("转发地址：{}", requestPath);
                     Object principal = authentication.getPrincipal();
+                    //如果为匿名状态，并且是公开权限，设置无权限状态
+                    if (ObjectUtils.nullSafeEquals(principal, "anonymousUser") &&
+                            permissionInfo.getOpen() == IntfTypeEnum.PUBLIC_PERMISSION.getIndex()) {
+                        logger.info("未登录或登录超时");
+                        authenticationHolder.setAuthorizationDecision(new AuthorizationDecision(false));
+                        return authenticationHolder;
+                    }
                     if (principal instanceof UserInfo) {
                         UserInfo userInfo = (UserInfo) principal;
                         exchangeSetHeader(exchange, userInfo.getUsername(), String.valueOf(userInfo.getId()));
                     } else if (principal instanceof WeChatUserInfo) {
                         WeChatUserInfo weChatUserInfo = (WeChatUserInfo) principal;
                         exchangeSetHeader(exchange, weChatUserInfo.getNickName(), weChatUserInfo.getOpenid());
-                    } else {
-                        logger.info("未登录或登录超时");
-                        authenticationHolder.setAuthorizationDecision(new AuthorizationDecision(false));
-                        return authenticationHolder;
                     }
-
                     authenticationHolder.setAuthorizationDecision(new AuthorizationDecision(true));
                     return authenticationHolder;
+
                 }
             }
             // 请求地址非公开权限，设置无公开权限状态
@@ -266,7 +270,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                 boolean match = ANT_PATH_MATCHER.match(permissionInfo.getUrl(), requestPath);
                 if (match) {
                     // 设置下游服务传递的头信息
-                    exchangeSetHeader(exchange, encodedNickName,  String.valueOf(weChatUserInfo.getOpenid()));
+                    exchangeSetHeader(exchange, encodedNickName, String.valueOf(weChatUserInfo.getOpenid()));
                     return new AuthorizationDecision(true);
                 }
             }
@@ -331,7 +335,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
      *
      * @param exchange 请求
      * @param username 用户名
-     * @param userId 用户id
+     * @param userId   用户id
      */
     private void exchangeSetHeader(ServerWebExchange exchange, String username, String userId) {
         // 设置下游服务传递的头信息
