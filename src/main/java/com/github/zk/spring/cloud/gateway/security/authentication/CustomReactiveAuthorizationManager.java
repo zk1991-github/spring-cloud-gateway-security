@@ -185,6 +185,8 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                         exchangeSetHeader(exchange, weChatUserInfo.getNickName(), weChatUserInfo.getOpenid());
                     } else {
                         logger.info("未登录或登录超时");
+                        authenticationHolder.setAuthorizationDecision(new AuthorizationDecision(false));
+                        return authenticationHolder;
                     }
 
                     authenticationHolder.setAuthorizationDecision(new AuthorizationDecision(true));
