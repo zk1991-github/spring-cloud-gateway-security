@@ -40,6 +40,7 @@ import org.springframework.security.web.server.authentication.RedirectServerAuth
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.RedirectServerLogoutSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.WebSessionServerLogoutHandler;
+import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -153,12 +154,12 @@ public class SecurityConfig {
                 .logoutSuccessHandler(createRedirectServerLogoutSuccessHandler())
                 .and()
                 // 禁用csrf拦截
-                .csrf().disable()
+                .csrf()
+                .csrfTokenRepository(customCookieServerCsrfTokenRepository())
+                .and()
                 // 启用跨域拦截
-                .cors()
-        ;
-
-
+                .cors();
+        // 允许匿名访问
         http.anonymous();
         return http.build();
     }
@@ -193,6 +194,11 @@ public class SecurityConfig {
     public DefaultUserImpl userDetailsService(LoginProperties properties,
                                               UserMapper userMapper) {
         return new DefaultUserImpl(properties, userMapper);
+    }
+
+    @Bean
+    public CookieServerCsrfTokenRepository customCookieServerCsrfTokenRepository() {
+        return CookieServerCsrfTokenRepository.withHttpOnlyFalse();
     }
 
     /**

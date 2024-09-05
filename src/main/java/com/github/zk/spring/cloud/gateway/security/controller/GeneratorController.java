@@ -20,11 +20,15 @@ package com.github.zk.spring.cloud.gateway.security.controller;
 
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.util.PasswordGeneratorUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.server.csrf.ServerCsrfTokenRepository;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 /**
  * 生成器 请求控制
@@ -36,6 +40,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/gateway")
 public class GeneratorController {
 
+    @Autowired
+    private ServerCsrfTokenRepository serverCsrfTokenRepository;
     @GetMapping("/passwordGenerator")
     public Response passwordGenerator(@RequestParam("password") String password) {
         if (ObjectUtils.isEmpty(password)) {
@@ -44,5 +50,12 @@ public class GeneratorController {
             String encodePassword = PasswordGeneratorUtils.encodePassword(password);
             return Response.setOk(encodePassword);
         }
+    }
+
+    @GetMapping("/csrfTokenGenerator")
+    public Mono<Response> csrfTokenGenerator(ServerWebExchange exchange) {
+        return serverCsrfTokenRepository.generateToken(exchange)
+                .delayUntil((token) -> serverCsrfTokenRepository.saveToken(exchange, token))
+                .cache().map(csrfToken -> Response.setOk());
     }
 }
