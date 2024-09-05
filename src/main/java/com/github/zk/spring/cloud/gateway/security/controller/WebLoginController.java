@@ -24,6 +24,7 @@ import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.log.LogHolder;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -36,6 +37,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
+
+import java.net.URI;
 
 /**
  * 登录 请求控制
@@ -112,10 +115,11 @@ public class WebLoginController {
     }
 
     @GetMapping("/invalid")
-    public Response invalid(WebSession session) {
+    public Mono<Void> invalid(WebSession session, ServerWebExchange exchange) {
         //使当前session失效
-        session.invalidate().subscribe();
-        return Response.setError(CodeEnum.NOT_LOGIN);
+        exchange.getResponse().setStatusCode(HttpStatus.FOUND);
+        exchange.getResponse().getHeaders().setLocation(URI.create("/web/dist/index.html"));
+        return session.invalidate().then(exchange.getResponse().setComplete());
     }
 
     @GetMapping("/logout")
