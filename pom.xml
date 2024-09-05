@@ -10,12 +10,12 @@
     </parent>
     <groupId>com.github.zk</groupId>
     <artifactId>spring-cloud-gateway-security</artifactId>
-    <version>v4.3.4</version>
+    <version>v4.3.5</version>
     <name>spring-cloud-gateway-security</name>
     <description>Spring Cloud gateway 整合 Spring Security</description>
     <properties>
         <java.version>1.8</java.version>
-        <spring-cloud.version>2021.0.8</spring-cloud.version>
+        <spring-cloud.version>2021.0.9</spring-cloud.version>
         <druid.version>1.1.9</druid.version>
         <mysql.version>8.0.33</mysql.version>
         <sqlit.version>3.44.1.0</sqlit.version>

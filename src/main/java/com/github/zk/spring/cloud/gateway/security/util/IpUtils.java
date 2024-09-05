@@ -49,7 +49,7 @@ public class IpUtils {
         }
         if (ObjectUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
             // 无代理时，直接获取远程地址
-            ip = Objects.requireNonNull(request.getRemoteAddress()).getHostName();
+            ip = Objects.requireNonNull(request.getRemoteAddress()).getAddress().getHostAddress();
         }
         return ip;
     }

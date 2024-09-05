@@ -185,7 +185,7 @@ GET http://<IP>:<PORT>/gateway/getUser
 - 失败样例
 
 ```json
-无
+"无"
 ```
 
 ## 4. 查询在线用户数
@@ -211,7 +211,7 @@ GET http://<IP>:<PORT>/gateway/getOnlineNums
 - 失败样例
 
 ```json
-无
+"无"
 ```
 
 ## 5. 修改密码
@@ -1012,12 +1012,37 @@ GET http://<IP>:<PORT>/gateway/clearAllSession
 - 成功样例
 
 ```json
-无
+"无"
 ```
 
 - 失败样例
 
 ```json
-无
+"无"
+```
+
+## 19. 获取csrf令牌
+
+请求接口
+
+```http request
+GET http://<IP>:<PORT>/gateway/csrfTokenGenerator
+```
+
+返回结构
+
+- 成功样例
+
+```json
+{
+  "msg": "成功",
+  "code": 200
+}
+```
+
+- 失败样例
+
+```json
+"无"
 ```
 
