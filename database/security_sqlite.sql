@@ -53,6 +53,7 @@ DROP TABLE IF EXISTS `gateway_permission`;
 
 CREATE TABLE `gateway_permission` (
   `id` bigint(64) NOT NULL,
+  `group_id` bigint(64) NOT NULL,
   `url_name` varchar(255) DEFAULT NULL,
   `url` varchar(255) NOT NULL,
   `open` tinyint(1) NOT NULL,
@@ -64,7 +65,20 @@ CREATE TABLE `gateway_permission` (
 
 /*Data for the table `gateway_permission` */
 
-insert  into `gateway_permission`(`id`,`url_name`,`url`,`open`,`description`,`fixed`,`create_time`) values (1495637399244447746,'分页查询权限','/queryPermission',0,'分页查询权限',1,'2022-02-21 13:51:59'),(1495637567519924225,'新增权限','/addPermission',0,'新增权限',1,'2022-02-21 13:52:39'),(1495637664693559298,'删除权限','/delPermission',0,'删除权限',1,'2022-02-21 13:53:02'),(1495637762299207682,'修改权限','/updatePermission',0,'修改权限',1,'2022-02-21 13:53:25'),(1495637865344868354,'查询所有角色','/queryAllRoles',0,'查询所有角色',1,'2022-02-21 13:53:50'),(1495637948090097665,'根据角色绑定权限','/bindPermissionByRole',0,'根据角色绑定权限',1,'2022-02-21 13:54:09'),(1495638064385564674,'根据角色id，查询权限','/queryPermissionsByRoleId',0,'根据角色id，查询权限',1,'2022-02-21 13:54:37'),(1495638486122831873,'根据字典类型id，查询字典信息','/queryDictByDictTypeId',1,'根据字典类型id，查询字典信息',1,'2022-02-21 13:56:18'),(1499320522679283714,'批量删除权限','/delPermissions',0,'根据权限id，批量删除权限',1,'2022-03-03 17:47:23'),(1778354083523031042,'生成密码','/passwordGenerator',0,'',1,'2024-04-11 17:27:08'),(1778621402404941825,'分页查询私有权限','/queryPrivatePermission',0,'',1,'2024-04-12 11:09:22'),(1778708514361913345,'清空所有会话','/clearAllSessions',0,'',1,'2024-04-12 16:55:31'),(1807969459632373761,'查询当前用户','/getUser',0,'',1,'2024-07-02 10:48:04'),(1813146900302745601,'获取csrf令牌','/csrfTokenGenerator',2,'',1,'2024-07-16 17:41:22');
+insert  into `gateway_permission`(`id`,`group_id`,`url_name`,`url`,`open`,`description`,`fixed`,`create_time`) values (1495637399244447746,0,'分页查询权限','/queryPermission',0,'分页查询权限',1,'2022-02-21 13:51:59'),(1495637567519924225,0,'新增权限','/addPermission',0,'新增权限',1,'2022-02-21 13:52:39'),(1495637664693559298,0,'删除权限','/delPermission',0,'删除权限',1,'2022-02-21 13:53:02'),(1495637762299207682,0,'修改权限','/updatePermission',0,'修改权限',1,'2022-02-21 13:53:25'),(1495637865344868354,0,'查询所有角色','/queryAllRoles',0,'查询所有角色',1,'2022-02-21 13:53:50'),(1495637948090097665,0,'根据角色绑定权限','/bindPermissionByRole',0,'根据角色绑定权限',1,'2022-02-21 13:54:09'),(1495638064385564674,0,'根据角色id，查询权限','/queryPermissionsByRoleId',0,'根据角色id，查询权限',1,'2022-02-21 13:54:37'),(1495638486122831873,0,'根据字典类型id，查询字典信息','/queryDictByDictTypeId',1,'根据字典类型id，查询字典信息',1,'2022-02-21 13:56:18'),(1499320522679283714,0,'批量删除权限','/delPermissions',0,'根据权限id，批量删除权限',1,'2022-03-03 17:47:23'),(1778354083523031042,0,'生成密码','/passwordGenerator',0,'',1,'2024-04-11 17:27:08'),(1778621402404941825,0,'分页查询私有权限','/queryPrivatePermission',0,'',1,'2024-04-12 11:09:22'),(1778708514361913345,0,'清空所有会话','/clearAllSessions',0,'',1,'2024-04-12 16:55:31'),(1807969459632373761,0,'查询当前用户','/getUser',0,'',1,'2024-07-02 10:48:04'),(1813146900302745601,0,'获取csrf令牌','/csrfTokenGenerator',2,'',1,'2024-07-16 17:41:22');
+
+/*Table structure for table `gateway_permission_group` */
+
+DROP TABLE IF EXISTS `gateway_permission_group`;
+
+CREATE TABLE `gateway_permission_group` (
+    `id` bigint(64) NOT NULL,
+    `group_name` varchar(15) NOT NULL,
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+);
+
+/*Data for the table `gateway_permission_group` */
 
 /*Table structure for table `gateway_request_monitor` */
 

@@ -1,54 +1,90 @@
 # 网关鉴权说明文档
-  网关鉴权是将服务与外部请求隔离，通过网关转发请求，达到服务统一入口。在网关层进行登录认证以及接口权限控制，对各服务统一认证。 
-## 版本更新说明
-  - v4.2.1 版本增加了锁定账户输入密码错误次数配置，并支持配置自动解锁时间。
-  - v4.3.0 版本支持单机(无Redis)和集群(有Redis)两种方式部署
-  - v4.3.1 修复三方依赖漏洞
-  - v4.3.2 增加密码加密生成接口,修复权限批量删除Bug
-  - v4.3.3 增加参数校验，规范化注释
-  - v4.3.4 新增强制登出所有用户功能
-  - v4.3.5 新增csrf令牌功能
-## 快速开始
+
+## 网关鉴权的用途
+
+1. 统一的用户登录认证：通用的用户登录功能，项目不必再单独编写登录认证功能；为各微服务提供统一的用户登录认证。
+2. 服务请求转发：所有请求发送至网关鉴权服务，网关鉴权服务将请求转发至相对应的服务器。
+3. 请求权限控制：对所有转发的请求，根据配置进行权限控制，严格控制接口的访问权限，防止跳过前端界面直接进行接口访问漏洞。
+
+## 一、快速开始
+
 1. 部署架构
 
-网关鉴权软件一般是在Nginx等负载软件下层，通过负载软件使网关鉴权软件达到高可用，部署架构如图所示：
+   网关鉴权软件一般是在Nginx等负载软件下层，通过负载软件使网关鉴权软件达到高可用，部署架构如图所示：
    ![](网关鉴权部署架构.jpg)
+   
 2. 软件部署
 
-2.1. 集群版部署（推荐）<br>
-   (1) package包中cluster是编译后的集群版软件，将jar包和config文件夹拷贝至服务器，注意层级保持一致。 <br>
-   (2) 将database中的security.sql导入到数据库中。<br>
-   (3) 修改`application-datasource.yml`中的数据库和redis连接地址。<br>
-   (4) `application-gateway.yml`中添加代理配置，详见`4 注意事项 的 4.1 跨域问题`章节。<br>
-   (5) 通过命令`nohup java -jar spring-cloud-gateway-security-vx.x.x.jar &`启动服务。
-   
-2.2. 单机版部署 <br>
-   (1) package包中stand-alone是编译后的单机版软件，将jar包和config文件夹拷贝至服务器，注意层级保持一致。 <br>
-   (2) 将database中的security.sql导入到数据库中。<br>
-   (3) 修改`application-datasource.yml`中的数据库连接地址。<br>
-   (4) `application-gateway.yml`中添加代理配置，详见`4 注意事项 的 4.1 跨域问题`章节。<br>
-   (5) 通过命令`nohup java -jar spring-cloud-gateway-security-vx.x.x.jar &`启动服务。
+   集群版和单机版的区别：`集群版本`在服务重启后依然保留各用户登录状态；`单机版本`在服务重启后会使各用户登出，需要再次重新登录使用。
+
+   （1） 集群版部署（推荐）
+
+   ① 将package --> cluster文件夹下jar包和config文件夹拷贝至服务器。
+
+   > 注意：jar包和config文件夹需要在同一目录下。
+
+   ② 将database文件夹下的`security_mysql.sql`导入到数据库中。
+
+   > 注意：如遇非`MySQL`数据库，请自行修改适配。
+
+   ③ 修改`application-datasource-cluster.yml`中的数据库和`redis`连接地址。
+
+   > 注意：如遇非`MySQL`数据库，还需修改driver-class-name数据库驱动配置。
+
+   ④ 修改`application-gateway.yml`中`uri`转发地址和`matcher`拦截地址。
+
+   > 注意：范围小的拦截地址要在范围大的拦截地址之前，如`/gateway/test/**`要在`/gateway/**`之前，否则范围小的拦截地址无效。
+
+   ⑤ 在`application-security.yml`中增加`spring.security.proxy-url `代理配置。
+
+   > 注意：代理地址前缀加`/`，代理地址与前端代理或Nginx等代理服务器代理地址保持一致。
+
+   ⑥ 通过命令`nohup java -jar spring-cloud-gateway-security-vx.x.x.jar &`启动服务。
+
+   （2）单机版部署
+
+   ① 将package --> stand-alone文件夹下jar包和config文件夹拷贝至服务器。
+
+   > 注意：jar包和config文件夹需要在同一目录下。
+
+   ② 将database文件夹下的`security_db.db`复制到本地目录。
+
+   > 注意：为了单机版更方便，选择sqlite作为数据库，也可使用其他关系型数据库。
+
+   ③ 修改`application-datasource-standalone.yml`中的数据库地址
+
+   ④ 修改`application-gateway.yml`中`uri`转发地址和`matcher`拦截地址。
+
+   > 注意：范围小的拦截地址要在范围大的拦截地址之前，如`/gateway/test/**`要在`/gateway/**`之前，否则范围小的拦截地址无效。
+
+   ⑤ 在`application-security.yml`中增加`spring.security.proxy-url `代理配置。
+
+   > 注意：代理地址前缀加`/`，代理地址与前端代理或Nginx等代理服务器代理地址保持一致。
+
+   ⑥ 通过命令`nohup java -jar spring-cloud-gateway-security-vx.x.x.jar &`启动服务。
+
 3. 成功验证
 
-启动完成后，在浏览器中输入前端地址http://localhost:8888/web/dist/index.html ，出现前端登录界面，表示服务部署成功。
+   启动完成后，在浏览器中输入前端地址http://localhost:8888，出现前端登录界面，表示服务部署成功。
 至此简单的网关鉴权已搭建完成，如需更多功能，请参考以下详细说明。
-### 1. 功能概述
-#### 1.1. 登录认证
-##### 1.1.1. 原理介绍
-登录认证是对用户名、密码的认证。
+
+4. 集成须知
+
+   如果启用了csrf令牌功能，需要在登录前调用“获取令牌”接口`http://ip:port/gateway/csrfTokenGenerator`。
+后续请求需要在请求头携带csrf令牌进行访问，头信息key为`X-XSRF-TOKEN`。
+
+## 二、网关对接
+
+### 1. 登录认证
 
 (1) web
-用户通过浏览器登录时，服务查询数据库中是否有匹配的用户名和密码，如果匹配成功，将浏览器与服务之间的会话保存在Redis中，并返回登录成功状态。
-(2) 小程序
-用户通过小程序登录时，服务通过http请求小程序登录接口，如果登录成功，将小程序与服务之前会话保存在Redis中，并返回登录成功状态。
-##### 1.1.2. 使用方式
-(1) web
 
-前端通过`POST`请求`/login`地址，`Content-Type`需要设置为`application/x-www-form-urlencoded`。用户名和密码的参数分别为`username`和`password`
+   前端通过`POST`请求`/login`地址，`Content-Type`需要设置为`application/x-www-form-urlencoded`。用户名和密码的参数分别为`username`和`password`
 
 (2) 小程序
 
-小程序通过 `POST`请求 `/login/weChatLogin`地址，`Content-Type` 设置为 `application/json`，传参为 `weChatCode` 和 `weChatUserInfo`，结构如下：
+   小程序通过 `POST`请求 `/login/weChatLogin`地址，`Content-Type` 设置为 `application/json`，传参为 `weChatCode` 和 `weChatUserInfo`，结构如下：
+
 ```json
 {
   "weChatCode": "xx",
@@ -58,11 +94,124 @@
   }
 }
 ```
-#### 1.2. 超级管理员
-##### 1.2.1. 原理介绍
-在配置文件中进行超级管理员设置，避免在数据库中误删除超级管理员。登录时匹配如果为超级管理员用户，则不进行数据库查询，直接与配置文件中的超级管理员用户名密码及角色进行匹配。
-##### 1.2.2. 使用方式
-在`application.yml`配置超级管理员，配置格式如下：
+
+### 2. 源IP获取
+
+   由于经过网关转发请求，普通使用`HttpServletRequest#getRemoteAddress`方式只能获取到网关IP。下游服务获取真实源IP，可从请求头`XReal-IP`中获取，调用方法`HttpServletRequest#getHeader(String)`。
+
+### 3. 用户ID获取
+
+   用户登录后经过网关转发的请求，网关会在请求头增加用户ID和用户名，下游服务可通过请求头获取相应数据，用户ID的key为`userId`，用户名的key为`username`。
+
+### 4. 转发日志
+
+   通过开启网关转发日志记录功能，所有经过转发的请求会记录在数据库表`gateway_request_monitor`中，如需编写逻辑，可直接对接数据库表。
+
+### 5. 转发统计
+
+   开启转发日志记录功能后，转发统计也被激活。请求接口`GET http://<IP>:<PORT>/gateway/queryRequestStatistic`即可获取统计信息，统计信息详情，请查看`web接口文档 6.查询转发统计信息`。
+
+### 6. 登录日志
+
+   通过开启登录日志记录功能，用户成功登录的日志信息会记录在数据库表`t_log`，如需编写逻辑，可直接对接数据库表。
+
+## 三、配置说明
+
+### 1. 网关拦截
+
+```yaml
+spring:
+  cloud:
+    gateway:
+      session:
+        # 不限制Session过期时间（转发时生效）：-1 单位：分钟
+        timeout: 30
+        # 不限制登录人数：-1
+        maxSessions: 10000
+      default-filters:
+        - Session
+      routes:
+        - id: server_route
+          # 转发地址
+          uri: http://localhost:8080
+          predicates:
+            # 拦截请求路径
+            - name: Path
+              args:
+                matcher: /gateway/**
+          filters:
+            # 跳过1个前缀
+            - name: StripPrefix
+              args:
+                # 此处 key 必须为 “parts”
+                parts: 1
+            # 请求流量限制，默认5MB
+            - name: RequestSize
+              args:
+                maxSize: 5000000
+            # 限流
+            - name: RequestRateLimiter
+              args:
+                # 每秒生成的令牌数
+                redis-rate-limiter.replenishRate: 100
+                # 最大令牌数量
+                redis-rate-limiter.burstCapacity: 200
+        - id: server_route2
+          # 转发地址, providerService为"application-loadbalance.yml"配置文件中
+          # spring.cloud.discovery:client.simple.instances 下的key
+          uri: lb://providerService
+          predicates:
+            # 拦截请求路径
+            - name: Path
+              args:
+                matcher: /loadbalance/**
+          filters:
+            # 跳过1个前缀
+            - name: StripPrefix
+              args:
+                # 此处 key 必须为 “parts”
+                parts: 1
+            # 请求流量限制，默认5MB
+            - name: RequestSize
+              args:
+                maxSize: 5000000
+        # sockJS路由需要与websocket路由结合使用
+        - id: sockJS_route
+          uri: http://localhost:8080
+          predicates:
+            - Path=/websocket/**
+        - id: websocket_route
+          uri: ws://localhost:8080
+          predicates:
+            - Path=/websocket/**
+      # 开启/关闭网关
+      enabled: true
+      loadbalancer:
+        use404: true
+  application:
+    name: gateway
+```
+
+   拦截主要配置`spring.cloud.gateway.routes`
+
+   HTTP拦截配置如下：
+
+（1）`id`为唯一即可
+
+（2）`uri`是拦截后要转发的地址，只能写到端口号
+
+（3）`predicates.name`为`Path`时，`args.matcher`为拦截的地址，可以为多级地址如`/a/b/**`
+
+（4）`filters.name`为`StripPrefix`时，`args.paths`为转发后跳过的路径数，如配置为`1`时，`/a/b** `转发后路径为`/b/**`
+
+（5）`filters.name`为`RequestSize`时，`args.maxSize`为请求转发的数据量最大值限制
+
+   WebSocket拦截分为sockjs和普通websocket，普通websocket直接拦截连接端点，转发到`ws`协议地址；sockjs还需要配置拦截的`url`以及转发的`http`地址。
+
+### 2. 超级管理员
+
+   在配置文件中进行超级管理员设置，避免在数据库中误删除超级管理员。在`application.yml`配置超级管理员，配置格式如下：
+
 ```yaml
 login:
   user:
@@ -87,12 +236,11 @@ login:
             # 自定义权限 /** 表示全部权限
             url: /**
 ```
-#### 1.3. Session控制
-##### 1.3.1. 原理介绍
-Session控制是在服务无请求时，自动登出服务的时间控制。在服务接收到请求时，通过过滤器截获请求，并更新Session会话时长，
-并将时长设置在Redis的过期时间。
-##### 1.3.2. 使用方式
-在`application-gateway.yml`配置Session超时时间，单位为分钟，值为-1时表示无限时长，具体配置如下：
+
+### 3. Session控制
+
+   Session控制是在服务无请求时，自动登出服务的时间控制。在`application-gateway.yml`配置Session超时时间，单位为分钟，值为-1时表示无限时长，具体配置如下：
+
 ```yaml
 spring:
   cloud:
@@ -101,12 +249,11 @@ spring:
         # 不限制Session过期时间（转发时生效）：-1 单位：分钟
         timeout: 30
 ```
-#### 1.4. 同时在线用户数控制
-##### 1.4.1. 原理介绍
-同时在线用户数控制是对登录用户数量的限制，通过设置可取消限制。服务通过对当前登录的用户Session数量判断登录的用户数，
-未退出的用户，重复登录时不受在线用户数量限制。
-##### 1.4.2. 使用方式
-在`application-gateway.yml`配置同时在线用户数控制，当值设置为-1时表示无限制，具体配置如下：
+
+### 4. 同时在线用户数控制
+
+   同时在线用户数控制是对登录用户数量的限制，未退出的用户，重复登录时不受在线用户数量限制。在`application-gateway.yml`配置同时在线用户数控制，当值设置为-1时表示无限制，具体配置如下：
+
 ```yaml
 spring:
   cloud:
@@ -115,36 +262,30 @@ spring:
         # 不限制登录人数：-1
         maxSessions: 10000
 ```
-#### 1.5. 异地登录踢出
-##### 1.5.1. 原理介绍
-异地登录踢出是当前用户在一处登录，同一账号在其他地方进行登录的时候，原登录被强制登出。服务在接收登录请求时会将Session进行更新，原Session信息失效，
-从而达到原登录失效的功能。
-##### 1.5.2. 使用方式
-软件自带功能，咱不支持配置。
-#### 1.6. 登录日志
-##### 1.6.1. 原理介绍
-登录日志是在用户登录后，将登录信息进行记录，支持在控制台打印日志和记录到数据库中两种方式。通过配置注入不同Bean，两种Bean实现不同的方法，
-从而达到两种日志记录方式。
-##### 1.6.2. 使用方式
-在`application-gateway.yml`配置日志记录，不配置时默认不记录登录日志，具体配置如下：
+
+### 5. 登录日志
+
+   登录日志是在用户登录后，将登录信息进行记录，支持在控制台打印日志和记录到数据库中两种方式。在`application-gateway.yml`配置日志记录，不配置时默认不记录登录日志，具体配置如下：
+
 1. 控制台打印
+
 ```yaml
 log:
   enabled: true
 ```
+
 2. 数据库中记录
+
 ```properties
 log:
   enabled: true
   database: true
 ```
-#### 1.7. 账户锁定
-##### 1.7.1. 原理介绍
-用户登录系统时，输入密码错误多次后锁定账户，避免暴力破解密码，默认输入错误3次。
-系统根据登录用户，在Redis中记录登录失败次数，登录失败累加计数，当失败次数超过3次后，触发锁定账户机制，
-修改数据库锁定字段，并清空Redis锁定计数。锁定后会立即触发解锁计时。
-##### 1.7.2. 使用方式
-在`application-gateway.yml`中配置密码错误次数，当值为-1时表示不锁定账户，同时可配置解锁时间，默认锁定时间5分钟,配置时需要携带单位，具体配置如下：
+
+### 6. 账户锁定
+
+   用户登录系统时，输入密码错误多次后锁定账户，避免暴力破解密码，默认输入错误3次。在`application-gateway.yml`中配置密码错误次数，当值为-1时表示不锁定账户，同时可配置解锁时间，默认锁定时间5分钟,配置时需要携带单位，具体配置如下：
+
 ```yaml
 spring:
   cloud:
@@ -153,15 +294,11 @@ spring:
         lockRecord: 5
         lockedTime: 1M
 ```
-#### 1.8. 密码加密
-##### 1.8.1. 原理介绍
-由于系统登录基于crypto加密方式进行验证，因此针对系统密码提供crypto加密。当请求使用`POST`方式时，
-系统检测传参字段带有password时，自动对该字段值进行加密，然后向下游转发。系统采用网关拦截器的方式，
-对请求进行拦截，当请求为`POST`时，对请求进行处理，提取`password`字段，调用加密插件进行加密后，
-放回原请求并设置请求头中数据长度等字段，转发至下游服务。
-##### 1.8.2. 使用方式
-在`application-gateway.yml`文件中配置`- RequestBodyOperation`，可对转发的请求地址进行密码加密。
-详细配置如下所示：
+
+### 7. 密码加密
+
+   当使用`POST`请求，传入`password`参数时，网关会自动将密码加密转发。在`application-gateway.yml`文件中配置`- RequestBodyOperation`，具体配置如下：
+
 ```yaml
 spring:
   cloud:
@@ -181,109 +318,13 @@ spring:
                      parts: 1
                 - RequestBodyOperation
 ```
-#### 1.9. 可视化界面
-##### 1.9.1. 原理介绍
-网关鉴权系统提供接口权限配置的功能界面，简化配置操作。权限分为私有、公开和匿名三种，私有是对角色进行接口权限配置，
-公开是用户登录后，所有角色都具有该权限，匿名是不需要登录系统，对外开放的权限。
-##### 1.9.2. 使用方式
-首先需要开放前端静态文件权限，在`application-gateway.yml`文件中配置静态文件放行，静态文件相对路径在`/web/dist/`目录下，如下所示：
-```yaml
-spring:
-  static:
-    antpatterns: "/web/dist/**"
-```
-接口权限配置不必配置全路径，可将接口地址进行分类，按照`/**`的方式进行配置，如上配置的`/web/dist/**`表示在/web/dist/目录下的所有地址均可访问。
-界面请求地址 http://<IP>:<PORT>/web/dist/index.html。IP是网关鉴权系统部署的服务器IP，PORT是网关鉴权系统中配置的端口号`server.port = 8888`。
-#### 1.10. 负载均衡
-##### 1.10.1. 原理介绍
-网关鉴权系统可对下游服务进行负载均衡，方便服务的集群管理。引入SpringCloudLoadbalance插件
-```xml
-<dependency>
-   <groupId>org.springframework.cloud</groupId>
-   <artifactId>spring-cloud-starter-loadbalancer</artifactId>
-</dependency>
-```
-系统根据配置的负载均衡地址进行轮询请求，当下游服务下线，自动剔除该节点，等待下游服务正常后，自动加入节点列表。
-##### 1.10.2. 使用方式
-1. 开启负载均衡配置文件
 
-在`application.yml`配置文件中开启`application-liadbalance.yml`配置。如下所示
-```yaml
-spring:
-  profiles:
-    active: loadbalance
-```
-2. 配置负载均衡
+### 8. 转发日志
 
-在`application-liadbalance.yml`配置文件中配置下游服务地址，以及健康检查地址等，注意健康检查地址需要下游服务提供http接口，详细配置如下所示
-```yaml
-spring:
-  cloud:
-    discovery:
-      client:
-        simple:
-          instances:
-            ## 负载均衡地址
-            providerService:
-              - uri: http://1.1.1.1:8080
-              - uri: http://1.1.1.2:8080
-    loadbalancer:
-      ## 负载均衡开关
-      enabled: true
-      healthCheck:
-        ## 健康检查地址， 可以采用服务其中一个地址作为健康检查地址
-        path:
-          providerService: /health/healthCheck
-        ## 健康检查初始延迟
-        initialDelay: 0
-        ## 重新运行健康检查周期间隔
-        interval: 5s
-      ##
-      configurations: health-check
-```   
-3. 配置转发路由
+   当请求经过网关时，网关会对转发的请求进行日志记录。在`application-gateway.yml`文件中配置`-Monitor`拦截器，可以在路由配置外配置所有转发都经过拦截，也可以在路由配置内，配置该路由转发拦截记录，详细配置如下：
 
-在`application-gateway.yml`配置文件中配置转发路由，注意地址uri为`application-loadbalance.yml`中的实例名称，实例中实例名称为`providerService`。
-详细配置如下：
-```yaml
-spring:
-  cloud:
-    gateway:
-      routes:
-        - id: server_route2
-          # 转发地址, providerService为"application-loadbalance.yml"配置文件中
-          # spring.cloud.discovery:client.simple.instances 下的key
-          uri: lb://providerService
-          predicates:
-            # 拦截请求路径
-            - name: Path
-              args:
-                matcher: /loadbalance/**
-          filters:
-            # 跳过1个前缀
-            - name: StripPrefix
-              args:
-                # 此处 key 必须为 “parts”
-                parts: 1
-            #            - StripPrefix=1
-            # token身份认证 JwtCheckGatewayFilterFactory
-            - TokenCheck
-            # 请求流量限制，默认5MB
-            - name: RequestSize
-              args:
-                maxSize: 5000000
-```
-#### 1.11. 上游IP转发
-##### 1.11.1. 原理介绍
-上游IP转发是对网关之前的调用方IP地址转发功能，一般情况下，下游服务获取到的访问来源地址都是网关鉴权服务所在服务器的地址。
-为了能够获取真实访问地址，例如浏览器所在客户端地址，网关鉴权系统将真实地址存放在请求头中，在请求头中增加了`XReal-IP`, 。
-##### 1.11.2. 使用方式
-下游服务获取真实来源IP，可从请求头`XReal-IP`中获取，如需获取网关IP，使用`request#getRemoteAddress`方式。
-#### 1.12. 转发日志
-##### 1.12.1. 原理介绍
-转发日志是请求经过网关鉴权系统时，对转发的日志进行记录的功能。网关鉴权系统通过拦截器对请求地址进行转发统计并存入数据库。记录的主要内容有接口地址、接口状态、响应时长、异常描述、请求时间。
-##### 1.12.2. 使用方式
-在`application-gateway.yml`文件中配置拦截器，可以在路由配置外配置所有转发都经过拦截，也可以在路由配置内，配置该路由转发拦截记录，详细配置如下：
+拦截所有请求
+
 ```yaml
 spring:
   cloud:
@@ -291,7 +332,9 @@ spring:
       default-filters:
         - Monitor
 ```
-或
+
+或拦截路由下请求
+
 ```yaml
 spring:
   cloud:
@@ -308,78 +351,103 @@ spring:
           filters:
             - Monitor
 ```
-#### 1.13. 转发统计
-##### 1.13.1. 原理介绍
-转发统计是对网关鉴权软件转发的数据进行统计功能，从开启转发记录功能开始，根据转发地址进行统计。统计数据存储在Redis中，方便用户快速查询请求统计信息。
-##### 1.13.2. 使用方式
-通过web接口访问获取，详细请求方式见 `Web接口文档中，"6. 查询转发统计信息"`。
-### 2. Web接口
-详见`Web接口文档`，Web接口主要用于对网关鉴权系统界面的自定义开发使用，若使用本系统自带界面，则忽略此文档。
-### 3. 数据库设计
-详见`数据库表结构设计`。
-### 4. 注意事项
-#### 4.1 跨域问题
-当前服务由于采用跳转方式，需要与前端同源，否则登录成功后会因无法获取用户，导致返回失败。解决方法有两种：<br>
-(1) 前端代理
 
-前端代理后，服务也需要在`application-gateway.yml`中配置代理路径，如下所示：
+### 9. csrf拦截
+
+   网关支持csrf拦截控制，防止跨站攻击。在`application-security.yml`文件中配置以关闭csrf拦截，默认开启，如图所示：
+
+```yml
+spring:
+  secrurity:
+    csrf-enable: false
+```
+
+### 10. 小程序
+
+   网关支持小程序应用，主要配置在`application-wechat.yml`，其中注意`wechat.roleIds`需要与数据库中的角色id对应，设置完成后自动绑定相关权限。
+
+### 11. 负载均衡
+
+​	负载均衡是将请求转发到多个下游服务集群的方式，用来减轻下游服务的请求压力。当`application.yml`中`spring.profiles.active`配置了`loadbalance`时，负载均衡开启。`application-loadbalance.yml`配置如下：
+
 ```yaml
 spring:
-  web:
-    proxy:
-      url: "/proxy"
+  cloud:
+    discovery:
+      client:
+        simple:
+          instances:
+            ## 负载均衡地址
+            providerService:
+              - uri: http://1.1.1.1:8080
+              - uri: http://1.1.1.2:8080
+    loadbalancer:
+      healthCheck:
+        ## 健康检查地址， 可以采用服务其中一个地址作为健康检查地址
+        path:
+          providerService: /health/healthCheck
+        ## 健康检查初始延迟
+        initialDelay: 0
+        ## 重新运行健康检查周期间隔
+        interval: 5s
+      ##
+      configurations: health-check
 ```
-(2) Nginx代理
 
-Nginx代理后，也需要配置如上所示代理路径，Nginx中配置应注意末尾"/"，详细配置如下：
+（1）`spring.cloud.discovery.client.simple.instances.providerService`中`uri`是服务的地址，根据实际服务，可配置多个地址用于负载均衡。
+
+（2）`spring.cloud.loadbalancer.healthCheck.path.providerService`为健康检查地址，需要被负载的服务提供与配置地址相同的`GET`服务。
+
+（3）其他配置保持默认即可。
+
+## 四、 注意事项
+
+### 1. 跨域问题
+
+   如果未使用网关代理前端，则需要使用代理解决跨域问题，方式有两种
+
+（1）前端代理
+
+（2）Nginx代理
+
+   Nginx代理后，也需要配置如上所示代理路径，Nginx中配置应注意末尾"/"，详细配置如下：
+
 ```text
 location /proxy/ {
   proxy_pass  http://127.0.0.1:8888/;
 }
 ```
 
-#### 4.2 数据库表结构
-用户相关的表结构（t_user、t_role、user_role）至少需要包含当前表数据，数据内容不限制。
-
-#### 4.3 拦截配置
-`application-gateway.yml` 中拦截地址范围大的写在范围小的配置之后,如/user/remove/** 应配置在/user/**之前，否则小范围限制不生效。
-
-#### 4.4 小程序配置
-小程序相关配置在 `application-wechat.yml` , 其中 roleIds 需要与数据库中的角色id对应，设置完成后自动绑定相关权限。
-
-#### 4.5 匿名访问接口
-允许匿名访问的转发配置，不能添加 -tokenCheck 配置，否则登录后无法访问接口，匿名接口登录后应依然可以访问。
-
-#### 4.6 静态资源放行
-在 `application-gateway.yml` 中配置，结构如下：
+   代理后，服务也需要在`application-security.yml`中配置代理路径，示例中`/proxy`根据实际地址修改，如下所示：
 
 ```yaml
 spring:
-  static:
+  security:
+    proxy-url: "/proxy"
+```
+
+### 2. 数据库依赖
+
+   如果需要对用户字段进行扩展，可在导入的表结构中扩展字段。
+
+### 3. 静态资源放行
+
+   如需将静态资源跳过网关控制，在 `application-security.yml` 中配置，结构如下：
+
+```yaml
+spring:
+  security:
     antpatterns: "/js/**,/css/**"
 ```
 
-#### 4.7 响应code
+### 4. websocket测试
 
-| 序号 | code  | 描述               |
-| ---: | :---: | :--------------- |
-|    1 |   0   | 成功              |
-|    2 | 9000  | 需要跳转到登录界面   |
-|    3 | 10000 | 失败              |
-
-#### 4.8 websocket测试
-访问 `http://IP:PORT/web/websocket.html` 界面，websocket测试访问地址为`ws://localhost:8888/websocket`，通过网关转发至目标服务。
+   访问 `http://IP:PORT/web/websocket.html` 界面，websocket测试访问地址为`ws://localhost:8888/websocket`，通过网关转发至目标服务。
 目标websocket服务需要暴露端点为websocket。
 
-#### 4.9 下游获取用户等信息
-网关鉴权软件通过将用户id和用户名以及真实源IP存入请求头（header）中，下游服务可通过请求头获取相应数据。
-```text
-用户ID key: userId
-用户名 key: username
-源IP key: XReal-IP
-```
+### 5. 源码编译
 
-#### 4.10 源码编译
-如需源码编译单机版本
+   如需源码编译版本
+
 - 单机版本，在maven的`profiles`选择`stand-alone`进行package打包
 - 集群版本，在maven的`profiles`选择`cluster`进行package打包

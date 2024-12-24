@@ -18,28 +18,16 @@
 
 package com.github.zk.spring.cloud.gateway.security.dao;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
-import org.apache.ibatis.annotations.Param;
+import com.github.zk.spring.cloud.gateway.security.pojo.PermissionGroup;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 /**
- * 权限仓储
+ * 权限分组仓储
  *
- * @author zk
- * @since 1.0
+ * @author zhaokai
+ * @since 4.3.6
  */
 @Repository
-public interface PermissionMapper extends BaseMapper<PermissionInfo> {
-
-    Page<PermissionInfo> selectPage(Page<PermissionInfo> page, @Param("ew") Wrapper<PermissionInfo> queryWrapper);
-
-    Page<PermissionInfo> selectGroupPermissionsPage(Page<PermissionInfo> page, @Param("ew") Wrapper<PermissionInfo> queryWrapper);
-
-    List<PermissionInfo> selectPermissionsByGroupIds(@Param("list") List<Long> groupIds,
-                                                @Param("ew") Wrapper<PermissionInfo> queryWrapper);
+public interface GroupPermissionMapper extends BaseMapper<PermissionGroup> {
 }

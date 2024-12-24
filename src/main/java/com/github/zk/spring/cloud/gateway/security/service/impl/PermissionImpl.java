@@ -19,10 +19,13 @@
 package com.github.zk.spring.cloud.gateway.security.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCache;
+import com.github.zk.spring.cloud.gateway.security.dao.GroupPermissionMapper;
 import com.github.zk.spring.cloud.gateway.security.dao.PermissionMapper;
 import com.github.zk.spring.cloud.gateway.security.enums.IntfTypeEnum;
+import com.github.zk.spring.cloud.gateway.security.pojo.PermissionGroup;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
@@ -33,7 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 权限实现类
@@ -54,6 +59,8 @@ public class PermissionImpl implements IPermission {
 
     @Autowired
     private PermissionMapper permissionMapper;
+    @Autowired
+    private GroupPermissionMapper groupPermissionMapper;
     @Autowired
     private IRolePermission iRolePermission;
     @Autowired
@@ -155,6 +162,33 @@ public class PermissionImpl implements IPermission {
         return 0;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean moveOutGroup(Long id, Long groupId) {
+        //查询当前分组下存在多少权限
+        QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("group_id", groupId);
+        Long permissionCount = permissionMapper.selectCount(queryWrapper);
+        //当存在权限在2个以上时，只移出当前权限；
+        //当权限在2个（包含）以内时，将2个权限一起修改状态，同时删除分组信息
+        boolean status;
+        if (permissionCount > 2) {
+            PermissionInfo pi = new PermissionInfo();
+            pi.setId(id);
+            pi.setGroupId(0L);
+            status = permissionMapper.updateById(pi) > 0;
+        } else {
+            //修改2个权限分组
+            UpdateWrapper<PermissionInfo> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.set("group_id", 0L).eq("group_id", groupId);
+            int update = permissionMapper.update(updateWrapper);
+            //删除分组
+            int del = groupPermissionMapper.deleteById(groupId);
+            status = update > 0 && del > 0;
+        }
+        return status;
+    }
+
     @Override
     public Page<PermissionInfo> queryPermission(String keywords, Page<PermissionInfo> page) {
         QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
@@ -165,6 +199,83 @@ public class PermissionImpl implements IPermission {
         }
         queryWrapper.orderByDesc("create_time");
         return permissionMapper.selectPage(page, queryWrapper);
+    }
+
+    @Override
+    public Page<PermissionGroup> queryGroupPermissionsPage(String keywords, Page<PermissionInfo> page) {
+        QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
+        if (!ObjectUtils.isEmpty(keywords)) {
+            queryWrapper.like("url_name", keywords)
+                    .or().like("url", keywords)
+                    .or().like("gd.dict_name", keywords);
+        }
+        // 分页查询权限
+        Page<PermissionInfo> permissionInfoPage = permissionMapper.selectGroupPermissionsPage(page, queryWrapper);
+        // 获取权限以及权限组
+        List<PermissionInfo> records = permissionInfoPage.getRecords();
+        List<Long> groupIds = filterGroupIds(records);
+        List<PermissionInfo> permissionGroups = null;
+        if (!groupIds.isEmpty()) {
+            permissionGroups = permissionMapper.selectPermissionsByGroupIds(groupIds, queryWrapper);
+        }
+        // 构建权限分组集合
+        List<PermissionGroup> newRecords = buildResult(records, permissionGroups);
+        // 构建新分页对象
+        Page<PermissionGroup> newPage = new Page<>();
+        newPage.setCurrent(page.getCurrent());
+        newPage.setSize(page.getSize());
+        newPage.setTotal(page.getTotal());
+        newPage.setRecords(newRecords);
+        return newPage;
+    }
+
+    /**
+     * 过滤存在组的 id
+     *
+     * @param records 权限列表
+     * @return 组 id 列表
+     */
+    private List<Long> filterGroupIds(List<PermissionInfo> records) {
+        return records.stream()
+                .map(PermissionInfo::getGroupId)
+                .filter(groupId -> groupId != 0)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 构建新分组权限集合
+     *
+     * @param srcList 源权限集合
+     * @param permissionGroups 带分组的权限集合
+     * @return 新的分组集合
+     */
+    private List<PermissionGroup> buildResult(List<PermissionInfo> srcList,
+                                              List<PermissionInfo> permissionGroups) {
+        List<PermissionGroup> list = new ArrayList<>();
+        for (PermissionInfo permissionInfo : srcList) {
+            if (permissionInfo.getGroupId() == 0) {
+                List<PermissionInfo> noGroupPermission = new ArrayList<>();
+                noGroupPermission.add(permissionInfo);
+                PermissionGroup pg = new PermissionGroup();
+                pg.setId(0L);
+                pg.setGroupName("未分组");
+                pg.setPermissionInfos(noGroupPermission);
+                list.add(pg);
+            } else {
+                List<PermissionInfo> groupPermissions = new ArrayList<>();
+                PermissionGroup pg = new PermissionGroup();
+                pg.setId(permissionInfo.getGroupId());
+                pg.setGroupName(permissionInfo.getGroupName());
+                for (PermissionInfo permissionGroup : permissionGroups) {
+                    if (ObjectUtils.nullSafeEquals(permissionGroup.getGroupId(), permissionInfo.getGroupId())) {
+                        groupPermissions.add(permissionGroup);
+                    }
+                }
+                pg.setPermissionInfos(groupPermissions);
+                list.add(pg);
+            }
+        }
+        return list;
     }
 
     @Override

@@ -19,6 +19,7 @@
 package com.github.zk.spring.cloud.gateway.security.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.zk.spring.cloud.gateway.security.pojo.PermissionGroup;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import reactor.core.publisher.Mono;
 
@@ -34,6 +35,7 @@ public interface IPermission {
 
     /**
      * 添加权限
+     *
      * @param permissionInfo 权限信息
      * @return 添加数量
      */
@@ -41,6 +43,7 @@ public interface IPermission {
 
     /**
      * 删除权限
+     *
      * @param id 权限id
      * @return 删除数量
      */
@@ -48,6 +51,7 @@ public interface IPermission {
 
     /**
      * 批量删除权限
+     *
      * @param ids 权限id
      * @return 删除条数
      */
@@ -55,28 +59,52 @@ public interface IPermission {
 
     /**
      * 修改权限
+     *
      * @param permissionInfo 权限信息
      * @return 修改权限
      */
     int updatePermission(PermissionInfo permissionInfo);
 
     /**
+     * 移出分组
+     *
+     * @param id 权限 id
+     * @param groupId 组 id
+     * @return 是否成功
+     */
+    boolean moveOutGroup(Long id, Long groupId);
+
+
+    /**
      * 分页查询权限
+     *
      * @param keywords 查询条件
+     * @param page 分页参数
      * @return 权限列表
      */
     Page<PermissionInfo> queryPermission(String keywords, Page<PermissionInfo> page);
 
     /**
+     * 分页查询权限及分组
+     *
+     * @param keywords 查询条件
+     * @param page 分页参数
+     * @return 权限列表
+     */
+    Page<PermissionGroup> queryGroupPermissionsPage(String keywords, Page<PermissionInfo> page);
+
+    /**
      * 根据公开类型，分页查询权限
-     * @param open
-     * @param page
-     * @return
+     *
+     * @param open 公开状态
+     * @param page 分页对象
+     * @return 分页权限信息
      */
     Page<PermissionInfo> queryPagePermissionByOpen(int open, String keywords, Page<PermissionInfo> page);
 
     /**
      * 根据公开状态查询权限列表
+     *
      * @param open 公开状态
      * @return 权限
      */
@@ -84,18 +112,21 @@ public interface IPermission {
 
     /**
      * 缓存公开权限
+     *
      * @return 公开权限数量
      */
     int cacheOpenPermissions();
 
     /**
      * 缓存匿名权限
+     *
      * @return 匿名权限数量
      */
     int cacheAnonymousPermissions();
 
     /**
      * 获取缓存中的公开权限
+     *
      * @return 权限列表
      */
     Mono<List<PermissionInfo>> getCacheOpenPermission();
@@ -107,6 +138,7 @@ public interface IPermission {
 
     /**
      * 获取缓存中的匿名权限
+     *
      * @return 权限列表
      */
     Mono<List<PermissionInfo>> getCacheAnonymousPermission();

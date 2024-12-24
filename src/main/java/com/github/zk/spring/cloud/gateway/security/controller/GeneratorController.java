@@ -23,10 +23,7 @@ import com.github.zk.spring.cloud.gateway.security.util.PasswordGeneratorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.server.csrf.ServerCsrfTokenRepository;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 

@@ -22,8 +22,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.zk.spring.cloud.gateway.security.common.CodeEnum;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCache;
+import com.github.zk.spring.cloud.gateway.security.pojo.GroupPermissionDTO;
+import com.github.zk.spring.cloud.gateway.security.pojo.PermissionGroup;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.RoleInfo;
+import com.github.zk.spring.cloud.gateway.security.service.IGroupPermission;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import com.github.zk.spring.cloud.gateway.security.service.IRole;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +49,8 @@ public class PermissionController {
 
     @Autowired
     private IPermission iPermission;
+    @Autowired
+    private IGroupPermission iGroupPermission;
     @Autowired
     private IRole iRole;
     @Autowired
@@ -91,9 +96,38 @@ public class PermissionController {
         }
     }
 
+    @PostMapping("/groupPermission")
+    public Response groupPermission(@RequestBody GroupPermissionDTO groupPermissionDTO) {
+        boolean b = iGroupPermission.groupPermission(groupPermissionDTO);
+        if (b) {
+            return Response.setOk();
+        }
+        return Response.setError();
+    }
+
+    @GetMapping("/moveOutGroup")
+    public Response moveOutGroup(@RequestParam("id") Long id, @RequestParam("groupId") Long groupId) {
+        boolean b = iPermission.moveOutGroup(id, groupId);
+        if (b) {
+            return Response.setOk();
+        } else {
+            return Response.setError();
+        }
+    }
+
     @GetMapping("/queryPermission")
     public Response queryPermission(@RequestParam("keywords") String keywords, Page<PermissionInfo> page) {
         Page<PermissionInfo> permissionInfoPage = iPermission.queryPermission(keywords, page);
+        if (permissionInfoPage != null) {
+            return Response.setOk(permissionInfoPage);
+        } else {
+            return Response.setError(CodeEnum.QUERY_FAIL);
+        }
+    }
+
+    @GetMapping("/queryPermissionGroupPage")
+    public Response queryPermissionGroupPage(@RequestParam("keywords") String keywords, Page<PermissionInfo> page) {
+        Page<PermissionGroup> permissionInfoPage = iPermission.queryGroupPermissionsPage(keywords, page);
         if (permissionInfoPage != null) {
             return Response.setOk(permissionInfoPage);
         } else {

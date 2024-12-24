@@ -4,6 +4,7 @@
 
     <resultMap id="PermissionsResultMap" type="com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo">
         <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="group_id" property="groupId" jdbcType="BIGINT"/>
         <result column="url_name" property="urlName" jdbcType="VARCHAR"/>
         <result column="url" property="url" jdbcType="VARCHAR"/>
         <result column="open" property="open" jdbcType="INTEGER"/>
@@ -21,8 +22,9 @@
     </resultMap>
 
 
+
     <sql id="Base_Column_List">
-        id, url_name, url, open, description, fixed, create_time
+        id, group_id, url_name, url, open, description, fixed, create_time
     </sql>
 
     <select id="selectPage" resultMap="PermissionsResultMap">
@@ -35,6 +37,25 @@
             ${ew.customSqlSegment}
     </select>
 
+    <select id="selectPermissionsByGroupIds" resultMap="PermissionsResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from gateway_permission gp
+        left join
+        (select dict_name, dict_val from gateway_dict where dict_type_id = 1) gd
+        on gp.open = gd.dict_val
+        <if test="ew.customSqlSegment != null and ew.customSqlSegment != ''">
+            ${ew.customSqlSegment}
+        </if>
+        <if test="ew.customSqlSegment == null or ew.customSqlSegment == ''">
+            where 1 = 1
+        </if>
+        and group_id in
+        <foreach collection="list" index="index" item="ids" separator="," open="(" close=")">
+            #{ids}
+        </foreach>
+    </select>
+
     <select id="selectRoles" resultMap="RolesResultMap">
         select tr.id, role_name
         from t_role tr
@@ -42,4 +63,38 @@
                 on tr.id = rp.role_id
         where rp.permission_id = #{id}
     </select>
+
+    <select id="selectGroupPermissionsPage" resultMap="PermissionsResultMap">
+        select gpg.group_name, gpg.create_time AS group_create_time, gp.*
+        from gateway_permission_group gpg
+        right join gateway_permission gp ON gpg.id = gp.group_id
+        left join
+        (select dict_name, dict_val from gateway_dict where dict_type_id = 1) gd
+        on gp.open = gd.dict_val
+        <if test="ew.customSqlSegment != null and ew.customSqlSegment != ''">
+            ${ew.customSqlSegment}
+        </if>
+        <if test="ew.customSqlSegment == null or ew.customSqlSegment == ''">
+            where 1 = 1
+        </if>
+        and group_id != 0
+        group by group_id
+        union all
+        select gpg.group_name, gpg.create_time as group_create_time, gp.*
+        from gateway_permission_group gpg
+        right join gateway_permission gp on gpg.id = gp.group_id
+        left join
+        (select dict_name, dict_val from gateway_dict where dict_type_id = 1) gd
+        on gp.open = gd.dict_val
+        <if test="ew.customSqlSegment != null and ew.customSqlSegment != ''">
+            ${ew.customSqlSegment}
+        </if>
+        <if test="ew.customSqlSegment == null or ew.customSqlSegment == ''">
+            where 1 = 1
+        </if>
+        and group_id = 0
+
+        order by group_create_time desc, create_time desc
+    </select>
+
 </mapper>
