@@ -55,6 +55,8 @@ import java.util.List;
  */
 public class CustomReactiveAuthorizationManager implements ReactiveAuthorizationManager<AuthorizationContext> {
 
+    private final String GATEWAY_MAPPING = "/gateway";
+
     private final Logger logger = LoggerFactory.getLogger(CustomReactiveAuthorizationManager.class);
 
     /**
@@ -288,6 +290,10 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
         ServerHttpRequest request = exchange.getRequest();
         // 请求的uri
         String requestPath = request.getURI().getPath();
+        // 处理 gateway 开头的 uri，适配网关服务内置接口访问
+        if (requestPath.startsWith(GATEWAY_MAPPING)) {
+            return requestPath.replaceFirst(GATEWAY_MAPPING, "");
+        }
         // 实例化真正请求地址字符串对象
         StringBuilder realRequestPath = new StringBuilder();
         outer:
