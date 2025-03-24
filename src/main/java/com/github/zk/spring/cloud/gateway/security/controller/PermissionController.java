@@ -96,23 +96,13 @@ public class PermissionController {
         }
     }
 
-    @PostMapping("/groupPermission")
-    public Response groupPermission(@RequestBody GroupPermissionDTO groupPermissionDTO) {
-        boolean b = iGroupPermission.groupPermission(groupPermissionDTO);
+    @PostMapping("/movePermission")
+    public Response movePermission(@RequestBody GroupPermissionDTO groupPermissionDTO) {
+        boolean b = iGroupPermission.movePermission(groupPermissionDTO);
         if (b) {
             return Response.setOk();
         }
         return Response.setError();
-    }
-
-    @GetMapping("/moveOutGroup")
-    public Response moveOutGroup(@RequestParam("id") Long id, @RequestParam("groupId") Long groupId) {
-        boolean b = iPermission.moveOutGroup(id, groupId);
-        if (b) {
-            return Response.setOk();
-        } else {
-            return Response.setError();
-        }
     }
 
     @GetMapping("/queryPermission")

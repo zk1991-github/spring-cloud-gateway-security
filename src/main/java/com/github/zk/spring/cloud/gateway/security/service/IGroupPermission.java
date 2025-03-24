@@ -18,8 +18,8 @@
 
 package com.github.zk.spring.cloud.gateway.security.service;
 
-import com.github.zk.spring.cloud.gateway.security.pojo.PermissionGroup;
 import com.github.zk.spring.cloud.gateway.security.pojo.GroupPermissionDTO;
+import com.github.zk.spring.cloud.gateway.security.pojo.PermissionGroup;
 
 import java.util.List;
 
@@ -31,7 +31,13 @@ import java.util.List;
  */
 public interface IGroupPermission {
 
-    boolean groupPermission(GroupPermissionDTO groupPermissionDTO);
+    /**
+     * 移动分组
+     *
+     * @param groupPermissionDTO 权限对象
+     * @return 是否成功状态
+     */
+    boolean movePermission(GroupPermissionDTO groupPermissionDTO);
 
     /**
      * 添加权限组
@@ -48,5 +54,5 @@ public interface IGroupPermission {
      * @param groupId 组 id
      * @return 是否修改成功
      */
-    boolean updatePermissionGroupByPermissionIds(List<Long> permissionIds, long groupId);
+    boolean updatePermissionGroupByPermissionIds(List<Long> permissionIds, Long groupId);
 }

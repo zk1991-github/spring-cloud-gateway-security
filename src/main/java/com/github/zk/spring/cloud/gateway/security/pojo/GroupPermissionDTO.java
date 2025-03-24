@@ -31,10 +31,15 @@ public class GroupPermissionDTO {
      * 权限 id 集合
      */
     private List<Long> permissionIds;
+
     /**
-     * 分组 id
+     * 源分组 id
      */
-    private Long groupId;
+    private Long srcGroupId;
+    /**
+     * 目标分组 id
+     */
+    private Long targetGroupId;
 
     private String groupName;
 
@@ -46,12 +51,20 @@ public class GroupPermissionDTO {
         this.permissionIds = permissionIds;
     }
 
-    public Long getGroupId() {
-        return groupId;
+    public Long getSrcGroupId() {
+        return srcGroupId;
     }
 
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
+    public void setSrcGroupId(Long srcGroupId) {
+        this.srcGroupId = srcGroupId;
+    }
+
+    public Long getTargetGroupId() {
+        return targetGroupId;
+    }
+
+    public void setTargetGroupId(Long targetGroupId) {
+        this.targetGroupId = targetGroupId;
     }
 
     public String getGroupName() {

@@ -19,7 +19,6 @@
 package com.github.zk.spring.cloud.gateway.security.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCache;
 import com.github.zk.spring.cloud.gateway.security.dao.GroupPermissionMapper;
@@ -160,33 +159,6 @@ public class PermissionImpl implements IPermission {
             return update;
         }
         return 0;
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public boolean moveOutGroup(Long id, Long groupId) {
-        //查询当前分组下存在多少权限
-        QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("group_id", groupId);
-        Long permissionCount = permissionMapper.selectCount(queryWrapper);
-        //当存在权限在2个以上时，只移出当前权限；
-        //当权限在2个（包含）以内时，将2个权限一起修改状态，同时删除分组信息
-        boolean status;
-        if (permissionCount > 2) {
-            PermissionInfo pi = new PermissionInfo();
-            pi.setId(id);
-            pi.setGroupId(0L);
-            status = permissionMapper.updateById(pi) > 0;
-        } else {
-            //修改2个权限分组
-            UpdateWrapper<PermissionInfo> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.set("group_id", 0L).eq("group_id", groupId);
-            int update = permissionMapper.update(updateWrapper);
-            //删除分组
-            int del = groupPermissionMapper.deleteById(groupId);
-            status = update > 0 && del > 0;
-        }
-        return status;
     }
 
     @Override

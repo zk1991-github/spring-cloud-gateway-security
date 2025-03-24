@@ -18,9 +18,11 @@
 
 package com.github.zk.spring.cloud.gateway.security.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.zk.spring.cloud.gateway.security.dao.GroupPermissionMapper;
 import com.github.zk.spring.cloud.gateway.security.dao.PermissionMapper;
+import com.github.zk.spring.cloud.gateway.security.enums.PermissionMoveType;
 import com.github.zk.spring.cloud.gateway.security.pojo.GroupPermissionDTO;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionGroup;
 import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
@@ -48,17 +50,93 @@ public class GroupPermissionImpl implements IGroupPermission {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean groupPermission(GroupPermissionDTO gpDTO) {
+    public boolean movePermission(GroupPermissionDTO gpDTO) {
+        PermissionMoveType permissionMoveType = validMoveType(gpDTO.getSrcGroupId(), gpDTO.getTargetGroupId());
         Long groupId;
-        //当组 id 为空时，需要创建新分组
-        if (ObjectUtils.isEmpty(gpDTO.getGroupId())) {
-            PermissionGroup gp = new PermissionGroup();
-            gp.setGroupName(gpDTO.getGroupName());
-            groupId = addGroupPermission(gp);
-        } else {
-            groupId = gpDTO.getGroupId();
+        long permissionCount;
+        switch (permissionMoveType) {
+            // 没有做移动，直接返回 true
+            case MOVE_NO:
+                return true;
+            // 移入组内，组 id 为传入的目标组 id
+            case MOVE_IN:
+                groupId = gpDTO.getTargetGroupId();
+                break;
+            // 移出分组
+            case MOVE_OUT:
+                permissionCount = permissionCount(gpDTO.getSrcGroupId());
+                if (permissionCount <= 2) {
+                    return movePermissionAndDelGroup(gpDTO.getSrcGroupId());
+                }
+                groupId = 0L;
+                break;
+            case MOVE_OUT_IN:
+                permissionCount = permissionCount(gpDTO.getSrcGroupId());
+                if (permissionCount <= 2) {
+                    return movePermissionAndDelGroup(gpDTO.getSrcGroupId());
+                }
+                groupId = gpDTO.getTargetGroupId();
+                break;
+            // 创建新分组
+            case MOVE_NEW_GROUP:
+                PermissionGroup permissionGroup = new PermissionGroup();
+                permissionGroup.setGroupName(gpDTO.getGroupName());
+                groupId = addGroupPermission(permissionGroup);
+                break;
+            default:
+                return false;
         }
         return updatePermissionGroupByPermissionIds(gpDTO.getPermissionIds(), groupId);
+    }
+
+    /**
+     * 验证移动类型
+     *
+     * @param srcGroupId    源分组 id
+     * @param targetGroupId 目标分组 id
+     * @return 移动类型
+     */
+    private PermissionMoveType validMoveType(Long srcGroupId, Long targetGroupId) {
+        if (ObjectUtils.isEmpty(targetGroupId)) {
+            return PermissionMoveType.MOVE_NEW_GROUP;
+        }
+        if (targetGroupId == 0) {
+            return PermissionMoveType.MOVE_OUT;
+        }
+        if (ObjectUtils.nullSafeEquals(srcGroupId, targetGroupId)) {
+            return PermissionMoveType.MOVE_NO;
+        }
+        if (srcGroupId != 0) {
+            return PermissionMoveType.MOVE_OUT_IN;
+        }
+        return PermissionMoveType.MOVE_IN;
+    }
+
+    /**
+     * 查询当前分组下存在多少权限
+     *
+     * @param groupId 分组 id
+     * @return 权限个数
+     */
+    private long permissionCount(Long groupId) {
+        QueryWrapper<PermissionInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("group_id", groupId);
+        return permissionMapper.selectCount(queryWrapper);
+    }
+
+    /**
+     * 移出权限并删除分组
+     *
+     * @param groupId 组 id
+     * @return 是否成功状态
+     */
+    private boolean movePermissionAndDelGroup(Long groupId) {
+        UpdateWrapper<PermissionInfo> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.set("group_id", 0L).eq("group_id", groupId);
+        int update = permissionMapper.update(updateWrapper);
+        //删除分组
+        int del = groupPermissionMapper.deleteById(groupId);
+        return update > 0 && del > 0;
     }
 
     @Override
@@ -68,7 +146,7 @@ public class GroupPermissionImpl implements IGroupPermission {
     }
 
     @Override
-    public boolean updatePermissionGroupByPermissionIds(List<Long> permissionIds, long groupId) {
+    public boolean updatePermissionGroupByPermissionIds(List<Long> permissionIds, Long groupId) {
         UpdateWrapper<PermissionInfo> updateWrapper = new UpdateWrapper<>();
         updateWrapper.set("group_id", groupId)
                 .in("id", permissionIds);

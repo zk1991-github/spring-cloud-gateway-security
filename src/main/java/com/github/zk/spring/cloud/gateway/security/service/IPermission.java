@@ -65,15 +65,6 @@ public interface IPermission {
      */
     int updatePermission(PermissionInfo permissionInfo);
 
-    /**
-     * 移出分组
-     *
-     * @param id 权限 id
-     * @param groupId 组 id
-     * @return 是否成功
-     */
-    boolean moveOutGroup(Long id, Long groupId);
-
 
     /**
      * 分页查询权限
