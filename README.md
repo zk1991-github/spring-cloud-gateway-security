@@ -97,7 +97,23 @@
 
 ### 2. 源IP获取
 
-   由于经过网关转发请求，普通使用`HttpServletRequest#getRemoteAddress`方式只能获取到网关IP。下游服务获取真实源IP，可从请求头`XReal-IP`中获取，调用方法`HttpServletRequest#getHeader(String)`。
+  由于经过网关转发请求，普通使用`HttpServletRequest#getRemoteAddress`方式只能获取到网关IP。下游服务获取真实源IP，可从请求头`XReal-IP`中获取，调用方法`HttpServletRequest#getHeader(String)`。
+
+  为了配合下游源IP获取，代理服务应在转发服务节点配置头信息，如nginx需配置
+
+```nginx
+location /gatewayservice/ {
+            proxy_pass http://127.0.0.1:8888/;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+
+            proxy_set_header Host $host;
+            proxy_set_header XReal-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+```
 
 ### 3. 用户ID获取
 
