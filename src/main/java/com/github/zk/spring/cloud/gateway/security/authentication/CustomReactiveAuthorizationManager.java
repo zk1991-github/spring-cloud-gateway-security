@@ -74,19 +74,24 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
      */
     private final IPermission iPermission;
 
-    public CustomReactiveAuthorizationManager(GatewayProperties gatewayProperties, IPermission iPermission) {
+    private final Boolean sourceIpEnable;
+
+    public CustomReactiveAuthorizationManager(GatewayProperties gatewayProperties, IPermission iPermission, Boolean sourceIpEnable) {
         this.gatewayProperties = gatewayProperties;
         this.iPermission = iPermission;
+        this.sourceIpEnable = sourceIpEnable;
     }
 
     @Override
     public Mono<AuthorizationDecision> check(Mono<Authentication> authentication, AuthorizationContext authorizationContext) {
         // 设置下游服务传递的头信息
         ServerWebExchange exchange = authorizationContext.getExchange();
-        ServerHttpRequest newRequest = exchange.getRequest().mutate()
-                .header("XReal-IP", IpUtils.getIpAddr(exchange.getRequest()))
-                .build();
-        exchange.mutate().request(newRequest).build();
+        if (sourceIpEnable) {
+            ServerHttpRequest newRequest = exchange.getRequest().mutate()
+                    .header("XReal-IP", IpUtils.getIpAddr(exchange.getRequest()))
+                    .build();
+            exchange.mutate().request(newRequest).build();
+        }
 
         return authentication
                 .flatMap(auth -> {

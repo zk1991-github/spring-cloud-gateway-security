@@ -43,6 +43,11 @@ public class SecurityProperties {
      */
     private Boolean csrfEnable = true;
 
+    /**
+     * 源 ip 转发，默认关闭
+     */
+    private Boolean sourceIpEnable = false;
+
     public String getProxyUrl() {
         return proxyUrl;
     }
@@ -65,5 +70,13 @@ public class SecurityProperties {
 
     public void setCsrfEnable(Boolean csrfEnable) {
         this.csrfEnable = csrfEnable;
+    }
+
+    public Boolean getSourceIpEnable() {
+        return sourceIpEnable;
+    }
+
+    public void setSourceIpEnable(Boolean sourceIpEnable) {
+        this.sourceIpEnable = sourceIpEnable;
     }
 }

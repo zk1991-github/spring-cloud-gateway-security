@@ -66,12 +66,14 @@ public class SecurityConfig {
     private String[] antPatterns;
     private String proxyUrl;
     private boolean csrfEnable;
+    private boolean sourceIpEnable;
 
     @PostConstruct
     public void init() {
         proxyUrl = securityProperties.getProxyUrl();
         antPatterns = securityProperties.getAntpatterns();
         csrfEnable = securityProperties.getCsrfEnable();
+        sourceIpEnable = securityProperties.getSourceIpEnable();
         //代理地址处理
         if (proxyUrl == null) {
             logger.info("前端无代理");
@@ -132,7 +134,7 @@ public class SecurityConfig {
             }
             // 设置授权管理器
             access.anyExchange()
-                    .access(new CustomReactiveAuthorizationManager(gatewayProperties, iPermission));
+                    .access(new CustomReactiveAuthorizationManager(gatewayProperties, iPermission, sourceIpEnable));
         })
                 // 禁用http默认设置
                 .httpBasic().disable()
