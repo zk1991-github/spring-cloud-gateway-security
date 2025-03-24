@@ -61,6 +61,11 @@
       "description": "csrf开关,默认开启."
     },
     {
+      "name": "spring.security.source-ip-enable",
+      "type": "java.lang.Boolean",
+      "description": "源ip转发,默认关闭."
+    },
+    {
       "name": "web.webRoot",
       "type": "java.lang.String",
       "description": "静态资源发布."

@@ -2,3 +2,4 @@ spring:
   security:
     antpatterns: "/web/dist/**,/web/websocket.html"
     csrf-enable: false
+    source-ip-enable: false
