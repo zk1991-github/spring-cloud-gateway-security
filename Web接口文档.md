@@ -1047,19 +1047,20 @@ GET http://<IP>:<PORT>/gateway/csrfTokenGenerator
 "无"
 ```
 
-## 20. 权限分组
+## 20. 权限移动
 
 请求接口
 
 ```http request
-POST http://<IP>:<PORT>/gateway/groupPermission
+POST http://<IP>:<PORT>/gateway/movePermission
 ```
 
 | 序号 | 参数       | 描述   | 类型 | 说明  |
 | ---- |----------| ---- | ---- |-----|
 | 1    | permissionIds | 权限id | 数组 | 必填  |
 | 2 | groupName | 分组名称 | 字符串 | 选填 |
-| 3 | groupId | 组id | 数字 | 选填 |
+| 3 | srcGroupId | 源组id | 数字 | 必填<br>当权限在组内时，传所在组id；<br>当权限在组外时，传0。 |
+| 4 | targetGroupId | 目标组id | 数字 | 选填<br>当与其他权限进行新分组时，不传此参数或传空；<br>当权限从组内移出时，传0；<br>当权限从组外移入时，传目标组id |
 
 返回结构
 
@@ -1208,38 +1209,5 @@ GET http://<IP>:<PORT>/gateway/queryPermissionGroupPage?keywords=<param1>&curren
 {
     "msg": "查询失败",
     "code": 704
-}
-```
-
-## 22. 移出分组
-
-请求接口
-
-```http request
-GET http://<IP>:<PORT>/gateway/moveOutGroup?id=<param1>&groupId=<param2>
-```
-
-| 序号 | 参数    | 描述   | 类型 | 说明 |
-| ---- | ------- | ------ | ---- | ---- |
-| 1    | id      | 权限id | 数字 | 必填 |
-| 2    | groupId | 组id   | 数字 | 必填 |
-
-返回结构
-
-- 成功样例
-
-```json
-{
-  "msg": "成功",
-  "code": 200
-}
-```
-
-- 失败样例
-
-```json
-{
-    "msg": "后台出现异常错误",
-    "code": 500
 }
 ```
