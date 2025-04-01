@@ -73,7 +73,7 @@ public class GroupPermissionImpl implements IGroupPermission {
             case MOVE_OUT_IN:
                 permissionCount = permissionCount(gpDTO.getSrcGroupId());
                 if (permissionCount <= 2) {
-                    return movePermissionAndDelGroup(gpDTO.getSrcGroupId());
+                    movePermissionAndDelGroup(gpDTO.getSrcGroupId());
                 }
                 groupId = gpDTO.getTargetGroupId();
                 break;
