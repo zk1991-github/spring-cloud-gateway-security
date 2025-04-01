@@ -20,6 +20,5 @@ if (strArr && strArr.length) {
 }
 
 var $url = {
-    //DATA_URL: GATEWAY_URL,
-     DATA_URL: "http://" + window.location.host + GATEWAY_URL,
+    DATA_URL: "http://" + window.location.host + GATEWAY_URL,
 };
