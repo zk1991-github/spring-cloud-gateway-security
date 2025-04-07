@@ -24,11 +24,12 @@ import com.github.zk.spring.cloud.gateway.security.authentication.WebRedirectSer
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
 import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
+import com.github.zk.spring.cloud.gateway.security.property.SecurityProperties;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.context.annotation.Bean;
@@ -60,13 +61,19 @@ import java.util.Collections;
 public class SecurityConfig {
     private final static Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
-    @Value("${spring.web.proxy.url:#{null}}")
-    private String proxyUrl;
-    @Value("${spring.static.antpatterns:#{null }}")
+    @Autowired
+    private SecurityProperties securityProperties;
     private String[] antPatterns;
+    private String proxyUrl;
+    private boolean csrfEnable;
+    private boolean sourceIpEnable;
 
     @PostConstruct
     public void init() {
+        proxyUrl = securityProperties.getProxyUrl();
+        antPatterns = securityProperties.getAntpatterns();
+        csrfEnable = securityProperties.getCsrfEnable();
+        sourceIpEnable = securityProperties.getSourceIpEnable();
         //代理地址处理
         if (proxyUrl == null) {
             logger.info("前端无代理");
@@ -127,7 +134,7 @@ public class SecurityConfig {
             }
             // 设置授权管理器
             access.anyExchange()
-                    .access(new CustomReactiveAuthorizationManager(gatewayProperties, iPermission));
+                    .access(new CustomReactiveAuthorizationManager(gatewayProperties, iPermission, sourceIpEnable));
         })
                 // 禁用http默认设置
                 .httpBasic().disable()
@@ -153,14 +160,16 @@ public class SecurityConfig {
                 // 设置登出成功处理器
                 .logoutSuccessHandler(createRedirectServerLogoutSuccessHandler())
                 .and()
-                // 禁用csrf拦截
-                .csrf()
-                .csrfTokenRepository(customCookieServerCsrfTokenRepository())
-                .and()
                 // 启用跨域拦截
                 .cors();
         // 允许匿名访问
         http.anonymous();
+        // csrf设置
+        if (csrfEnable) {
+            http.csrf().csrfTokenRepository(customCookieServerCsrfTokenRepository());
+        } else {
+            http.csrf().disable();
+        }
         return http.build();
     }
 

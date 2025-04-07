@@ -15,4 +15,4 @@ login:
             url: /**
 spring:
   profiles:
-    active: datasource-cluster, gateway, wechat, release, loadbalance
+    active: datasource-cluster, gateway, security, wechat, release, loadbalance

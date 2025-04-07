@@ -22,6 +22,7 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import reactor.core.publisher.Mono;
 
@@ -58,6 +59,7 @@ public class TokenCheckGatewayFilterFactory extends AbstractGatewayFilterFactory
             httpHeaders.add("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
             //设置body
             String warningStr = "未登录或登录超时";
+            response.setStatusCode(HttpStatus.FORBIDDEN);
             DataBuffer bodyDataBuffer = response.bufferFactory().wrap(warningStr.getBytes());
 
             return response.writeWith(Mono.just(bodyDataBuffer));

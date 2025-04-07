@@ -54,6 +54,14 @@ public class PermissionInfo implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     /**
+     * 组 id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long groupId;
+
+    @TableField(exist = false)
+    private String groupName;
+    /**
      * 地址名称
      */
     @NotEmpty(groups = {AddPermission.class, UpdatePermission.class})
@@ -94,6 +102,22 @@ public class PermissionInfo implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     public String getUrl() {

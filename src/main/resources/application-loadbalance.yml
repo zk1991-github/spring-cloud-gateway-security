@@ -9,8 +9,6 @@ spring:
               - uri: http://1.1.1.1:8080
               - uri: http://1.1.1.2:8080
     loadbalancer:
-      ## 负载均衡开关
-      enabled: true
       healthCheck:
         ## 健康检查地址， 可以采用服务其中一个地址作为健康检查地址
         path:

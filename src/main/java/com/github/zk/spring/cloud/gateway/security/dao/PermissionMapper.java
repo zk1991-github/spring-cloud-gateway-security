@@ -25,6 +25,8 @@ import com.github.zk.spring.cloud.gateway.security.pojo.PermissionInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * 权限仓储
  *
@@ -35,4 +37,9 @@ import org.springframework.stereotype.Repository;
 public interface PermissionMapper extends BaseMapper<PermissionInfo> {
 
     Page<PermissionInfo> selectPage(Page<PermissionInfo> page, @Param("ew") Wrapper<PermissionInfo> queryWrapper);
+
+    Page<PermissionInfo> selectGroupPermissionsPage(Page<PermissionInfo> page, @Param("ew") Wrapper<PermissionInfo> queryWrapper);
+
+    List<PermissionInfo> selectPermissionsByGroupIds(@Param("list") List<Long> groupIds,
+                                                @Param("ew") Wrapper<PermissionInfo> queryWrapper);
 }

@@ -18,6 +18,8 @@
 
 package com.github.zk.spring.cloud.gateway.security.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zk.spring.cloud.gateway.security.common.CodeEnum;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
@@ -25,6 +27,7 @@ import com.github.zk.spring.cloud.gateway.security.log.LogHolder;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -39,6 +42,7 @@ import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 登录 请求控制
@@ -123,7 +127,23 @@ public class WebLoginController {
     }
 
     @GetMapping("/logout")
-    public Response logout() {
-        return Response.setOk();
+    public Mono<Void> logout(WebSession session, ServerWebExchange exchange) {
+        ServerHttpResponse serverHttpResponse = exchange.getResponse();
+        //使当前session失效
+        serverHttpResponse.setStatusCode(HttpStatus.OK);
+        serverHttpResponse.getHeaders().set("Content-Type", "application/json");
+        // 组织返回结构
+        Response response = Response.setOk();
+        String body = "";
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            body = objectMapper.writeValueAsString(response);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return serverHttpResponse
+                .writeWith(Mono.just(serverHttpResponse.bufferFactory()
+                        .wrap(body.getBytes(StandardCharsets.UTF_8))))
+                .then(session.invalidate());
     }
 }

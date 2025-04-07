@@ -46,14 +46,24 @@
       "description": "系统默认用户id."
     },
     {
-      "name": "spring.web.proxy.url",
+      "name": "spring.security.antpatterns",
+      "type": "java.lang.String[]",
+      "description": "静态资源匹配规则."
+    },
+    {
+      "name": "spring.security.proxy-url",
       "type": "java.lang.String",
       "description": "前端代理地址."
     },
     {
-      "name": "spring.static.antpatterns",
-      "type": "java.lang.String",
-      "description": "静态资源匹配规则."
+      "name": "spring.security.csrf-enable",
+      "type": "java.lang.Boolean",
+      "description": "csrf开关,默认开启."
+    },
+    {
+      "name": "spring.security.source-ip-enable",
+      "type": "java.lang.Boolean",
+      "description": "源ip转发,默认关闭."
     },
     {
       "name": "web.webRoot",
@@ -70,4 +80,5 @@
       "type": "java.lang.String",
       "description": "是否记录到数据库"
     }
-  ] }
+  ]
+}

@@ -1,4 +1,5 @@
-#  Web接口
+Web接口
+
 > Web接口主要用于对网关鉴权系统界面的自定义开发使用，若使用本系统自带界面，则忽略此文档。Web接口中的IP为网关鉴权系统所在服务器IP，PORT为网关鉴权系统端口。
 ## 1. 登录
 请求接口
@@ -1046,3 +1047,167 @@ GET http://<IP>:<PORT>/gateway/csrfTokenGenerator
 "无"
 ```
 
+## 20. 权限移动
+
+请求接口
+
+```http request
+POST http://<IP>:<PORT>/gateway/movePermission
+```
+
+| 序号 | 参数       | 描述   | 类型 | 说明  |
+| ---- |----------| ---- | ---- |-----|
+| 1    | permissionIds | 权限id | 数组 | 必填  |
+| 2 | groupName | 分组名称 | 字符串 | 选填 |
+| 3 | srcGroupId | 源组id | 数字 | 必填<br>当权限在组内时，传所在组id；<br>当权限在组外时，传0。 |
+| 4 | targetGroupId | 目标组id | 数字 | 选填<br>当与其他权限进行新分组时，不传此参数或传空；<br>当权限从组内移出时，传0；<br>当权限从组外移入时，传目标组id |
+
+返回结构
+
+- 成功样例
+
+```json
+{
+  "msg": "成功",
+  "code": 200
+}
+```
+
+- 失败样例
+
+```json
+{
+    "msg": "后台出现异常错误",
+    "code": 500
+}
+```
+
+## 21. 分页查询权限及分组
+
+请求接口
+
+```http request
+GET http://<IP>:<PORT>/gateway/queryPermissionGroupPage?keywords=<param1>&current=<param2>&size=<param3>
+```
+
+| 序号 | 参数     | 描述     | 类型   | 说明 |
+| ---- | -------- | -------- | ------ | ---- |
+| 1    | keywords | 关键字   | 字符串 | 选填 |
+| 2    | current  | 当前页码 | 数字   | 必填 |
+| 3    | size     | 页容量   | 数字   | 必填 |
+
+返回结构
+
+- 成功样例
+
+```json
+{
+    "data": {
+        "records": [
+            {
+                "id": "1834832757904396289",
+                "groupName": "测试分组1",
+                "createTime": null,
+                "permissionInfos": [
+                    {
+                        "id": "1495637399244447746",
+                        "groupId": "1834832757904396289",
+                        "groupName": null,
+                        "urlName": "分页查询权限",
+                        "url": "/queryPermission",
+                        "open": 0,
+                        "description": "分页查询权限",
+                        "fixed": 1,
+                        "createTime": "2022-02-21 13:51:59",
+                        "roleInfos": [
+                            {
+                                "id": "1",
+                                "roleName": "管理员",
+                                "description": null,
+                                "permissionInfos": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "1495637567519924225",
+                        "groupId": "1834832757904396289",
+                        "groupName": null,
+                        "urlName": "新增权限",
+                        "url": "/addPermission",
+                        "open": 0,
+                        "description": "新增权限",
+                        "fixed": 1,
+                        "createTime": "2022-02-21 13:52:39",
+                        "roleInfos": [
+                            {
+                                "id": "1",
+                                "roleName": "管理员",
+                                "description": null,
+                                "permissionInfos": null
+                            },
+                            {
+                                "id": "2",
+                                "roleName": "普通用户",
+                                "description": null,
+                                "permissionInfos": null
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0",
+                "groupName": "未分组",
+                "createTime": null,
+                "permissionInfos": [
+                    {
+                        "id": "1495637948090097665",
+                        "groupId": "0",
+                        "groupName": null,
+                        "urlName": "根据角色绑定权限",
+                        "url": "/bindPermissionByRole",
+                        "open": 0,
+                        "description": "根据角色绑定权限",
+                        "fixed": 1,
+                        "createTime": "2022-02-21 13:54:09",
+                        "roleInfos": [
+                            {
+                                "id": "1",
+                                "roleName": "管理员",
+                                "description": null,
+                                "permissionInfos": null
+                            },
+                            {
+                                "id": "2",
+                                "roleName": "普通用户",
+                                "description": null,
+                                "permissionInfos": null
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "total": 16,
+        "size": 10,
+        "current": 1,
+        "orders": [],
+        "optimizeCountSql": true,
+        "searchCount": true,
+        "maxLimit": null,
+        "countId": null,
+        "pages": 2
+    },
+    "msg": "成功",
+    "code": 200
+}
+```
+
+- 失败样例
+
+```json
+{
+    "msg": "查询失败",
+    "code": 704
+}
+```

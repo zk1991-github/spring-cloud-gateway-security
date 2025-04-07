@@ -1,0 +1,2 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-1668ad7c"],{"1b78":function(n,t,r){},2593:function(n,t,r){"use strict";r("1b78")},f96a:function(n,t,r){"use strict";r.r(t);var c=function(){var n=this,t=n._self._c;return t("div",{staticClass:"error-page"},[t("h1",[n._v("404")]),t("p",[n._v("页面未找到")]),t("router-link",{attrs:{to:"/index"}},[n._v("返回首页")])],1)},e=[],s={name:"Error404"},a=s,i=(r("2593"),r("2877")),o=Object(i["a"])(a,c,e,!1,null,"35559c76",null);t["default"]=o.exports}}]);
+//# sourceMappingURL=chunk-1668ad7c.bfc6e36d.js.map
