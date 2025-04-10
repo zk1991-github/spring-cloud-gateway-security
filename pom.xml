@@ -10,11 +10,12 @@
     </parent>
     <groupId>com.github.zk</groupId>
     <artifactId>spring-cloud-gateway-security</artifactId>
-    <version>v4.3.6</version>
+    <version>v4.3.6-3.x</version>
     <name>spring-cloud-gateway-security</name>
     <description>Spring Cloud gateway 整合 Spring Security</description>
     <properties>
-        <java.version>1.8</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <spring-cloud.version>2024.0.1</spring-cloud.version>
         <druid.version>1.2.23</druid.version>
         <mysql.version>8.0.33</mysql.version>
@@ -159,6 +160,16 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- 指定源码兼容版本 -->
+                    <source>17</source>
+                    <!-- 指定编译目标版本 -->
+                    <target>17</target>
+                </configuration>
+            </plugin>
             <!-- 排除静态配置资源 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
