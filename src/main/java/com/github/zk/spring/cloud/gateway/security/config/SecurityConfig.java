@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2024 the original author or authors.
+ *  * Copyright 2021-2025 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
 import com.github.zk.spring.cloud.gateway.security.property.SecurityProperties;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -46,7 +48,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
-import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.util.Collections;
 
@@ -125,50 +126,48 @@ public class SecurityConfig {
                                                             DefaultUserImpl userDetailsService,
                                                             IPermission iPermission) {
         http.authorizeExchange(exchanges -> {
-            ServerHttpSecurity.AuthorizeExchangeSpec access = exchanges
-                    .pathMatchers(SUCCESS_URL, FAIL_URL, INVALID_URL,
-                            WECHAT_URL, LOGOUT_URL).permitAll();
-            // 静态资源放行
-            if (antPatterns != null && antPatterns.length > 0) {
-                access.pathMatchers(antPatterns).permitAll();
-            }
-            // 设置授权管理器
-            access.anyExchange()
-                    .access(new CustomReactiveAuthorizationManager(gatewayProperties, iPermission, sourceIpEnable));
-        })
+                    ServerHttpSecurity.AuthorizeExchangeSpec access = exchanges
+                            .pathMatchers(SUCCESS_URL, FAIL_URL, INVALID_URL,
+                                    WECHAT_URL, LOGOUT_URL).permitAll();
+                    // 静态资源放行
+                    if (antPatterns != null && antPatterns.length > 0) {
+                        access.pathMatchers(antPatterns).permitAll();
+                    }
+                    // 设置授权管理器
+                    access.anyExchange()
+                            .access(new CustomReactiveAuthorizationManager(gatewayProperties, iPermission, sourceIpEnable));
+                })
                 // 禁用http默认设置
-                .httpBasic().disable()
+                .httpBasic(Customizer.withDefaults())
                 // 登录设置
-                .formLogin()
-                // 设置认证管理器
-                .authenticationManager(new WebReactiveAuthenticationManager(userDetailsService, loginProcessor))
-                //登录服务地址
-                .loginPage(LOGIN_URL)
-                // 设置认证成功处理器
-                .authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler(
-                        proxyUrl + SUCCESS_URL))
-                // 设置认证失败处理器
-                .authenticationFailureHandler(new WebRedirectServerAuthenticationFailureHandler(
-                        proxyUrl + FAIL_URL))
-                // 设置无权限时端点
-                .authenticationEntryPoint(new RedirectServerAuthenticationEntryPoint(proxyUrl + INVALID_URL))
-                .and()
+                .formLogin(formLogin ->
+                        // 设置认证管理器
+                        formLogin.authenticationManager(new WebReactiveAuthenticationManager(userDetailsService, loginProcessor))
+                                //登录服务地址
+                                .loginPage(LOGIN_URL)
+                                // 设置认证成功处理器
+                                .authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler(
+                                        proxyUrl + SUCCESS_URL))
+                                // 设置认证失败处理器
+                                .authenticationFailureHandler(new WebRedirectServerAuthenticationFailureHandler(
+                                        proxyUrl + FAIL_URL))
+                                // 设置无权限时端点
+                                .authenticationEntryPoint(new RedirectServerAuthenticationEntryPoint(proxyUrl + INVALID_URL)))
                 // 登出设置
-                .logout()
-                // 设置登出处理器
-                .logoutHandler(new WebSessionServerLogoutHandler())
-                // 设置登出成功处理器
-                .logoutSuccessHandler(createRedirectServerLogoutSuccessHandler())
-                .and()
+                .logout(logout ->
+                        // 设置登出处理器
+                        logout.logoutHandler(new WebSessionServerLogoutHandler())
+                                // 设置登出成功处理器
+                                .logoutSuccessHandler(createRedirectServerLogoutSuccessHandler()))
                 // 启用跨域拦截
-                .cors();
+                .cors(Customizer.withDefaults());
         // 允许匿名访问
-        http.anonymous();
+        http.anonymous(Customizer.withDefaults());
         // csrf设置
         if (csrfEnable) {
-            http.csrf().csrfTokenRepository(customCookieServerCsrfTokenRepository());
+            http.csrf(csrf -> csrf.csrfTokenRepository(customCookieServerCsrfTokenRepository()));
         } else {
-            http.csrf().disable();
+            http.csrf(csrf -> csrf.disable());
         }
         return http.build();
     }

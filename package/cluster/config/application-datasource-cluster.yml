@@ -41,10 +41,10 @@ spring:
         pool-prepared-statements: false
         # 使用 sqlite 需要把值设置为小于 0
         max-open-prepared-statements: 20
-
-  redis:
-    host: 192.168.110.130
-    port: 6379
-    password: 123456
+  data:
+    redis:
+      host: 192.168.110.130
+      port: 6379
+      password: 123456
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
