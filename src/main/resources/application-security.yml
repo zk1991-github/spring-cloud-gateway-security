@@ -1,5 +1,5 @@
 spring:
   security:
-    antpatterns: "/web/dist/**,/web/websocket.html"
+    antpatterns: "/web/dist/**,/web/websocket.html,/web/ai.html"
     csrf-enable: false
     source-ip-enable: false
