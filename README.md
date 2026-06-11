@@ -385,7 +385,7 @@ spring:
 
 ### 11. 负载均衡
 
-​	负载均衡是将请求转发到多个下游服务集群的方式，用来减轻下游服务的请求压力。当`application.yml`中`spring.profiles.active`配置了`loadbalance`时，负载均衡开启。`application-loadbalance.yml`配置如下：
+   负载均衡是将请求转发到多个下游服务集群的方式，用来减轻下游服务的请求压力。当`application.yml`中`spring.profiles.active`配置了`loadbalance`时，负载均衡开启。`application-loadbalance.yml`配置如下：
 
 ```yaml
 spring:
@@ -416,6 +416,21 @@ spring:
 （2）`spring.cloud.loadbalancer.healthCheck.path.providerService`为健康检查地址，需要被负载的服务提供与配置地址相同的`GET`服务。
 
 （3）其他配置保持默认即可。
+
+### 12.白名单
+根据IP设置白名单，限制登录IP段，在`application-security.yml`文件中配置，配置方式如下：
+```yaml
+spring:
+  security:
+    # 白名单认证开关，默认关闭
+    whitelist-enable: false
+    # 白名单配置，启用后在此配置 IP
+    whitelist:
+      ips:
+        - 127.0.0.1
+        - 192.168.1.100              # 单 IP
+        - 192.168.1.1-192.168.1.255   # 范围（- 分隔）
+```
 
 ## 四、 注意事项
 

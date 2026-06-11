@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2024 the original author or authors.
+ *  * Copyright 2021-2026 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ package com.github.zk.spring.cloud.gateway.security.property;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author zhaokai
@@ -47,6 +50,16 @@ public class SecurityProperties {
      * 源 ip 转发，默认关闭
      */
     private Boolean sourceIpEnable = false;
+
+    /**
+     * 白名单认证，默认关闭
+     */
+    private Boolean whitelistEnable = false;
+
+    /**
+     * 白名单配置
+     */
+    private Whitelist whitelist = new Whitelist();
 
     public String getProxyUrl() {
         return proxyUrl;
@@ -78,5 +91,34 @@ public class SecurityProperties {
 
     public void setSourceIpEnable(Boolean sourceIpEnable) {
         this.sourceIpEnable = sourceIpEnable;
+    }
+
+    public Boolean getWhitelistEnable() {
+        return whitelistEnable;
+    }
+
+    public void setWhitelistEnable(Boolean whitelistEnable) {
+        this.whitelistEnable = whitelistEnable;
+    }
+
+    public Whitelist getWhitelist() {
+        return whitelist;
+    }
+
+    public void setWhitelist(Whitelist whitelist) {
+        this.whitelist = whitelist;
+    }
+
+    public static class Whitelist {
+        private List<String> ips = new ArrayList<>();
+
+        public List<String> getIps() {
+            return ips;
+        }
+
+        public void setIps(List<String> ips) {
+            this.ips = ips;
+        }
+
     }
 }
