@@ -66,6 +66,16 @@
       "description": "源ip转发,默认关闭."
     },
     {
+      "name": "spring.security.whitelist-enable",
+      "type": "java.lang.Boolean",
+      "description": "白名单认证开关,默认关闭."
+    },
+    {
+      "name": "spring.security.whitelist.ips",
+      "type": "java.util.List",
+      "description": "白名单IP列表,支持单IP(192.168.1.100)和范围(192.168.1.1-192.168.1.255)."
+    },
+    {
       "name": "web.webRoot",
       "type": "java.lang.String",
       "description": "静态资源发布."
