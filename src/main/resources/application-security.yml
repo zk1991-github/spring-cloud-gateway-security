@@ -3,3 +3,11 @@ spring:
     antpatterns: "/web/dist/**,/web/websocket.html"
     csrf-enable: false
     source-ip-enable: false
+    # 白名单认证开关，默认关闭
+    whitelist-enable: false
+    # 白名单配置，启用后在此配置 IP
+    whitelist:
+      ips:
+        - 127.0.0.1
+        - 192.168.1.100              # 单 IP
+        - 192.168.1.1-192.168.1.255   # 范围（- 分隔）

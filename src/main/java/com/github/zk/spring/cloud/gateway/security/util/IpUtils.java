@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2024 the original author or authors.
+ *  * Copyright 2021-2026 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -52,5 +52,40 @@ public class IpUtils {
             ip = Objects.requireNonNull(request.getRemoteAddress()).getAddress().getHostAddress();
         }
         return ip;
+    }
+
+    public static boolean isIpInRange(String ip, String pattern) {
+        if (ip == null || pattern == null) {
+            return false;
+        }
+        ip = normalizeIp(ip);
+        pattern = normalizeIp(pattern.trim());
+        int dashIndex = pattern.indexOf('-');
+        if (dashIndex > 0) {
+            long ipLong = ipToLong(ip);
+            long start = ipToLong(pattern.substring(0, dashIndex).trim());
+            long end = ipToLong(pattern.substring(dashIndex + 1).trim());
+            return ipLong >= start && ipLong <= end;
+        }
+        return ip.equals(pattern);
+    }
+
+    private static String normalizeIp(String ip) {
+        if ("localhost".equalsIgnoreCase(ip)) {
+            return "127.0.0.1";
+        }
+        if ("::1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
+            return "127.0.0.1";
+        }
+        return ip;
+    }
+
+    private static long ipToLong(String ip) {
+        String[] parts = ip.split("\\.");
+        long result = 0;
+        for (String part : parts) {
+            result = (result << 8) | Integer.parseInt(part);
+        }
+        return result;
     }
 }

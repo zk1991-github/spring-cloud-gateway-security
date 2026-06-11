@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2025 the original author or authors.
+ *  * Copyright 2021-2026 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -23,9 +23,11 @@ import com.github.zk.spring.cloud.gateway.security.authentication.WebReactiveAut
 import com.github.zk.spring.cloud.gateway.security.authentication.WebRedirectServerAuthenticationFailureHandler;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
+import com.github.zk.spring.cloud.gateway.security.filter.IpWhitelistWebFilter;
 import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
 import com.github.zk.spring.cloud.gateway.security.property.SecurityProperties;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
+import com.github.zk.spring.cloud.gateway.security.service.IWhitelist;
 import com.github.zk.spring.cloud.gateway.security.service.impl.DefaultUserImpl;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -37,6 +39,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationEntryPoint;
@@ -68,13 +71,16 @@ public class SecurityConfig {
     private String proxyUrl;
     private boolean csrfEnable;
     private boolean sourceIpEnable;
+    private boolean whitelist;
 
     @PostConstruct
     public void init() {
-        proxyUrl = securityProperties.getProxyUrl();
-        antPatterns = securityProperties.getAntpatterns();
-        csrfEnable = securityProperties.getCsrfEnable();
-        sourceIpEnable = securityProperties.getSourceIpEnable();
+        this.proxyUrl = securityProperties.getProxyUrl();
+        this.antPatterns = securityProperties.getAntpatterns();
+        this.csrfEnable = securityProperties.getCsrfEnable();
+        this.sourceIpEnable = securityProperties.getSourceIpEnable();
+        this.whitelist = securityProperties.getWhitelistEnable();
+
         //代理地址处理
         if (proxyUrl == null) {
             logger.info("前端无代理");
@@ -124,7 +130,8 @@ public class SecurityConfig {
                                                             GatewayProperties gatewayProperties,
                                                             LoginProcessor loginProcessor,
                                                             DefaultUserImpl userDetailsService,
-                                                            IPermission iPermission) {
+                                                            IPermission iPermission,
+                                                            IWhitelist iWhitelist) {
         http.authorizeExchange(exchanges -> {
                     ServerHttpSecurity.AuthorizeExchangeSpec access = exchanges
                             .pathMatchers(SUCCESS_URL, FAIL_URL, INVALID_URL,
@@ -167,7 +174,10 @@ public class SecurityConfig {
         if (csrfEnable) {
             http.csrf(csrf -> csrf.csrfTokenRepository(customCookieServerCsrfTokenRepository()));
         } else {
-            http.csrf(csrf -> csrf.disable());
+            http.csrf(ServerHttpSecurity.CsrfSpec::disable);
+        }
+        if (whitelist) {
+            http.addFilterBefore(new IpWhitelistWebFilter(iWhitelist), SecurityWebFiltersOrder.FORM_LOGIN);
         }
         return http.build();
     }
