@@ -60,6 +60,11 @@ public class IpUtils {
         }
         ip = normalizeIp(ip);
         pattern = normalizeIp(pattern.trim());
+        // wildcard: 1.1.1.* -> 1.1.1.0-1.1.1.255
+        if (pattern.endsWith(".*")) {
+            String prefix = pattern.substring(0, pattern.length() - 1);
+            pattern = prefix + "0-" + prefix + "255";
+        }
         int dashIndex = pattern.indexOf('-');
         if (dashIndex > 0) {
             long ipLong = ipToLong(ip);

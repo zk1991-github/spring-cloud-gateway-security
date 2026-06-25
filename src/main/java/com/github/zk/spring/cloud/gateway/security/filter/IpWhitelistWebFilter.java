@@ -20,6 +20,7 @@ package com.github.zk.spring.cloud.gateway.security.filter;
 
 import com.github.zk.spring.cloud.gateway.security.service.IWhitelist;
 import com.github.zk.spring.cloud.gateway.security.util.IpUtils;
+import com.github.zk.spring.cloud.gateway.security.util.MacUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -58,7 +59,8 @@ public class IpWhitelistWebFilter implements WebFilter {
             return chain.filter(exchange);
         }
         String ipAddr = IpUtils.getIpAddr(request);
-        return iWhitelist.isWhiteList(ipAddr)
+        String macAddr = MacUtils.getMacAddr(request);
+        return iWhitelist.isWhiteList(ipAddr, macAddr)
                 // 查询结果为空，证明不在白名单
                 .defaultIfEmpty(false)
                 .flatMap(allowed -> {

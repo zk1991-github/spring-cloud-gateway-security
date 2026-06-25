@@ -18,9 +18,10 @@
 
 package com.github.zk.spring.cloud.gateway.security.service.impl;
 
-import com.github.zk.spring.cloud.gateway.security.property.SecurityProperties;
+import com.github.zk.spring.cloud.gateway.security.pojo.WhitelistInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IWhitelist;
-import com.github.zk.spring.cloud.gateway.security.util.IpUtils;
+import com.github.zk.spring.cloud.gateway.security.service.IWhitelistService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -28,31 +29,17 @@ import reactor.core.publisher.Mono;
  * 白名单实现类
  *
  * @author zhaokai
- * @since 5.1.0
+ * @since 5.0.0-1
  */
 @Service
 public class WhitelistImpl implements IWhitelist {
 
-    private final SecurityProperties securityProperties;
-
-    public WhitelistImpl(SecurityProperties securityProperties) {
-        this.securityProperties = securityProperties;
-    }
+    @Autowired
+    private IWhitelistService whitelistService;
 
     @Override
-    public Mono<Boolean> isWhiteList(String ip) {
-        return Mono.just(ipMatch(ip));
-    }
-
-    private boolean ipMatch(String ip) {
-        SecurityProperties.Whitelist whitelist = securityProperties.getWhitelist();
-        if (ip != null && !ip.isEmpty() && !whitelist.getIps().isEmpty()) {
-            for (String pattern : whitelist.getIps()) {
-                if (IpUtils.isIpInRange(ip, pattern)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    public Mono<Boolean> isWhiteList(String ip, String macAddr) {
+        WhitelistInfo w = whitelistService.queryByIpAndMac(ip, macAddr);
+        return Mono.just(w != null);
     }
 }

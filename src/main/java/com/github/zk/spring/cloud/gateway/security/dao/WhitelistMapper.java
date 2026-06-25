@@ -16,23 +16,18 @@
  *
  */
 
-package com.github.zk.spring.cloud.gateway.security.service;
+package com.github.zk.spring.cloud.gateway.security.dao;
 
-import reactor.core.publisher.Mono;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.zk.spring.cloud.gateway.security.pojo.WhitelistInfo;
+import org.springframework.stereotype.Repository;
 
 /**
- * 白名单接口
+ * 白名单 仓储
  *
  * @author zhaokai
- * @since 5.0.0-1
+ * @since 5.1.0
  */
-public interface IWhitelist {
-    /**
-     * 是否白名单
-     *
-     * @param ip ip地址
-     * @param macAddr mac地址
-     * @return 是否为白名单
-     */
-    Mono<Boolean> isWhiteList(String ip, String macAddr);
+@Repository
+public interface WhitelistMapper extends BaseMapper<WhitelistInfo> {
 }

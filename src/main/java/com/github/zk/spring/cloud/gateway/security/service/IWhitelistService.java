@@ -18,21 +18,25 @@
 
 package com.github.zk.spring.cloud.gateway.security.service;
 
-import reactor.core.publisher.Mono;
+import com.github.zk.spring.cloud.gateway.security.pojo.WhitelistInfo;
+
+import java.util.List;
 
 /**
- * 白名单接口
+ * 白名单服务接口
  *
  * @author zhaokai
  * @since 5.0.0-1
  */
-public interface IWhitelist {
-    /**
-     * 是否白名单
-     *
-     * @param ip ip地址
-     * @param macAddr mac地址
-     * @return 是否为白名单
-     */
-    Mono<Boolean> isWhiteList(String ip, String macAddr);
+public interface IWhitelistService {
+
+    int addWhitelist(WhitelistInfo whitelistInfo);
+
+    int delWhitelist(long id);
+
+    int updateWhitelist(WhitelistInfo whitelistInfo);
+
+    List<WhitelistInfo> queryAll();
+
+    WhitelistInfo queryByIpAndMac(String ip, String macAddr);
 }
