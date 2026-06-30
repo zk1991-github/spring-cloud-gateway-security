@@ -22,12 +22,15 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import java.time.LocalDateTime;
 
 import java.io.Serializable;
 
 /**
- * 白名单 实体
+ * 鐧藉悕鍗?瀹炰綋
  *
  * @author zhaokai
  * @since 5.0.0-1
@@ -42,9 +45,13 @@ public class WhitelistInfo implements Serializable {
     private String ipAddr;
     private String macAddr;
     @TableField(fill = FieldFill.INSERT)
-    private String createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime createTime;
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String updateTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime updateTime;
 
     public Long getId() {
         return id;
@@ -70,19 +77,22 @@ public class WhitelistInfo implements Serializable {
         this.macAddr = macAddr;
     }
 
-    public String getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
     }
 
-    public String getUpdateTime() {
+    public LocalDateTime getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(String updateTime) {
+    public void setUpdateTime(LocalDateTime updateTime) {
         this.updateTime = updateTime;
     }
 }
+
+
+

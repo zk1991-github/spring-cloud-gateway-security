@@ -20,9 +20,11 @@ package com.github.zk.spring.cloud.gateway.security.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -30,7 +32,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 用户信息 实体
+ * 鐢ㄦ埛淇℃伅 瀹炰綋
  *
  * @author zk
  * @since 1.0
@@ -40,28 +42,30 @@ import java.util.List;
 public class UserInfo implements UserDetails {
     private static final long serialVersionUID = -6177045879532008391L;
 
-    /** 用户id */
+    /** 鐢ㄦ埛id */
     @TableId(type = IdType.ASSIGN_ID)
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
-    /** 用户名 */
+    /** 鐢ㄦ埛鍚?*/
     private String username;
-    /** 密码 */
+    /** 瀵嗙爜 */
     private transient String password;
-    /** 电话号码 */
+    /** 鐢佃瘽鍙风爜 */
     private String phone;
-    /** 是否未锁定 */
+    /** 鏄惁鏈攣瀹?*/
     private boolean accountNonLocked;
-    /** 创建时间 */
+    /** 鍒涘缓鏃堕棿 */
     @TableField(fill = FieldFill.INSERT)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private String createTime;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime createTime;
 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(exist = false)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private String updateTime;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime updateTime;
 
-    /**角色列表 */
+    /**瑙掕壊鍒楄〃 */
     private List<RoleInfo> roles;
 
     public Long getId() {
@@ -96,19 +100,19 @@ public class UserInfo implements UserDetails {
         return true;
     }
 
-    public String getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
     }
 
-    public String getUpdateTime() {
+    public LocalDateTime getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(String updateTime) {
+    public void setUpdateTime(LocalDateTime updateTime) {
         this.updateTime = updateTime;
     }
 
@@ -161,3 +165,9 @@ public class UserInfo implements UserDetails {
                 '}';
     }
 }
+
+
+
+
+
+

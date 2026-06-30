@@ -24,6 +24,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import java.time.LocalDateTime;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -31,7 +33,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 权限信息
+ * 鏉冮檺淇℃伅
  *
  * @author zk
  * @since 1.0
@@ -49,12 +51,12 @@ public class PermissionInfo implements Serializable {
     private static final long serialVersionUID = 874671003093440548L;
 
     /**
-     * 权限id
+     * 鏉冮檺id
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     /**
-     * 组 id
+     * 缁?id
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long groupId;
@@ -62,36 +64,38 @@ public class PermissionInfo implements Serializable {
     @TableField(exist = false)
     private String groupName;
     /**
-     * 地址名称
+     * 鍦板潃鍚嶇О
      */
     @NotEmpty(groups = {AddPermission.class, UpdatePermission.class})
     private String urlName;
     /**
-     * 地址
+     * 鍦板潃
      */
     @NotEmpty(groups = {AddPermission.class, UpdatePermission.class})
     private String url;
     /**
-     * 是否公开 0：不公开；1：公开；2：匿名
+     * 鏄惁鍏紑 0锛氫笉鍏紑锛?锛氬叕寮€锛?锛氬尶鍚?
      */
     @NotNull(groups = {AddPermission.class, UpdatePermission.class})
     private Integer open;
     /**
-     * 描述
+     * 鎻忚堪
      */
     private String description;
     /**
-     * 是否固定
+     * 鏄惁鍥哄畾
      */
     private Integer fixed;
     /**
-     * 创建时间
+     * 鍒涘缓鏃堕棿
      */
     @TableField(fill = FieldFill.INSERT)
-    private String createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime createTime;
 
     /**
-     * 角色列表
+     * 瑙掕壊鍒楄〃
      */
     @TableField(exist = false)
     private List<RoleInfo> roleInfos;
@@ -160,11 +164,11 @@ public class PermissionInfo implements Serializable {
         this.description = description;
     }
 
-    public String getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
     }
 
@@ -186,3 +190,4 @@ public class PermissionInfo implements Serializable {
                 '}';
     }
 }
+

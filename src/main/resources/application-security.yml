@@ -4,4 +4,4 @@ spring:
     csrf-enable: false
     source-ip-enable: false
     # 白名单认证开关，默认关闭
-    whitelist-enable: true
+    whitelist-enable: false

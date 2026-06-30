@@ -19,6 +19,7 @@
 package com.github.zk.spring.cloud.gateway.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.zk.spring.cloud.gateway.security.jackson2.CustomCoreJackson2Module;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +29,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.session.data.redis.config.annotation.web.server.EnableRedisWebSession;
 
 /**
- * Redis 配置
+ * Redis 閰嶇疆
  *
  * @author zk
  * @since 3.0
@@ -39,15 +40,17 @@ import org.springframework.session.data.redis.config.annotation.web.server.Enabl
 public class RedisConfig {
 
     /**
-     * 注入序列化bean
-     * @return 序列化对象
+     * 娉ㄥ叆搴忓垪鍖朾ean
+     * @return 搴忓垪鍖栧璞?
      */
 
     @Bean
     public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new CustomCoreJackson2Module());
+        objectMapper.registerModule(new JavaTimeModule());
         return new GenericJackson2JsonRedisSerializer(objectMapper);
     }
 
 }
+

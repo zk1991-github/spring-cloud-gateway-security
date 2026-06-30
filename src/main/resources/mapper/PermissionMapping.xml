@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.zk.spring.cloud.gateway.security.dao.PermissionMapper">
 
@@ -10,7 +10,7 @@
         <result column="open" property="open" jdbcType="INTEGER"/>
         <result column="description" property="description" jdbcType="VARCHAR"/>
         <result column="fixed" property="fixed" jdbcType="INTEGER"/>
-        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <collection property="roleInfos" ofType="map" column="id" select="selectRoles">
         </collection>
     </resultMap>
@@ -33,7 +33,7 @@
         from gateway_permission gp
             left join
             (select dict_name, dict_val from gateway_dict where dict_type_id = 1) gd
-                on gp.open = gd.dict_val
+                on gp.open = CAST(gd.dict_val AS smallint)
             ${ew.customSqlSegment}
     </select>
 
@@ -43,7 +43,7 @@
         from gateway_permission gp
         left join
         (select dict_name, dict_val from gateway_dict where dict_type_id = 1) gd
-        on gp.open = gd.dict_val
+        on gp.open = CAST(gd.dict_val AS smallint)
         <if test="ew.customSqlSegment != null and ew.customSqlSegment != ''">
             ${ew.customSqlSegment}
         </if>
@@ -65,36 +65,25 @@
     </select>
 
     <select id="selectGroupPermissionsPage" resultMap="PermissionsResultMap">
-        select gpg.group_name, gpg.create_time AS group_create_time, gp.*
-        from gateway_permission_group gpg
-        right join gateway_permission gp ON gpg.id = gp.group_id
-        left join
-        (select dict_name, dict_val from gateway_dict where dict_type_id = 1) gd
-        on gp.open = gd.dict_val
-        <if test="ew.customSqlSegment != null and ew.customSqlSegment != ''">
-            ${ew.customSqlSegment}
-        </if>
-        <if test="ew.customSqlSegment == null or ew.customSqlSegment == ''">
-            where 1 = 1
-        </if>
-        and group_id != 0
-        group by group_id
-        union all
-        select gpg.group_name, gpg.create_time as group_create_time, gp.*
-        from gateway_permission_group gpg
-        right join gateway_permission gp on gpg.id = gp.group_id
-        left join
-        (select dict_name, dict_val from gateway_dict where dict_type_id = 1) gd
-        on gp.open = gd.dict_val
-        <if test="ew.customSqlSegment != null and ew.customSqlSegment != ''">
-            ${ew.customSqlSegment}
-        </if>
-        <if test="ew.customSqlSegment == null or ew.customSqlSegment == ''">
-            where 1 = 1
-        </if>
-        and group_id = 0
-
-        order by group_create_time desc, create_time desc
+        select t.group_name, t.group_create_time, t.id, t.group_id,
+               t.url_name, t.url, t.open, t.description, t.fixed, t.create_time
+        from (
+            select gpg.group_name, gpg.create_time AS group_create_time, gp.*,
+                   row_number() over (partition by gp.group_id order by gp.create_time desc) as rn
+            from gateway_permission_group gpg
+            right join gateway_permission gp ON gpg.id = gp.group_id
+            left join
+            (select dict_name, dict_val from gateway_dict where dict_type_id = 1) gd
+            on gp.open = CAST(gd.dict_val AS smallint)
+            <if test="ew.customSqlSegment != null and ew.customSqlSegment != ''">
+                ${ew.customSqlSegment}
+            </if>
+            <if test="ew.customSqlSegment == null or ew.customSqlSegment == ''">
+                where 1 = 1
+            </if>
+        ) t
+        where t.rn = 1 or t.group_id = 0
+        order by t.group_id = 0, coalesce(t.group_id, 0), t.create_time desc
     </select>
 
 </mapper>

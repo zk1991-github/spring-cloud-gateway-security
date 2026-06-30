@@ -22,12 +22,15 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import java.time.LocalDateTime;
 
 import java.util.List;
 
 /**
- * 分组权限实体
+ * 鍒嗙粍鏉冮檺瀹炰綋
  *
  * @author zhaokai
  * @since 4.3.6
@@ -35,20 +38,22 @@ import java.util.List;
 @TableName("gateway_permission_group")
 public class PermissionGroup {
     /**
-     * 组 id
+     * 缁?id
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     /**
-     * 组名称
+     * 缁勫悕绉?
      */
     private String groupName;
     /**
-     * 创建时间
+     * 鍒涘缓鏃堕棿
      */
     @TableField(fill = FieldFill.INSERT)
-    private String createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime createTime;
 
     private List<PermissionInfo> permissionInfos;
 
@@ -68,11 +73,11 @@ public class PermissionGroup {
         this.groupName = groupName;
     }
 
-    public String getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
     }
 
@@ -84,3 +89,4 @@ public class PermissionGroup {
         this.permissionInfos = permissionInfos;
     }
 }
+

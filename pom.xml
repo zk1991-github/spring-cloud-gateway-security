@@ -105,6 +105,12 @@
                     <version>${mysql.version}</version>
                     <scope>runtime</scope>
                 </dependency>
+                <!-- 引入PostgreSQL驱动 -->
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
                 <!-- 引入spring-cloud-loadbalancer 负载均衡-->
                 <dependency>
                     <groupId>org.springframework.cloud</groupId>
@@ -128,6 +134,12 @@
                     <groupId>org.xerial</groupId>
                     <artifactId>sqlite-jdbc</artifactId>
                     <version>${sqlit.version}</version>
+                </dependency>
+                <!-- 引入PostgreSQL驱动 -->
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>runtime</scope>
                 </dependency>
             </dependencies>
             <build>

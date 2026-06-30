@@ -1,5 +1,5 @@
 /*
- *
+
  *  * Copyright 2021-2024 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,10 +23,9 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
- * 自定义 元对象处理器
+ * 自动元对象处理器
  * 用于处理新增和修改时，自动填充数据
  *
  * @author zk
@@ -34,33 +33,16 @@ import java.time.format.DateTimeFormatter;
  */
 @Component
 public class CustomMetaObjectHandler implements MetaObjectHandler {
-    /**
-     * 插入时填充
-     *
-     * @param metaObject 元数据
-     */
+
     @Override
     public void insertFill(MetaObject metaObject) {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formatTime = localDateTime.format(dateTimeFormatter);
-        // 创建时间字段自动填充
-        this.fillStrategy(metaObject, "createTime", formatTime);
-        // 修改时间字段自动填充
-        this.fillStrategy(metaObject, "updateTime", formatTime);
+        LocalDateTime now = LocalDateTime.now();
+        this.fillStrategy(metaObject, "createTime", now);
+        this.fillStrategy(metaObject, "updateTime", now);
     }
 
-    /**
-     * 修改时填充
-     *
-     * @param metaObject 元数据
-     */
     @Override
     public void updateFill(MetaObject metaObject) {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formatTime = localDateTime.format(dateTimeFormatter);
-        // 修改时间字段自动填充
-        this.fillStrategy(metaObject, "updateTime", formatTime);
+        this.fillStrategy(metaObject, "updateTime", LocalDateTime.now());
     }
 }
