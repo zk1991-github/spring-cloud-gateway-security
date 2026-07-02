@@ -24,6 +24,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
+import java.time.LocalDateTime;
+
 /**
  * 日志实体类
  *
@@ -35,7 +37,7 @@ public class LogInfo {
     /** 唯一id */
     @TableId(type = IdType.ASSIGN_ID)
     @JsonSerialize(using = ToStringSerializer.class)
-    private String id;
+    private Long id;
     /** 用户id */
     private String userId;
     /** 用户名 */
@@ -47,12 +49,12 @@ public class LogInfo {
     /** 登录信息 */
     private String msg;
     /** 登录时间 */
-    private String time;
+    private LocalDateTime time;
 
     public LogInfo() {
     }
 
-    public LogInfo(String userId, String username, String ip, Integer status, String msg, String time) {
+    public LogInfo(String userId, String username, String ip, Integer status, String msg, LocalDateTime time) {
         this.userId = userId;
         this.username = username;
         this.ip = ip;
@@ -61,11 +63,11 @@ public class LogInfo {
         this.time = time;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -109,11 +111,11 @@ public class LogInfo {
         this.msg = msg;
     }
 
-    public String getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(LocalDateTime time) {
         this.time = time;
     }
 }

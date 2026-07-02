@@ -26,6 +26,7 @@ import org.springframework.web.server.ServerWebExchange;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 /**
  * 日志持有类
@@ -85,8 +86,7 @@ public class LogHolder {
         }
         // 获取 ip 地址
         String ip = IpUtils.getIpAddr(exchange.getRequest());
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String time = LocalDateTime.now().format(dateTimeFormatter);
+        LocalDateTime time = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         LogInfo logInfo = new LogInfo(userId, username, ip, status, msg, time);
         log.loginLog(logInfo);
     }

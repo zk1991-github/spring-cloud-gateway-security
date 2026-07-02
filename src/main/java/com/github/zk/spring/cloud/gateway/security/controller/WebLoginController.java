@@ -25,6 +25,7 @@ import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.log.LogHolder;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
+import com.github.zk.spring.cloud.gateway.security.property.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -59,6 +60,9 @@ public class WebLoginController {
 
     @Autowired
     private LogHolder logHolder;
+
+    @Autowired
+    private SecurityProperties securityProperties;
 
     @GetMapping("/success")
     public Mono<Response> success(ServerWebExchange exchange) {
@@ -122,7 +126,8 @@ public class WebLoginController {
     public Mono<Void> invalid(WebSession session, ServerWebExchange exchange) {
         //使当前session失效
         exchange.getResponse().setStatusCode(HttpStatus.FOUND);
-        exchange.getResponse().getHeaders().setLocation(URI.create("/web/dist/index.html"));
+        String proxyUrl = securityProperties.getProxyUrl() != null ? securityProperties.getProxyUrl() : "";
+        exchange.getResponse().getHeaders().setLocation(URI.create(proxyUrl + "/web/dist/index.html"));
         return session.invalidate().then(exchange.getResponse().setComplete());
     }
 
