@@ -86,13 +86,6 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
     public Mono<AuthorizationDecision> check(Mono<Authentication> authentication, AuthorizationContext authorizationContext) {
         // 设置下游服务传递的头信息
         ServerWebExchange exchange = authorizationContext.getExchange();
-        if (sourceIpEnable) {
-            ServerHttpRequest newRequest = exchange.getRequest().mutate()
-                    .header("XReal-IP", IpUtils.getIpAddr(exchange.getRequest()))
-                    .build();
-            exchange.mutate().request(newRequest).build();
-        }
-
         return authentication
                 .flatMap(auth -> {
                     // 匿名权限匹配
@@ -194,10 +187,8 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                     }
                     if (principal instanceof UserInfo) {
                         UserInfo userInfo = (UserInfo) principal;
-                        exchangeSetHeader(exchange, userInfo.getUsername(), String.valueOf(userInfo.getId()));
                     } else if (principal instanceof WeChatUserInfo) {
                         WeChatUserInfo weChatUserInfo = (WeChatUserInfo) principal;
-                        exchangeSetHeader(exchange, weChatUserInfo.getNickName(), weChatUserInfo.getOpenid());
                     }
                     authenticationHolder.setAuthorizationDecision(new AuthorizationDecision(true));
                     return authenticationHolder;
@@ -241,8 +232,6 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                 // 请求地址匹配权限地址
                 boolean match = ANT_PATH_MATCHER.match(permissionInfo.getUrl(), requestPath);
                 if (match) {
-                    // 设置下游服务传递的头信息
-                    exchangeSetHeader(exchange, userInfo.getUsername(), String.valueOf(userInfo.getId()));
                     return new AuthorizationDecision(true);
                 }
             }
@@ -277,7 +266,6 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                 boolean match = ANT_PATH_MATCHER.match(permissionInfo.getUrl(), requestPath);
                 if (match) {
                     // 设置下游服务传递的头信息
-                    exchangeSetHeader(exchange, encodedNickName, String.valueOf(weChatUserInfo.getOpenid()));
                     return new AuthorizationDecision(true);
                 }
             }
@@ -341,19 +329,4 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
         return realRequestPath.toString();
     }
 
-    /**
-     * 请求设置头信息
-     *
-     * @param exchange 请求
-     * @param username 用户名
-     * @param userId   用户id
-     */
-    private void exchangeSetHeader(ServerWebExchange exchange, String username, String userId) {
-        // 设置下游服务传递的头信息
-        ServerHttpRequest newRequest = exchange.getRequest().mutate()
-                .header("username", username)
-                .header("userId", String.valueOf(userId))
-                .build();
-        exchange.mutate().request(newRequest).build();
-    }
 }
