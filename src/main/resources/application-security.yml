@@ -1,6 +1,6 @@
 spring:
   security:
-    antpatterns: "/web/dist/**,/web/websocket.html"
+    antpatterns: "/web/dist/**,/web/websocket.html,/web/ai.html"
     csrf-enable: false
     source-ip-enable: false
     # 白名单认证开关，默认关闭

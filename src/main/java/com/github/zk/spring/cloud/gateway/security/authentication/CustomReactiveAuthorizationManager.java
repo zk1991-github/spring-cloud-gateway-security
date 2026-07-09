@@ -86,13 +86,6 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
     public Mono<AuthorizationDecision> check(Mono<Authentication> authentication, AuthorizationContext authorizationContext) {
         // 设置下游服务传递的头信息
         ServerWebExchange exchange = authorizationContext.getExchange();
-        if (sourceIpEnable) {
-            ServerHttpRequest newRequest = exchange.getRequest().mutate()
-                    .header("XReal-IP", IpUtils.getIpAddr(exchange.getRequest()))
-                    .build();
-            exchange.mutate().request(newRequest).build();
-        }
-
         return authentication
                 .flatMap(auth -> {
                     // 匿名权限匹配

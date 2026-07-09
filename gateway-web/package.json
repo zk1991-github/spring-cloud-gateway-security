@@ -1,0 +1,70 @@
+{
+    "name": "qx",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "serve": "vue-cli-service serve",
+        "build": "vue-cli-service build",
+        "lint": "vue-cli-service lint"
+    },
+    "dependencies": {
+        "@riophae/vue-treeselect": "^0.4.0",
+        "axios": "^0.21.4",
+        "core-js": "^3.6.5",
+        "echarts": "^5.3.0",
+        "echarts-liquidfill": "^3.1.0",
+        "element": "^0.1.4",
+        "element-ui": "^2.15.3",
+        "iview": "^3.5.4",
+        "js-base64": "^3.7.2",
+        "js-file-download": "^0.4.12",
+        "json-bigint": "^1.0.0",
+        "lib-flexible": "^0.3.2",
+        "nprogress": "^0.2.0",
+        "postcss-px2rem": "^0.3.0",
+        "postcss-px2rem-exclude": "0.0.6",
+        "postcss-pxtorem": "^6.0.0",
+        "qs": "^6.10.1",
+        "sockjs-client": "^1.5.2",
+        "stompjs": "^2.3.3",
+        "tiny-emitter": "^2.1.0",
+        "v-viewer": "^1.6.4",
+        "video.js": "^7.17.0",
+        "vue": "^2.6.11",
+        "vue-pdf": "^4.3.0",
+        "vue-router": "^3.1.5",
+        "vuedraggable": "^2.24.3",
+        "vuex": "^3.6.2"
+    },
+    "devDependencies": {
+        "@vue/cli-plugin-babel": "~4.5.0",
+        "@vue/cli-plugin-eslint": "~4.5.0",
+        "@vue/cli-service": "~4.5.0",
+        "babel-eslint": "^10.1.0",
+        "eslint": "^6.7.2",
+        "eslint-plugin-vue": "^6.2.2",
+        "px2rem-loader": "^0.1.9",
+        "sass": "^1.25.0",
+        "sass-loader": "^8.0.2",
+        "vue-template-compiler": "^2.6.11"
+    },
+    "eslintConfig": {
+        "root": true,
+        "env": {
+            "node": true
+        },
+        "extends": [
+            "plugin:vue/essential",
+            "eslint:recommended"
+        ],
+        "parserOptions": {
+            "parser": "babel-eslint"
+        },
+        "rules": {}
+    },
+    "browserslist": [
+        "> 1%",
+        "last 2 versions",
+        "not dead"
+    ]
+}
