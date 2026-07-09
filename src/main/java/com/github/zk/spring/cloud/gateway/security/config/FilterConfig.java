@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2024 the original author or authors.
+ *  * Copyright 2021-2026 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -18,10 +18,7 @@
 
 package com.github.zk.spring.cloud.gateway.security.config;
 
-import com.github.zk.spring.cloud.gateway.security.filter.factory.MonitorGatewayFilterFactory;
-import com.github.zk.spring.cloud.gateway.security.filter.factory.RequestBodyOperationGatewayFilterFactory;
-import com.github.zk.spring.cloud.gateway.security.filter.factory.SessionGatewayFilterFactory;
-import com.github.zk.spring.cloud.gateway.security.filter.factory.TokenCheckGatewayFilterFactory;
+import com.github.zk.spring.cloud.gateway.security.filter.factory.*;
 import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -69,6 +66,16 @@ public class FilterConfig {
     @Bean
     public MonitorGatewayFilterFactory monitorGatewayFilterFactory(RequestMonitor requestMonitor) {
         return new MonitorGatewayFilterFactory(requestMonitor);
+    }
+
+    /**
+     * 请求头拦截处理
+     *
+     * @return 请求头拦截工厂
+     */
+    @Bean
+    public AuthHeaderGatewayFilterFactory authHeaderGatewayFilterFactory() {
+        return new AuthHeaderGatewayFilterFactory();
     }
 
 }

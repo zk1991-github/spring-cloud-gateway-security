@@ -1,0 +1,7 @@
+public/*
+/node_modules
+/dist
+# /src/assets/js
+/package-lock.json
+.DS_Store
+vue.config.js

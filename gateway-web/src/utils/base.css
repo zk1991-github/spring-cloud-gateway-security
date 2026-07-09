@@ -1,0 +1,28 @@
+*{
+  margin:0;
+  padding:0;
+}
+html,body{
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  font-family: "Helvetica Neue", Helvetica, Tahoma, Arial, "Microsoft Yahei", "Hiragino Sans GB", "WenQuanYi Micro Hei", sans-serif;
+  font-size: 14px;
+  background-color: #fff;
+  -webkit-overflow-scrolling: touch;
+}
+.el-input__inner{
+  height: 40px !important;
+}
+.el-upload{
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}

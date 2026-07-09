@@ -1,0 +1,76 @@
+//背景颜色
+$main-background-color:#171b22;
+$main-light-background-color :linear-gradient( to bottom, #eee, #fff);
+//主色调
+$main-color:#0548a5;
+$light-main-color:#18aefa;
+//字体颜色
+$logo-font-color:#fff;
+$active-font-color:#00baff;
+$dark-font-color:#fff;
+$light-logo-font-color:#333;
+$light-font-color:#171b22;
+//logo底边颜色
+$light-bottom-border-color :#18aefa;
+$bottom-border-color :#18aefa;
+$background-animaiton:linear-gradient( to right, transparent, #fff);
+$light-background-animaiton:linear-gradient( to right, transparent, #18aefa);
+//退出图标
+$logout-icon:url("../../assets/icons/logout.png") no-repeat center/100% 100%;
+$light-logout-icon:url("../../assets/icons/logoutl.png") no-repeat center/100% 100%;
+//弹框背景色
+$dialog-bk:#303640;
+$light-dialog-bk:#f5f7fa;
+//权限列表颜色
+$qx-list-bk:#1c222b;
+$light-qx-list-bk:linear-gradient(90deg,
+#9ad5f3 0,
+#d1effe 50%,
+#18aefa 100%); //rgba(25, 175, 251, 0.2);
+//权限列表hover
+$qx-list-hover-bk:linear-gradient( -90deg,
+rgba(0,
+222,
+255,
+0) 10%,
+rgba(0,
+221,
+255,
+0.03) 69%,
+#1894ff 110%);
+$light-qx-list-hover-bk:linear-gradient(-90deg,
+#f5dab2 0,
+#9fdaf8 100%);
+//权限列表右侧背景
+$type-list-bk:linear-gradient(90deg,
+#292f3b 0,
+#171b22 100%);
+$light-type-list-bk:linear-gradient(90deg,
+#18aefa 0,
+#d1effe 100%);
+//权限列表左侧
+$operate-list-bg:linear-gradient(-90deg,
+#12b3ff 0,
+#0548a5 100%);
+$light-operate-list-bg:linear-gradient(-90deg,
+#9fdaf8 0,
+#f5dab2 100%);
+//列表权限字体
+$list-color: #1894ff;
+$light-list-color: #fdbb38;
+//列表边框
+$list-border-bg: #3a4659;
+$light-list-border-bg: #eee;
+//role背景
+$list-role-bg:#40455c;
+$light-list-role-bg:#fff;
+//tab切换图标
+$js-icon: url("../../assets/icons/js.png") no-repeat center/100% 100%;
+$light-js-icon: url("../../assets/icons/jsl.png") no-repeat center /100% 100%;
+$qx-icon: url("../../assets/icons/qx.png") no-repeat center /100% 100%;
+$light-qx-icon: url("../../assets/icons/qxl.png") no-repeat center /100% 100%;
+//选中后图标
+$js-icon-active: url("../../assets/icons/jss.png") no-repeat center/100% 100%;
+$light-js-icon-active: url("../../assets/icons/jss.png") no-repeat center/100% 100%;
+$qx-icon-active: url("../../assets/icons/qxs.png") no-repeat center /100% 100%;
+$light-qx-icon-active: url("../../assets/icons/qxs.png") no-repeat center /100% 100%;
