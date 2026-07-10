@@ -8,6 +8,7 @@ spring:
         maxSessions: 10000
       default-filters:
         - Session
+        - AuthHeader
       routes:
         - id: server_route
           # 转发地址

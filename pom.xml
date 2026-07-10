@@ -100,8 +100,8 @@
             <id>cluster</id>
             <dependencies>
                 <dependency>
-                    <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>com.mysql</groupId>
+                    <artifactId>mysql-connector-j</artifactId>
                     <version>${mysql.version}</version>
                     <scope>runtime</scope>
                 </dependency>
@@ -112,6 +112,7 @@
                 </dependency>
             </dependencies>
             <build>
+                <finalName>spring-cloud-gateway-security-cluster-${project.version}</finalName>
                 <plugins>
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
@@ -131,6 +132,7 @@
                 </dependency>
             </dependencies>
             <build>
+                <finalName>spring-cloud-gateway-security-stand-alone-${project.version}</finalName>
                 <plugins>
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
