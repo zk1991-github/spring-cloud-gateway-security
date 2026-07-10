@@ -31,6 +31,9 @@ build/
 ### VS Code ###
 .vscode/
 
+### Web ###
+/gateway-web/node_modules
+
 ### AI ###
 .omo
 .codegraph
