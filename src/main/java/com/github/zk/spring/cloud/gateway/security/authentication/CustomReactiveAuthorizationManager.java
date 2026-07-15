@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2024 the original author or authors.
+ *  * Copyright 2021-2026 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
@@ -74,16 +75,13 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
      */
     private final IPermission iPermission;
 
-    private final Boolean sourceIpEnable;
-
-    public CustomReactiveAuthorizationManager(GatewayProperties gatewayProperties, IPermission iPermission, Boolean sourceIpEnable) {
+    public CustomReactiveAuthorizationManager(GatewayProperties gatewayProperties, IPermission iPermission) {
         this.gatewayProperties = gatewayProperties;
         this.iPermission = iPermission;
-        this.sourceIpEnable = sourceIpEnable;
     }
 
     @Override
-    public Mono<AuthorizationDecision> check(Mono<Authentication> authentication, AuthorizationContext authorizationContext) {
+    public Mono<AuthorizationResult> authorize(Mono<Authentication> authentication, AuthorizationContext authorizationContext) {
         // 设置下游服务传递的头信息
         ServerWebExchange exchange = authorizationContext.getExchange();
         return authentication
@@ -126,7 +124,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                     } else {
                         return new AuthorizationDecision(false);
                     }
-                })
+                }).cast(AuthorizationResult.class)
                 // 未登录时默认无权限
                 .defaultIfEmpty(new AuthorizationDecision(false));
     }
@@ -185,11 +183,6 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                         authenticationHolder.setAuthorizationDecision(new AuthorizationDecision(false));
                         return authenticationHolder;
                     }
-                    if (principal instanceof UserInfo) {
-                        UserInfo userInfo = (UserInfo) principal;
-                    } else if (principal instanceof WeChatUserInfo) {
-                        WeChatUserInfo weChatUserInfo = (WeChatUserInfo) principal;
-                    }
                     authenticationHolder.setAuthorizationDecision(new AuthorizationDecision(true));
                     return authenticationHolder;
 
@@ -203,8 +196,8 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
 
     @Override
     public Mono<Void> verify(Mono<Authentication> authentication, AuthorizationContext object) {
-        return check(authentication, object)
-                .filter(AuthorizationDecision::isGranted)
+        return authorize(authentication, object)
+                .filter(AuthorizationResult::isGranted)
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new AccessDeniedException("Access Denied"))))
                 .flatMap((decision) -> Mono.empty());
     }
