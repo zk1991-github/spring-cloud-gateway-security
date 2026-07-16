@@ -70,7 +70,6 @@ public class SecurityConfig {
     private String[] antPatterns;
     private String proxyUrl;
     private boolean csrfEnable;
-    private boolean sourceIpEnable;
     private boolean whitelist;
 
     @PostConstruct
@@ -78,7 +77,6 @@ public class SecurityConfig {
         this.proxyUrl = securityProperties.getProxyUrl();
         this.antPatterns = securityProperties.getAntpatterns();
         this.csrfEnable = securityProperties.getCsrfEnable();
-        this.sourceIpEnable = securityProperties.getSourceIpEnable();
         this.whitelist = securityProperties.getWhitelistEnable();
 
         //代理地址处理
@@ -142,10 +140,8 @@ public class SecurityConfig {
                     }
                     // 设置授权管理器
                     access.anyExchange()
-                            .access(new CustomReactiveAuthorizationManager(gatewayProperties, iPermission, sourceIpEnable));
+                            .access(new CustomReactiveAuthorizationManager(gatewayProperties, iPermission));
                 })
-                // 禁用http默认设置
-                .httpBasic(Customizer.withDefaults())
                 // 登录设置
                 .formLogin(formLogin ->
                         // 设置认证管理器

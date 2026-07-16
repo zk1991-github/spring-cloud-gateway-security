@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2024 the original author or authors.
+ *  * Copyright 2021-2026 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
 
 package com.github.zk.spring.cloud.gateway.security.authentication;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.core.WeChatUserDetails;
 import com.github.zk.spring.cloud.gateway.security.pojo.WeChatDO;
@@ -38,6 +36,8 @@ import org.springframework.security.web.server.context.WebSessionServerSecurityC
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * 微信登录认证管理器
@@ -121,10 +121,10 @@ public class WeChatReactiveAuthenticationManager implements ReactiveAuthenticati
                 .uri(formatUrl)
                 .exchangeToMono(clientResponse -> clientResponse.bodyToMono(String.class))
                 .map(s -> {
-                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonMapper objectMapper = new JsonMapper();
                     try {
                         return objectMapper.readValue(s, WeChatDO.class);
-                    } catch (JsonProcessingException e) {
+                    } catch (JacksonException e) {
                         e.printStackTrace();
                     }
                     return new WeChatDO();

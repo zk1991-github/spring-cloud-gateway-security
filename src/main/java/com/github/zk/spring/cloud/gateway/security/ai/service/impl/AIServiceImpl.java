@@ -1,9 +1,5 @@
 package com.github.zk.spring.cloud.gateway.security.ai.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zk.spring.cloud.gateway.security.ai.config.AiProperties;
 import com.github.zk.spring.cloud.gateway.security.ai.pojo.AiRequest;
 import com.github.zk.spring.cloud.gateway.security.ai.pojo.AiResponse;
@@ -16,6 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.*;
 
@@ -27,12 +27,12 @@ public class AIServiceImpl implements AIService {
     private final AiProperties aiProperties;
     private final AIToolExecutor toolExecutor;
     private final WebClient webClient;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper mapper;
 
     public AIServiceImpl(AiProperties aiProperties, AIToolExecutor toolExecutor) {
         this.aiProperties = aiProperties;
         this.toolExecutor = toolExecutor;
-        this.objectMapper = new ObjectMapper();
+        this.mapper = new JsonMapper();
         this.webClient = WebClient.builder()
                 .baseUrl(aiProperties.getApiUrl())
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -96,11 +96,11 @@ public class AIServiceImpl implements AIService {
                 String funcName = tc.get("function").get("name").asText();
                 String argsStr = tc.get("function").get("arguments").asText();
                 try {
-                    Map<String, Object> args = objectMapper.readValue(argsStr,
+                    Map<String, Object> args = mapper.readValue(argsStr,
                             new TypeReference<Map<String, Object>>() {});
                     String result = toolExecutor.execute(funcName, args);
                     resultBuilder.append(result).append("\n");
-                } catch (JsonProcessingException e) {
+                } catch (JacksonException e) {
                     log.error("Failed to parse tool arguments", e);
                     resultBuilder.append("❌ 解析工具参数失败: ").append(e.getMessage()).append("\n");
                 }

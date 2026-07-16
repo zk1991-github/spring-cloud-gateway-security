@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2024 the original author or authors.
+ *  * Copyright 2021-2026 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@ package com.github.zk.spring.cloud.gateway.security.authentication;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.SpringSecurityCoreVersion;
+import org.springframework.security.core.authority.AuthorityUtils;
 
+import java.io.Serial;
 import java.util.Collection;
 
 /**
@@ -31,8 +32,9 @@ import java.util.Collection;
  * @since 3.0
  */
 public class WeChatAuthenticationToken extends AbstractAuthenticationToken {
-    private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
+    @Serial
+    private static final long serialVersionUID = 6600054331339445469L;
     private final Object principal;
 
 
@@ -41,7 +43,7 @@ public class WeChatAuthenticationToken extends AbstractAuthenticationToken {
      * @param principal weChatCode
      */
     public WeChatAuthenticationToken(Object principal) {
-        super(null);
+        super(AuthorityUtils.NO_AUTHORITIES);
         this.principal = principal;
         super.setAuthenticated(false);
     }

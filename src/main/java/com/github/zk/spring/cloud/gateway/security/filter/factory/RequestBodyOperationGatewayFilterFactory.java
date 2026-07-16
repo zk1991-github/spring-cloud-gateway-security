@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2024 the original author or authors.
+ *  * Copyright 2021-2026 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
 
 package com.github.zk.spring.cloud.gateway.security.filter.factory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -40,6 +38,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.Map;
 
@@ -129,13 +129,13 @@ public class RequestBodyOperationGatewayFilterFactory extends AbstractGatewayFil
      * @return 修改后的请求体
      */
     private String modifyBody(String body) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        JsonMapper mapper = new JsonMapper();
         Object bodyObject;
         Map<String, String> bodyMap;
         String modifiedBody = "";
         try {
             // 有些头信息是json，传参不为json格式，兼容这种情况
-            bodyObject = objectMapper.readValue(body, Object.class);
+            bodyObject = mapper.readValue(body, Object.class);
             if (bodyObject instanceof Map) {
                 // 如果是json格式，转换为Map
                 bodyMap = (Map<String, String>) bodyObject;
@@ -146,12 +146,12 @@ public class RequestBodyOperationGatewayFilterFactory extends AbstractGatewayFil
                 String presentedPassword = bodyMap.get(passwordKey);
                 String encodedPassword = PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(presentedPassword);
                 bodyMap.put(passwordKey, encodedPassword);
-                modifiedBody = objectMapper.writeValueAsString(bodyMap);
+                modifiedBody = mapper.writeValueAsString(bodyMap);
             } else {
                 return body;
             }
 
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             e.printStackTrace();
         }
 

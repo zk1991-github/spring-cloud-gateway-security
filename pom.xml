@@ -5,18 +5,18 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.4</version>
+        <version>4.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.github.zk</groupId>
     <artifactId>spring-cloud-gateway-security</artifactId>
-    <version>v6.0.2</version>
+    <version>v6.0.3</version>
     <name>spring-cloud-gateway-security</name>
     <description>Spring Cloud gateway 整合 Spring Security</description>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <spring-cloud.version>2024.0.1</spring-cloud.version>
+        <spring-cloud.version>2025.1.2</spring-cloud.version>
         <druid.version>1.2.23</druid.version>
         <mysql.version>8.0.33</mysql.version>
         <sqlit.version>3.44.1.0</sqlit.version>
@@ -29,12 +29,16 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-gateway</artifactId>
+            <artifactId>spring-cloud-starter-gateway-server-webflux</artifactId>
         </dependency>
         <!-- MyBatis plus 相关jar -->
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -52,9 +56,10 @@
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-data-redis</artifactId>
         </dependency>
+        <!-- Reactive Redis 自动配置（Spring Boot 4.x 模块化拆分） -->
         <dependency>
-            <groupId>io.lettuce</groupId>
-            <artifactId>lettuce-core</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
 
         <!-- yml 配置提示，需要在项目中打包（package）后才有提示信息 -->
@@ -88,7 +93,7 @@
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-bom</artifactId>
-                <version>3.5.11</version>
+                <version>3.5.17</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -146,7 +151,7 @@
                                 </exclude>
                                 <exclude>
                                     <groupId>org.springframework.session</groupId>
-                                    <artifactId>spring-session-core</artifactId>
+                                    <artifactId>spring-boot-data-redis</artifactId>
                                 </exclude>
                                 <exclude>
                                     <groupId>org.springframework.data</groupId>

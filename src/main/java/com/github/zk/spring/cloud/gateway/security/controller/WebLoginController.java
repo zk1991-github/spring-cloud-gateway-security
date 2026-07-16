@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright 2021-2024 the original author or authors.
+ *  * Copyright 2021-2026 the original author or authors.
  *  *
  *  * Licensed under the Apache License, Version 2.0 (the "License");
  *  * you may not use this file except in compliance with the License.
@@ -18,13 +18,12 @@
 
 package com.github.zk.spring.cloud.gateway.security.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zk.spring.cloud.gateway.security.common.CodeEnum;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.log.LogHolder;
 import com.github.zk.spring.cloud.gateway.security.pojo.UserInfo;
+import com.github.zk.spring.cloud.gateway.security.property.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -40,6 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -59,6 +60,9 @@ public class WebLoginController {
 
     @Autowired
     private LogHolder logHolder;
+
+    @Autowired
+    private SecurityProperties securityProperties;
 
     @GetMapping("/success")
     public Mono<Response> success(ServerWebExchange exchange) {
@@ -122,7 +126,11 @@ public class WebLoginController {
     public Mono<Void> invalid(WebSession session, ServerWebExchange exchange) {
         //使当前session失效
         exchange.getResponse().setStatusCode(HttpStatus.FOUND);
-        exchange.getResponse().getHeaders().setLocation(URI.create("/web/dist/index.html"));
+        URI uri = URI.create("/web/dist/index.html");
+        if (!ObjectUtils.isEmpty(securityProperties.getProxyUrl())) {
+            uri = URI.create(securityProperties.getProxyUrl() + "/web/dist/index.html");
+        }
+        exchange.getResponse().getHeaders().setLocation(uri);
         return session.invalidate().then(exchange.getResponse().setComplete());
     }
 
@@ -136,9 +144,9 @@ public class WebLoginController {
         Response response = Response.setOk();
         String body = "";
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            body = objectMapper.writeValueAsString(response);
-        } catch (JsonProcessingException e) {
+            JsonMapper mapper = new JsonMapper();
+            body = mapper.writeValueAsString(response);
+        } catch (JacksonException e) {
             e.printStackTrace();
         }
         return serverHttpResponse

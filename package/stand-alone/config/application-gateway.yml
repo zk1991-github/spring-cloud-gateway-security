@@ -7,7 +7,6 @@ spring:
         # 不限制登录人数：-1
         maxSessions: 10000
       default-filters:
-        - Session
         - AuthHeader
       routes:
         - id: server_route

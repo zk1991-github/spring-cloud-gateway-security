@@ -41,15 +41,6 @@ public class FilterConfig {
     }
 
     /**
-     * 注入session拦截 bean
-     * @return session拦截工厂
-     */
-    @Bean
-    public SessionGatewayFilterFactory sessionGatewayFilterFactory() {
-        return new SessionGatewayFilterFactory();
-    }
-
-    /**
      * 修改请求体拦截 bean
      * @return 修改请求体工厂
      */
