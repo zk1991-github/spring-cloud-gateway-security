@@ -144,8 +144,7 @@ public class SecurityConfig {
                     access.anyExchange()
                             .access(new CustomReactiveAuthorizationManager(gatewayProperties, iPermission, sourceIpEnable));
                 })
-                // 禁用http默认设置
-                .httpBasic(Customizer.withDefaults())
+//                .httpBasic(Customizer.withDefaults())
                 // 登录设置
                 .formLogin(formLogin ->
                         // 设置认证管理器

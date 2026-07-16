@@ -23,12 +23,17 @@ import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCacheMap;
 import com.github.zk.spring.cloud.gateway.security.dao.RequestMonitorMapper;
 import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitor;
 import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitorMap;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.server.WebSession;
 import org.springframework.web.server.session.DefaultWebSessionManager;
 import org.springframework.web.server.session.InMemoryWebSessionStore;
 import org.springframework.web.server.session.WebSessionManager;
+import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 /**
  * Map 缓存自动配置
@@ -40,6 +45,9 @@ import org.springframework.web.server.session.WebSessionManager;
 @ConditionalOnMissingBean(AutoConfigurationRedisCache.class)
 public class AutoConfigurationMapCache {
 
+    @Value("${spring.cloud.gateway.session.timeout:30}")
+    private long timeoutMinutes;
+
     @Bean
     public GatewaySecurityCache gatewaySecurityCacheMap(WebSessionManager webSessionManager) {
         DefaultWebSessionManager defaultWebSessionManager = (DefaultWebSessionManager) webSessionManager;
@@ -50,6 +58,44 @@ public class AutoConfigurationMapCache {
     @Bean
     public RequestMonitor requestMonitorMap(RequestMonitorMapper requestMonitorMapper) {
         return new RequestMonitorMap(requestMonitorMapper);
+    }
+
+    /**
+     * Map 模式 —— 替换默认 WebSessionManager，使 InMemoryWebSessionStore
+     * 创建 session 时使用配置的超时时间。
+     *
+     * <p>仅在 {@link AutoConfigurationRedisCache} 不存在时激活（即非 Redis 环境）。
+     * 此时 {@code @EnableRedisWebSession} 不生效，应用使用 Spring WebFlux 默认的
+     * {@link DefaultWebSessionManager}。我们替换它，注入自定义的 session store。
+     */
+    @Bean
+    @ConditionalOnMissingBean(AutoConfigurationRedisCache.class)
+    public DefaultWebSessionManager webSessionManager() {
+        Duration maxIdleTime = Duration.ofMinutes(timeoutMinutes);
+        DefaultWebSessionManager manager = new DefaultWebSessionManager();
+        manager.setSessionStore(new AutoConfigurationMapCache.TimeoutAwareInMemoryWebSessionStore(maxIdleTime));
+        return manager;
+    }
+
+    /**
+     * 自定义 InMemoryWebSessionStore，在 {@code createWebSession()} 时注入超时时间。
+     *
+     * <p>{@link InMemoryWebSessionStore} 没有公开的 maxIdleTime 配置方法，
+     * 因此通过子类重写 {@code createWebSession()} 来设置。
+     */
+    private static class TimeoutAwareInMemoryWebSessionStore extends InMemoryWebSessionStore {
+
+        private final Duration maxIdleTime;
+
+        TimeoutAwareInMemoryWebSessionStore(Duration maxIdleTime) {
+            this.maxIdleTime = maxIdleTime;
+        }
+
+        @Override
+        public Mono<WebSession> createWebSession() {
+            return super.createWebSession()
+                    .doOnNext(session -> session.setMaxIdleTime(maxIdleTime));
+        }
     }
 
 }

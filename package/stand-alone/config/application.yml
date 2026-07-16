@@ -15,4 +15,4 @@ login:
             url: /**
 spring:
   profiles:
-    active: datasource-standalone, gateway, security, wechat, release
+    active: datasource-postgresql, gateway, security, wechat, release, loadbalance
