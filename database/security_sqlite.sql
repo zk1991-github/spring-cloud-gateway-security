@@ -65,7 +65,7 @@ CREATE TABLE `gateway_permission` (
 
 /*Data for the table `gateway_permission` */
 
-insert  into `gateway_permission`(`id`,`group_id`,`url_name`,`url`,`open`,`description`,`fixed`,`create_time`) values (1495637399244447746,1906646886417293313,'分页查询权限','/queryPermission',0,'分页查询权限',1,'2022-02-21 13:51:59'),(1495637567519924225,1906646886417293313,'新增权限','/addPermission',0,'新增权限',1,'2022-02-21 13:52:39'),(1495637664693559298,1906646886417293313,'删除权限','/delPermission',0,'删除权限',1,'2022-02-21 13:53:02'),(1495637762299207682,1906646886417293313,'修改权限','/updatePermission',0,'修改权限',1,'2022-02-21 13:53:25'),(1495637865344868354,1906646886417293313,'查询所有角色','/queryAllRoles',0,'查询所有角色',1,'2022-02-21 13:53:50'),(1495637948090097665,1906646886417293313,'根据角色绑定权限','/bindPermissionByRole',0,'根据角色绑定权限',1,'2022-02-21 13:54:09'),(1495638064385564674,1906646886417293313,'根据角色id，查询权限','/queryPermissionsByRoleId',0,'根据角色id，查询权限',1,'2022-02-21 13:54:37'),(1495638486122831873,1906646886417293313,'根据字典类型id，查询字典信息','/queryDictByDictTypeId',1,'根据字典类型id，查询字典信息',1,'2022-02-21 13:56:18'),(1499320522679283714,1906646886417293313,'批量删除权限','/delPermissions',0,'根据权限id，批量删除权限',1,'2022-03-03 17:47:23'),(1778354083523031042,1906646886417293313,'生成密码','/passwordGenerator',0,'',1,'2024-04-11 17:27:08'),(1778621402404941825,1906646886417293313,'分页查询私有权限','/queryPrivatePermission',0,'',1,'2024-04-12 11:09:22'),(1778708514361913345,1906646886417293313,'清空所有会话','/clearAllSessions',0,'',1,'2024-04-12 16:55:31'),(1807969459632373761,1906646886417293313,'查询当前用户','/getUser',0,'',1,'2024-07-02 10:48:04'),(1813146900302745601,1906646886417293313,'获取csrf令牌','/csrfTokenGenerator',2,'',1,'2024-07-16 17:41:22'),(1881583947941801985,1906646886417293313,'分组查询权限','/queryPermissionGroupPage',0,'',1,'2025-01-21 14:05:45'),(1881945545390702593,1906646886417293313,'权限移动','/movePermission',0,'',1,'2025-01-22 14:02:37');
+insert  into `gateway_permission`(`id`,`group_id`,`url_name`,`url`,`open`,`description`,`fixed`,`create_time`) values (2078391084839272450,0,'网关内置接口','/gateway/**',0,'',1,'2026-07-18 16:07:03');
 
 /*Table structure for table `gateway_permission_group` */
 
@@ -79,8 +79,6 @@ CREATE TABLE `gateway_permission_group` (
 ) ;
 
 /*Data for the table `gateway_permission_group` */
-
-insert  into `gateway_permission_group`(`id`,`group_name`,`create_time`) values (1898996597176705025,'111','2025-03-10 15:17:25'),(1906646886417293313,'网关内置接口','2025-03-31 17:56:56');
 
 /*Table structure for table `gateway_request_monitor` */
 
@@ -113,7 +111,24 @@ CREATE TABLE `gateway_role_permission` (
 
 /*Data for the table `gateway_role_permission` */
 
-insert  into `gateway_role_permission`(`id`,`role_id`,`permission_id`) values (1779687659203989506,1,1495637399244447746),(1779687659203989507,1,1495637567519924225),(1779687659203989508,1,1495637664693559298),(1779687659212378113,1,1495637762299207682),(1779687659212378114,1,1495637865344868354),(1779687659212378115,1,1495637948090097665),(1779687659212378117,1,1499320522679283714),(1779687659212378118,1,1778621402404941825),(1779687659212378120,1,1778354083523031042),(1781198773301657601,1,1778708514361913345),(1807969459703676930,1,1807969459632373761),(1881583948025688065,1,1881583947941801985),(1881620957729390593,1,1495638064385564674),(1881945545482977281,1,1881945545390702593),(1881945671848968194,1,1881945671832190977),(1898994404159692802,2,1495637567519924225),(1898994404168081410,2,1495637664693559298),(1898994404168081411,2,1495637762299207682),(1898994404168081412,2,1495637948090097665),(1898994404168081413,2,1499320522679283714),(1898994404176470018,2,1778621402404941825),(1898994404184858625,2,1807969459632373761),(1898994404184858626,2,1495638064385564674),(1898994404184858627,2,1881945671832190977);
+insert  into `gateway_role_permission`(`id`,`role_id`,`permission_id`) values (2078486728362913793,1,2078391084839272450);
+
+/*Table structure for table `gateway_whitelist` */
+
+DROP TABLE IF EXISTS `gateway_whitelist`;
+
+CREATE TABLE `gateway_whitelist` (
+  `id` bigint(64) NOT NULL,
+  `ip_addr` varchar(255) NOT NULL ,
+  `mac_addr` varchar(50) DEFAULT NULL ,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP  ,
+  `update_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ,
+  PRIMARY KEY (`id`)
+) ;
+
+/*Data for the table `gateway_whitelist` */
+
+insert  into `gateway_whitelist`(`id`,`ip_addr`,`mac_addr`,`create_time`,`update_time`) values (1,'127.0.0.1','6C-1F-F7-05-93-84','2026-06-25 11:20:56','0000-00-00 00:00:00');
 
 /*Table structure for table `t_log` */
 
@@ -132,7 +147,7 @@ CREATE TABLE `t_log` (
 
 /*Data for the table `t_log` */
 
-insert  into `t_log`(`id`,`user_id`,`username`,`ip`,`status`,`msg`,`time`) values (1479021086000984065,'0','superadmin','127.0.0.1',1,'登录成功','2022-01-06 17:24:40'),(1710558306419937282,'0','superadmin','0:0:0:0:0:0:0:1',1,'登录成功','2023-10-07 15:30:55'),(1710592907234250754,'0','superadmin','127.0.0.1',1,'登录成功','2023-10-07 17:48:25'),(1710602428241416193,'0','superadmin','127.0.0.1',1,'登录成功','2023-10-07 18:26:15');
+insert  into `t_log`(`id`,`user_id`,`username`,`ip`,`status`,`msg`,`time`) values (1479021086000984065,'0','superadmin','127.0.0.1',1,'登录成功','2022-01-06 17:24:40'),(1710558306419937282,'0','superadmin','0:0:0:0:0:0:0:1',1,'登录成功','2023-10-07 15:30:55'),(1710592907234250754,'0','superadmin','127.0.0.1',1,'登录成功','2023-10-07 17:48:25'),(1710602428241416193,'0','superadmin','127.0.0.1',1,'登录成功','2023-10-07 18:26:15'),(2072228898540195841,'1','admin','0:0:0:0:0:0:0:1',1,'登录成功','2026-07-01 16:00:44'),(2072229202392354817,'1','admin','0:0:0:0:0:0:0:1',1,'登录成功','2026-07-01 16:01:47');
 
 /*Table structure for table `t_role` */
 
@@ -160,12 +175,13 @@ CREATE TABLE `t_user` (
   `phone` varchar(255) DEFAULT NULL ,
   `account_non_locked` tinyint(1) NOT NULL DEFAULT '1' ,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP  ,
+  `update_time` timestamp NULL DEFAULT NULL ,
   PRIMARY KEY (`id`)
 ) ;
 
 /*Data for the table `t_user` */
 
-insert  into `t_user`(`id`,`username`,`password`,`phone`,`account_non_locked`,`create_time`) values (1,'admin','{bcrypt}$2a$10$zLX9NstaOMno60xyqDWaOupK5KXCPQp1n75GOIoa4JVFO.BrZJWm2','13333333333',1,'2024-03-27 15:31:30'),(2,'zk','{bcrypt}$2a$10$0EQexC0XYw58x.ys.Ym8QO3H2Llr0G4wEAFddm8PkOUGy6hQraaui','14444444444',1,'2023-10-07 15:04:32');
+insert  into `t_user`(`id`,`username`,`password`,`phone`,`account_non_locked`,`create_time`,`update_time`) values (1,'admin','{bcrypt}$2a$10$zLX9NstaOMno60xyqDWaOupK5KXCPQp1n75GOIoa4JVFO.BrZJWm2','13333333333',1,'2024-03-27 15:31:30',NULL),(2,'zk','{bcrypt}$2a$10$0EQexC0XYw58x.ys.Ym8QO3H2Llr0G4wEAFddm8PkOUGy6hQraaui','14444444444',1,'2023-10-07 15:04:32',NULL);
 
 /*Table structure for table `user_role` */
 
