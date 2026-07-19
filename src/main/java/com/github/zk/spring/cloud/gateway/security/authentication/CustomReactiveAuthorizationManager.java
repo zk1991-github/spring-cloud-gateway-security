@@ -43,8 +43,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -87,7 +87,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
         return authentication
                 .flatMap(auth -> {
                     // 匿名权限匹配
-                    String realRequestPath = getRealRequestPath(exchange);
+                    String realRequestPath = getRequestPath(exchange);
                     return anonymousPermissionMatch(exchange, auth, realRequestPath);
                 })
                 .flatMap(authenticationHolder -> {
@@ -101,8 +101,8 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                         return Mono.just(authenticationHolder);
                     }
                     // 所有角色的公开权限匹配
-                    String realRequestPath = getRealRequestPath(exchange);
-                    return openPermissionMatch(exchange, auth, realRequestPath);
+                    String realRequestPath = getRequestPath(exchange);
+                    return openPermissionMatch(auth, realRequestPath);
                 })
                 .map(authenticationHolder -> {
                     // 公开权限认证通过，直接返回认证通过
@@ -110,17 +110,15 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                         return new AuthorizationDecision(true);
                     }
                     // 私有权限验证
-                    String realRequestPath = getRealRequestPath(exchange);
+                    String realRequestPath = getRequestPath(exchange);
                     logger.info("转发地址：{}", realRequestPath);
 
                     // 获取用户信息
                     Object principal = authenticationHolder.getAuthentication().getPrincipal();
-                    if (principal instanceof UserInfo) {
-                        UserInfo userInfo = (UserInfo) principal;
-                        return userInfoAuthorization(userInfo, exchange, realRequestPath);
-                    } else if (principal instanceof WeChatUserInfo) {
-                        WeChatUserInfo weChatUserInfo = (WeChatUserInfo) principal;
-                        return weChatUserInfoAuthorization(weChatUserInfo, exchange, realRequestPath);
+                    if (principal instanceof UserInfo userInfo) {
+                        return userInfoAuthorization(userInfo, realRequestPath);
+                    } else if (principal instanceof WeChatUserInfo weChatUserInfo) {
+                        return weChatUserInfoAuthorization(weChatUserInfo, realRequestPath);
                     } else {
                         return new AuthorizationDecision(false);
                     }
@@ -138,7 +136,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
      */
     private Mono<AuthenticationHolder> anonymousPermissionMatch(ServerWebExchange exchange, Authentication auth, String realRequestPath) {
         Mono<List<PermissionInfo>> cacheAnonymousPermission = iPermission.getCacheAnonymousPermission();
-        return permissionMatch(exchange, cacheAnonymousPermission, auth, realRequestPath);
+        return permissionMatch(cacheAnonymousPermission, auth, realRequestPath);
     }
 
     /**
@@ -148,11 +146,10 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
      * @param realRequestPath 真实访问地址
      * @return 认证持有对象
      */
-    private Mono<AuthenticationHolder> openPermissionMatch(ServerWebExchange exchange,
-                                                           Authentication auth,
+    private Mono<AuthenticationHolder> openPermissionMatch(Authentication auth,
                                                            String realRequestPath) {
         Mono<List<PermissionInfo>> cacheOpenPermission = iPermission.getCacheOpenPermission();
-        return permissionMatch(exchange, cacheOpenPermission, auth, realRequestPath);
+        return permissionMatch(cacheOpenPermission, auth, realRequestPath);
     }
 
     /**
@@ -161,8 +158,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
      * @param requestPath 请求地址
      * @return 权限认证结果
      */
-    private Mono<AuthenticationHolder> permissionMatch(ServerWebExchange exchange,
-                                                       Mono<List<PermissionInfo>> monoPermissions,
+    private Mono<AuthenticationHolder> permissionMatch(Mono<List<PermissionInfo>> monoPermissions,
                                                        Authentication authentication,
                                                        String requestPath) {
         return monoPermissions.map(permissionInfos -> {
@@ -206,12 +202,10 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
      * web鉴权
      *
      * @param userInfo    用户信息
-     * @param exchange    web请求
      * @param requestPath 请求地址
      * @return 权限信息
      */
-    private AuthorizationDecision userInfoAuthorization(UserInfo userInfo, ServerWebExchange exchange,
-                                                        String requestPath) {
+    private AuthorizationDecision userInfoAuthorization(UserInfo userInfo, String requestPath) {
 
         logger.debug("用户名【{}】,角色【{}】", userInfo.getUsername(), userInfo.getRoles());
         //角色的url权限过滤
@@ -236,20 +230,14 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
      * 微信鉴权
      *
      * @param weChatUserInfo 微信用户信息
-     * @param exchange       请求
      * @param requestPath    请求地址
      * @return 权限信息
      */
-    private AuthorizationDecision weChatUserInfoAuthorization(WeChatUserInfo weChatUserInfo, ServerWebExchange exchange,
-                                                              String requestPath) {
+    private AuthorizationDecision weChatUserInfoAuthorization(WeChatUserInfo weChatUserInfo, String requestPath) {
         // 定义编码昵称
         String encodedNickName = "";
-        try {
-            //为处理中文昵称，需要编码
-            encodedNickName = URLEncoder.encode(weChatUserInfo.getNickName(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        //为处理中文昵称，需要编码
+        encodedNickName = URLEncoder.encode(weChatUserInfo.getNickName(), StandardCharsets.UTF_8);
         logger.debug("昵称【{}】,角色【{}】", weChatUserInfo.getNickName(), weChatUserInfo.getRoles());
         //角色的url权限过滤
         for (RoleInfo role : weChatUserInfo.getRoles()) {
@@ -267,11 +255,24 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
     }
 
     /**
+     * 获取请求地址
+     *
+     * @param exchange 请求对象
+     * @return 请求地址
+     */
+    private String getRequestPath(ServerWebExchange exchange) {
+        ServerHttpRequest request = exchange.getRequest();
+        // 请求的uri
+        return request.getURI().getPath();
+    }
+
+    /**
      * 获取真实请求地址
      *
      * @param exchange 请求对象
      * @return 真实的请求地址
      */
+    @Deprecated
     private String getRealRequestPath(ServerWebExchange exchange) {
         ServerHttpRequest request = exchange.getRequest();
         // 请求的uri
@@ -318,7 +319,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
             }
         }
         // 当未跳过路径时，请求地址为转发地址
-        realRequestPath = new StringBuilder((realRequestPath.length() == 0) ? requestPath : realRequestPath.toString());
+        realRequestPath = new StringBuilder((realRequestPath.isEmpty()) ? requestPath : realRequestPath.toString());
         return realRequestPath.toString();
     }
 
