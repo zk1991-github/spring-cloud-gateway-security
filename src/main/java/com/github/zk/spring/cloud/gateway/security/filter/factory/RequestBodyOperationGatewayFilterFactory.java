@@ -73,7 +73,9 @@ public class RequestBodyOperationGatewayFilterFactory extends AbstractGatewayFil
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
-            if (request.getMethod() != HttpMethod.POST) {
+            if (request.getMethod() != HttpMethod.POST &&
+                    request.getMethod() != HttpMethod.PUT &&
+                    request.getMethod() != HttpMethod.PATCH) {
                 return chain.filter(exchange);
             }
             return operationExchange(exchange, chain);
