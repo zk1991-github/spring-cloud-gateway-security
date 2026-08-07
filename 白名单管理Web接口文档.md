@@ -204,6 +204,86 @@ GET http://<IP>:<PORT>/gateway/whitelist/query?ip=<param1>&macAddr=<param2>
 }
 ```
 
+## 6. 查询白名单开关状态
+
+> 白名单开关状态持久化在数据库 `gateway_config` 表中，配置键分别为 `ip_whitelist_enabled`（IP白名单开关）和 `mac_whitelist_enabled`（MAC白名单开关）。该接口实时查询数据库返回当前状态。
+
+请求接口
+```http request
+GET http://<IP>:<PORT>/gateway/whitelist/toggle
+```
+
+返回结构
+
+- 成功样例
+```json
+{
+    "data": {
+        "ipEnabled": true,
+        "macEnabled": false
+    },
+    "msg": "成功",
+    "code": 200
+}
+```
+
+| 序号 | 参数       | 描述          | 类型    | 说明                                     |
+| ---- | ---------- | ------------- | ------- | ---------------------------------------- |
+| 1    | ipEnabled  | IP白名单开关  | 布尔值  | `true`开启，`false`关闭                  |
+| 2    | macEnabled | MAC白名单开关 | 布尔值  | `true`开启，`false`关闭                  |
+
+> 说明：`ipEnabled`和`macEnabled`可独立开启/关闭，互不影响。两者都关闭时，登录请求不进行白名单校验，直接放行。
+
+## 7. 设置白名单开关状态
+
+请求接口
+```http request
+PUT http://<IP>:<PORT>/gateway/whitelist/toggle
+Content-Type: application/json
+```
+
+请求体支持单独控制 IP 白名单和 MAC 白名单开关，未传的字段保持原状态不变。
+
+- 仅开启 IP 白名单
+```json
+{
+    "ipEnabled": true
+}
+```
+
+- 同时设置 IP 和 MAC 白名单
+```json
+{
+    "ipEnabled": true,
+    "macEnabled": false
+}
+```
+
+| 序号 | 参数       | 描述          | 类型    | 说明                                     |
+| ---- | ---------- | ------------- | ------- | ---------------------------------------- |
+| 1    | ipEnabled  | IP白名单开关  | 布尔值  | 选填，`true`开启，`false`关闭            |
+| 2    | macEnabled | MAC白名单开关 | 布尔值  | 选填，`true`开启，`false`关闭            |
+
+返回结构
+
+- 成功样例
+```json
+{
+    "msg": "成功",
+    "code": 200
+}
+```
+
+- 失败样例（未传入任何开关字段）
+```json
+{
+    "msg": "至少需要传入 ipEnabled 或 macEnabled 参数",
+    "code": 712
+}
+```
+
+> 说明：设置成功后立即生效并持久化到数据库，服务重启后状态不丢失；同时会同步更新运行时内存缓存，登录白名单校验实时生效。
+
 ## 测试数据示例
 
 以下数据供开发和测试使用：

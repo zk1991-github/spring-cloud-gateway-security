@@ -22,6 +22,7 @@ import com.github.zk.spring.cloud.gateway.security.authentication.CustomReactive
 import com.github.zk.spring.cloud.gateway.security.authentication.WebReactiveAuthenticationManager;
 import com.github.zk.spring.cloud.gateway.security.authentication.WebRedirectServerAuthenticationFailureHandler;
 import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
+import com.github.zk.spring.cloud.gateway.security.core.WhitelistToggle;
 import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
 import com.github.zk.spring.cloud.gateway.security.filter.IpWhitelistWebFilter;
 import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
@@ -71,7 +72,6 @@ public class SecurityConfig {
     private String proxyUrl;
     private boolean csrfEnable;
     private boolean sourceIpEnable;
-    private boolean whitelist;
 
     @PostConstruct
     public void init() {
@@ -79,7 +79,6 @@ public class SecurityConfig {
         this.antPatterns = securityProperties.getAntpatterns();
         this.csrfEnable = securityProperties.getCsrfEnable();
         this.sourceIpEnable = securityProperties.getSourceIpEnable();
-        this.whitelist = securityProperties.getWhitelistEnable();
 
         //代理地址处理
         if (proxyUrl == null) {
@@ -130,8 +129,9 @@ public class SecurityConfig {
                                                             GatewayProperties gatewayProperties,
                                                             LoginProcessor loginProcessor,
                                                             DefaultUserImpl userDetailsService,
-                                                            IPermission iPermission,
-                                                            IWhitelist iWhitelist) {
+            IPermission iPermission,
+                                                             IWhitelist iWhitelist,
+                                                             WhitelistToggle whitelistToggle) {
         http.authorizeExchange(exchanges -> {
                     ServerHttpSecurity.AuthorizeExchangeSpec access = exchanges
                             .pathMatchers(SUCCESS_URL, FAIL_URL, INVALID_URL,
@@ -175,9 +175,8 @@ public class SecurityConfig {
         } else {
             http.csrf(ServerHttpSecurity.CsrfSpec::disable);
         }
-        if (whitelist) {
-            http.addFilterBefore(new IpWhitelistWebFilter(iWhitelist), SecurityWebFiltersOrder.FORM_LOGIN);
-        }
+        // 始终注册白名单过滤器，由 WhitelistToggle 在运行时控制 IP/MAC 开关
+        http.addFilterBefore(new IpWhitelistWebFilter(iWhitelist, whitelistToggle), SecurityWebFiltersOrder.FORM_LOGIN);
         return http.build();
     }
 
@@ -216,6 +215,14 @@ public class SecurityConfig {
     @Bean
     public CookieServerCsrfTokenRepository customCookieServerCsrfTokenRepository() {
         return CookieServerCsrfTokenRepository.withHttpOnlyFalse();
+    }
+
+    /**
+     * 白名单运行时开关缓存，供 filter 快速读取
+     */
+    @Bean
+    public WhitelistToggle whitelistToggle() {
+        return new WhitelistToggle();
     }
 
     /**

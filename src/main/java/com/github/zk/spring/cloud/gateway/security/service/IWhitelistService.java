@@ -39,4 +39,20 @@ public interface IWhitelistService {
     List<WhitelistInfo> queryAll();
 
     WhitelistInfo queryByIpAndMac(String ip, String macAddr);
+
+    /**
+     * 仅通过 IP 查询白名单（忽略 MAC 地址）
+     *
+     * @param ip IP 地址
+     * @return 匹配的白名单记录，无匹配返回 null
+     */
+    WhitelistInfo queryByIpOnly(String ip);
+
+    /**
+     * 仅通过 MAC 地址查询白名单（忽略 IP 地址）
+     *
+     * @param macAddr MAC 地址
+     * @return 匹配的白名单记录，无匹配返回 null
+     */
+    WhitelistInfo queryByMacOnly(String macAddr);
 }

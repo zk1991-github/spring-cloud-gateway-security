@@ -53,8 +53,20 @@ public class SecurityProperties {
 
     /**
      * 白名单认证，默认关闭
+     * @deprecated 使用 {@link #ipWhitelistEnable} 和 {@link #macWhitelistEnable} 替代
      */
+    @Deprecated
     private Boolean whitelistEnable = false;
+
+    /**
+     * IP 白名单认证开关，默认关闭
+     */
+    private Boolean ipWhitelistEnable = false;
+
+    /**
+     * MAC 白名单认证开关，默认关闭
+     */
+    private Boolean macWhitelistEnable = false;
 
     /**
      * 白名单配置
@@ -93,12 +105,30 @@ public class SecurityProperties {
         this.sourceIpEnable = sourceIpEnable;
     }
 
+    @Deprecated
     public Boolean getWhitelistEnable() {
         return whitelistEnable;
     }
 
+    @Deprecated
     public void setWhitelistEnable(Boolean whitelistEnable) {
         this.whitelistEnable = whitelistEnable;
+    }
+
+    public Boolean getIpWhitelistEnable() {
+        return ipWhitelistEnable;
+    }
+
+    public void setIpWhitelistEnable(Boolean ipWhitelistEnable) {
+        this.ipWhitelistEnable = ipWhitelistEnable;
+    }
+
+    public Boolean getMacWhitelistEnable() {
+        return macWhitelistEnable;
+    }
+
+    public void setMacWhitelistEnable(Boolean macWhitelistEnable) {
+        this.macWhitelistEnable = macWhitelistEnable;
     }
 
     public Whitelist getWhitelist() {

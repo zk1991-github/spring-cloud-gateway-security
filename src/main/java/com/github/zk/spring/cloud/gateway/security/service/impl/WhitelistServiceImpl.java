@@ -72,4 +72,23 @@ public class WhitelistServiceImpl implements IWhitelistService {
         }
         return null;
     }
+
+    @Override
+    public WhitelistInfo queryByIpOnly(String ip) {
+        List<WhitelistInfo> list = whitelistMapper.selectList(null);
+        for (WhitelistInfo w : list) {
+            if (IpUtils.isIpInRange(ip, w.getIpAddr())) {
+                return w;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public WhitelistInfo queryByMacOnly(String macAddr) {
+        QueryWrapper<WhitelistInfo> wrapper = new QueryWrapper<>();
+        wrapper.eq("mac_addr", macAddr);
+        List<WhitelistInfo> list = whitelistMapper.selectList(wrapper);
+        return list.isEmpty() ? null : list.get(0);
+    }
 }

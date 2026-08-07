@@ -42,4 +42,16 @@ public class WhitelistImpl implements IWhitelist {
         WhitelistInfo w = whitelistService.queryByIpAndMac(ip, macAddr);
         return Mono.just(w != null);
     }
+
+    @Override
+    public Mono<Boolean> isIpWhiteList(String ip) {
+        WhitelistInfo w = whitelistService.queryByIpOnly(ip);
+        return Mono.just(w != null);
+    }
+
+    @Override
+    public Mono<Boolean> isMacWhiteList(String macAddr) {
+        WhitelistInfo w = whitelistService.queryByMacOnly(macAddr);
+        return Mono.just(w != null);
+    }
 }

@@ -132,6 +132,24 @@ CREATE TABLE `gateway_whitelist` (
 
 insert  into `gateway_whitelist`(`id`,`ip_addr`,`mac_addr`,`create_time`,`update_time`) values (1,'127.0.0.1','6C-1F-F7-05-93-84','2026-06-25 11:20:56','0000-00-00 00:00:00');
 
+/*Table structure for table `gateway_config` */
+
+DROP TABLE IF EXISTS `gateway_config`;
+
+CREATE TABLE `gateway_config` (
+  `id` bigint(64) NOT NULL,
+  `config_key` varchar(100) NOT NULL,
+  `config_value` varchar(255) NOT NULL,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  UNIQUE (`config_key`)
+);
+
+/*Data for the table `gateway_config` */
+
+insert  into `gateway_config`(`id`,`config_key`,`config_value`,`create_time`,`update_time`) values (1,'ip_whitelist_enabled','false','2026-08-06 16:00:00','0000-00-00 00:00:00'),(2,'mac_whitelist_enabled','false','2026-08-06 16:00:00','0000-00-00 00:00:00');
+
 /*Table structure for table `t_log` */
 
 DROP TABLE IF EXISTS `t_log`;

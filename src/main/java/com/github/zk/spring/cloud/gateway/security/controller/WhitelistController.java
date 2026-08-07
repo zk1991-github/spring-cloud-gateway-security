@@ -21,6 +21,8 @@ package com.github.zk.spring.cloud.gateway.security.controller;
 import com.github.zk.spring.cloud.gateway.security.common.CodeEnum;
 import com.github.zk.spring.cloud.gateway.security.common.Response;
 import com.github.zk.spring.cloud.gateway.security.pojo.WhitelistInfo;
+import com.github.zk.spring.cloud.gateway.security.pojo.WhitelistToggleInfo;
+import com.github.zk.spring.cloud.gateway.security.service.IConfigService;
 import com.github.zk.spring.cloud.gateway.security.service.IWhitelistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +41,9 @@ public class WhitelistController {
 
     @Autowired
     private IWhitelistService whitelistService;
+
+    @Autowired
+    private IConfigService configService;
 
     @PostMapping("/add")
     public Response addWhitelist(@RequestBody WhitelistInfo whitelistInfo) {
@@ -80,5 +85,28 @@ public class WhitelistController {
             return Response.setOk(w);
         }
         return Response.setError(CodeEnum.QUERY_FAIL);
+    }
+
+    /**
+     * 获取白名单开关状态
+     */
+    @GetMapping("/toggle")
+    public Response getToggle() {
+        return Response.setOk(configService.getWhitelistToggleInfo());
+    }
+
+    /**
+     * 设置白名单开关状态
+     * 支持单独控制 IP 白名单和 MAC 白名单的开启/关闭
+     *
+     * @param toggleInfo 白名单开关状态，字段为空表示不修改
+     */
+    @PutMapping("/toggle")
+    public Response setToggle(@RequestBody WhitelistToggleInfo toggleInfo) {
+        if (toggleInfo.getIpEnabled() == null && toggleInfo.getMacEnabled() == null) {
+            return Response.setError("至少需要传入 ipEnabled 或 macEnabled 参数");
+        }
+        configService.setWhitelistToggleInfo(toggleInfo);
+        return Response.setOk();
     }
 }

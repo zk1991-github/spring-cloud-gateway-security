@@ -3,6 +3,7 @@ spring:
     antpatterns: "/web/dist/**,/web/websocket.html"
     csrf-enable: false
     source-ip-enable: false
-    # 白名单认证开关，默认关闭
-    whitelist-enable: false
-    proxy-url: "/wg"
+    # IP 白名单认证开关，默认关闭
+    ip-whitelist-enable: false
+    # MAC 白名单认证开关，默认关闭
+    mac-whitelist-enable: false

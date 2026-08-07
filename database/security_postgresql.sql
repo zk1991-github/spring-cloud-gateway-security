@@ -188,6 +188,29 @@ INSERT INTO gateway_whitelist (id, ip_addr, mac_addr, create_time, update_time)
 VALUES (1, '127.0.0.1', '6C-1F-F7-05-93-84', '2026-06-25 11:20:56', '1970-01-01 00:00:00')
 ON CONFLICT (id) DO NOTHING;
 
+-- 通用配置表
+CREATE TABLE IF NOT EXISTS gateway_config (
+    id           bigint NOT NULL,
+    config_key   varchar(100) NOT NULL,
+    config_value varchar(255) NOT NULL,
+    create_time  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time  timestamp NOT NULL DEFAULT '1970-01-01 00:00:00',
+    PRIMARY KEY (id),
+    CONSTRAINT uk_config_key UNIQUE (config_key)
+);
+
+COMMENT ON TABLE gateway_config IS '通用配置表';
+COMMENT ON COLUMN gateway_config.id IS '唯一id';
+COMMENT ON COLUMN gateway_config.config_key IS '配置键';
+COMMENT ON COLUMN gateway_config.config_value IS '配置值';
+COMMENT ON COLUMN gateway_config.create_time IS '创建时间';
+COMMENT ON COLUMN gateway_config.update_time IS '修改时间';
+
+INSERT INTO gateway_config (id, config_key, config_value, create_time, update_time)
+VALUES (1, 'ip_whitelist_enabled', 'false', '2026-08-06 16:00:00', '1970-01-01 00:00:00'),
+       (2, 'mac_whitelist_enabled', 'false', '2026-08-06 16:00:00', '1970-01-01 00:00:00')
+ON CONFLICT (id) DO NOTHING;
+
 -- 登录日志表
 CREATE TABLE IF NOT EXISTS t_log (
     id       bigint NOT NULL,

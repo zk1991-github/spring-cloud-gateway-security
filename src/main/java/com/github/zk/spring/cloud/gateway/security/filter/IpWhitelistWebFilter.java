@@ -18,6 +18,7 @@
 
 package com.github.zk.spring.cloud.gateway.security.filter;
 
+import com.github.zk.spring.cloud.gateway.security.core.WhitelistToggle;
 import com.github.zk.spring.cloud.gateway.security.service.IWhitelist;
 import com.github.zk.spring.cloud.gateway.security.util.IpUtils;
 import com.github.zk.spring.cloud.gateway.security.util.MacUtils;
@@ -37,7 +38,8 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * 白名单拦截器
- * 在表单登录之前校验客户端 IP 地址是否在白名单中
+ * 在表单登录之前校验客户端 IP 地址和 MAC 地址是否在白名单中
+ * 支持通过 {@link WhitelistToggle} 在运行时分别控制 IP 白名单和 MAC 白名单的开关
  *
  * @author zhaokai
  * @since 5.1.0
@@ -46,9 +48,11 @@ public class IpWhitelistWebFilter implements WebFilter {
     private final Logger logger = LoggerFactory.getLogger(IpWhitelistWebFilter.class);
     private final static String LOGIN_URL = "/login";
     private final IWhitelist iWhitelist;
+    private final WhitelistToggle whitelistToggle;
 
-    public IpWhitelistWebFilter(IWhitelist iWhitelist) {
+    public IpWhitelistWebFilter(IWhitelist iWhitelist, WhitelistToggle whitelistToggle) {
         this.iWhitelist = iWhitelist;
+        this.whitelistToggle = whitelistToggle;
     }
 
     @Override
@@ -58,21 +62,39 @@ public class IpWhitelistWebFilter implements WebFilter {
         if (request.getMethod() != HttpMethod.POST || !LOGIN_URL.equals(request.getURI().getPath())) {
             return chain.filter(exchange);
         }
+        // IP 和 MAC 白名单都关闭，直接放行
+        if (whitelistToggle.isAllDisabled()) {
+            return chain.filter(exchange);
+        }
+
         String ipAddr = IpUtils.getIpAddr(request);
         String macAddr = MacUtils.getMacAddr(request);
-        return iWhitelist.isWhiteList(ipAddr, macAddr)
-                // 查询结果为空，证明不在白名单
-                .defaultIfEmpty(false)
-                .flatMap(allowed -> {
-                    if (allowed) {
-                        // 白名单通过，继续认证
+
+        return Mono.zip(
+                        whitelistToggle.isIpEnabled() ? iWhitelist.isIpWhiteList(ipAddr).defaultIfEmpty(false)
+                                : Mono.just(true),
+                        whitelistToggle.isMacEnabled() ? iWhitelist.isMacWhiteList(macAddr).defaultIfEmpty(false)
+                                : Mono.just(true)
+                )
+                .flatMap(tuple -> {
+                    boolean ipAllowed = tuple.getT1();
+                    boolean macAllowed = tuple.getT2();
+                    if (ipAllowed && macAllowed) {
                         return chain.filter(exchange);
                     }
-                    // 白名单未通过，直接返回401
+                    // 白名单未通过，返回 401
                     ServerHttpResponse response = exchange.getResponse();
                     response.setStatusCode(HttpStatus.UNAUTHORIZED);
                     response.getHeaders().add("Content-Type", "application/json; charset=UTF-8");
-                    String body = "{\"code\":401,\"msg\":\"登录失败,当前主机未在白名单！\"}";
+                    String message;
+                    if (!ipAllowed && !macAllowed) {
+                        message = "登录失败,当前主机 IP 与 MAC 均未在白名单！";
+                    } else if (!ipAllowed) {
+                        message = "登录失败,当前主机 IP 未在白名单！";
+                    } else {
+                        message = "登录失败,当前主机 MAC 未在白名单！";
+                    }
+                    String body = "{\"code\":401,\"msg\":\"" + message + "\"}";
                     DataBuffer buffer = response.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
                     return response.writeWith(Mono.just(buffer));
                 });

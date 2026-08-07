@@ -18,37 +18,27 @@
 
 package com.github.zk.spring.cloud.gateway.security.service;
 
-import reactor.core.publisher.Mono;
+import com.github.zk.spring.cloud.gateway.security.pojo.WhitelistToggleInfo;
 
 /**
- * 白名单接口
+ * 通用配置服务接口
  *
  * @author zhaokai
- * @since 5.0.0-1
+ * @since 5.2.0
  */
-public interface IWhitelist {
-    /**
-     * 是否白名单（IP 和 MAC 都校验）
-     *
-     * @param ip ip地址
-     * @param macAddr mac地址
-     * @return 是否为白名单
-     */
-    Mono<Boolean> isWhiteList(String ip, String macAddr);
+public interface IConfigService {
 
     /**
-     * 仅校验 IP 是否在白名单中
+     * 查询白名单开关状态
      *
-     * @param ip ip地址
-     * @return 是否为白名单
+     * @return 白名单开关状态
      */
-    Mono<Boolean> isIpWhiteList(String ip);
+    WhitelistToggleInfo getWhitelistToggleInfo();
 
     /**
-     * 仅校验 MAC 地址是否在白名单中
+     * 设置白名单开关状态，持久化到数据库并同步运行时缓存
      *
-     * @param macAddr mac地址
-     * @return 是否为白名单
+     * @param toggleInfo 白名单开关状态（字段为空表示不修改）
      */
-    Mono<Boolean> isMacWhiteList(String macAddr);
+    void setWhitelistToggleInfo(WhitelistToggleInfo toggleInfo);
 }
