@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.github.zk</groupId>
     <artifactId>spring-cloud-gateway-security</artifactId>
-    <version>v4.3.7</version>
+    <version>v4.3.8</version>
     <name>spring-cloud-gateway-security</name>
     <description>Spring Cloud gateway 整合 Spring Security</description>
     <properties>
@@ -117,6 +117,12 @@
                     <groupId>org.xerial</groupId>
                     <artifactId>sqlite-jdbc</artifactId>
                     <version>${sqlit.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>${mysql.version}</version>
+                    <scope>runtime</scope>
                 </dependency>
             </dependencies>
             <build>
