@@ -70,33 +70,36 @@ public class IpWhitelistWebFilter implements WebFilter {
         String ipAddr = IpUtils.getIpAddr(request);
         String macAddr = MacUtils.getMacAddr(request);
 
-        return Mono.zip(
-                        whitelistToggle.isIpEnabled() ? iWhitelist.isIpWhiteList(ipAddr).defaultIfEmpty(false)
-                                : Mono.just(true),
-                        whitelistToggle.isMacEnabled() ? iWhitelist.isMacWhiteList(macAddr).defaultIfEmpty(false)
-                                : Mono.just(true)
-                )
-                .flatMap(tuple -> {
-                    boolean ipAllowed = tuple.getT1();
-                    boolean macAllowed = tuple.getT2();
-                    if (ipAllowed && macAllowed) {
-                        return chain.filter(exchange);
-                    }
-                    // 白名单未通过，返回 401
-                    ServerHttpResponse response = exchange.getResponse();
-                    response.setStatusCode(HttpStatus.UNAUTHORIZED);
-                    response.getHeaders().add("Content-Type", "application/json; charset=UTF-8");
-                    String message;
-                    if (!ipAllowed && !macAllowed) {
-                        message = "登录失败,当前主机 IP 与 MAC 均未在白名单！";
-                    } else if (!ipAllowed) {
-                        message = "登录失败,当前主机 IP 未在白名单！";
-                    } else {
-                        message = "登录失败,当前主机 MAC 未在白名单！";
-                    }
-                    String body = "{\"code\":401,\"msg\":\"" + message + "\"}";
-                    DataBuffer buffer = response.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
-                    return response.writeWith(Mono.just(buffer));
-                });
+        // IP 和 MAC 开关都开启：必须在同一条白名单记录中同时匹配 IP 和 MAC
+        // 仅开启其中之一：分别查询对应的白名单
+        Mono<Boolean> check;
+        if (whitelistToggle.isIpEnabled() && whitelistToggle.isMacEnabled()) {
+            check = iWhitelist.isWhiteList(ipAddr, macAddr).defaultIfEmpty(false);
+        } else if (whitelistToggle.isIpEnabled()) {
+            check = iWhitelist.isIpWhiteList(ipAddr).defaultIfEmpty(false);
+        } else {
+            check = iWhitelist.isMacWhiteList(macAddr).defaultIfEmpty(false);
+        }
+        return check.flatMap(allowed -> {
+            if (allowed) {
+                // 白名单通过，继续认证
+                return chain.filter(exchange);
+            }
+            // 白名单未通过，返回 401
+            ServerHttpResponse response = exchange.getResponse();
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            response.getHeaders().add("Content-Type", "application/json; charset=UTF-8");
+            String message;
+            if (whitelistToggle.isIpEnabled() && whitelistToggle.isMacEnabled()) {
+                message = "登录失败,当前主机未在白名单！";
+            } else if (whitelistToggle.isIpEnabled()) {
+                message = "登录失败,当前主机 IP 未在白名单！";
+            } else {
+                message = "登录失败,当前主机 MAC 未在白名单！";
+            }
+            String body = "{\"code\":401,\"msg\":\"" + message + "\"}";
+            DataBuffer buffer = response.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
+            return response.writeWith(Mono.just(buffer));
+        });
     }
 }

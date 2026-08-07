@@ -24,6 +24,9 @@ import com.github.zk.spring.cloud.gateway.security.dao.ConfigMapper;
 import com.github.zk.spring.cloud.gateway.security.pojo.ConfigInfo;
 import com.github.zk.spring.cloud.gateway.security.pojo.WhitelistToggleInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IConfigService;
+import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +39,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class ConfigServiceImpl implements IConfigService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ConfigServiceImpl.class);
+
     private static final String KEY_IP_ENABLED = "ip_whitelist_enabled";
     private static final String KEY_MAC_ENABLED = "mac_whitelist_enabled";
 
@@ -44,6 +49,18 @@ public class ConfigServiceImpl implements IConfigService {
 
     @Autowired
     private WhitelistToggle whitelistToggle;
+
+    /**
+     * 启动时从数据库加载白名单开关状态到运行时缓存
+     */
+    @PostConstruct
+    public void init() {
+        boolean ipEnabled = loadConfig(KEY_IP_ENABLED);
+        boolean macEnabled = loadConfig(KEY_MAC_ENABLED);
+        whitelistToggle.setIpEnabled(ipEnabled);
+        whitelistToggle.setMacEnabled(macEnabled);
+        logger.info("Whitelist toggle loaded from database: ipEnabled={}, macEnabled={}", ipEnabled, macEnabled);
+    }
 
     @Override
     public WhitelistToggleInfo getWhitelistToggleInfo() {

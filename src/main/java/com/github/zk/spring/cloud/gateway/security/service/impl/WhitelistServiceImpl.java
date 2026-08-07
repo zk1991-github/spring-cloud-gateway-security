@@ -23,6 +23,7 @@ import com.github.zk.spring.cloud.gateway.security.dao.WhitelistMapper;
 import com.github.zk.spring.cloud.gateway.security.pojo.WhitelistInfo;
 import com.github.zk.spring.cloud.gateway.security.service.IWhitelistService;
 import com.github.zk.spring.cloud.gateway.security.util.IpUtils;
+import com.github.zk.spring.cloud.gateway.security.util.MacUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,11 +63,15 @@ public class WhitelistServiceImpl implements IWhitelistService {
 
     @Override
     public WhitelistInfo queryByIpAndMac(String ip, String macAddr) {
-        QueryWrapper<WhitelistInfo> wrapper = new QueryWrapper<>();
-        wrapper.eq("mac_addr", macAddr);
-        List<WhitelistInfo> list = whitelistMapper.selectList(wrapper);
+        // 归一化 MAC 地址，忽略 - 与 : 连接符差异
+        String normalizedMac = MacUtils.normalizeMac(macAddr);
+        if (normalizedMac == null || normalizedMac.isEmpty()) {
+            return null;
+        }
+        List<WhitelistInfo> list = whitelistMapper.selectList(null);
         for (WhitelistInfo w : list) {
-            if (IpUtils.isIpInRange(ip, w.getIpAddr())) {
+            if (normalizedMac.equals(MacUtils.normalizeMac(w.getMacAddr()))
+                    && IpUtils.isIpInRange(ip, w.getIpAddr())) {
                 return w;
             }
         }
@@ -86,9 +91,17 @@ public class WhitelistServiceImpl implements IWhitelistService {
 
     @Override
     public WhitelistInfo queryByMacOnly(String macAddr) {
-        QueryWrapper<WhitelistInfo> wrapper = new QueryWrapper<>();
-        wrapper.eq("mac_addr", macAddr);
-        List<WhitelistInfo> list = whitelistMapper.selectList(wrapper);
-        return list.isEmpty() ? null : list.get(0);
+        // 归一化 MAC 地址，忽略 - 与 : 连接符差异
+        String normalizedMac = MacUtils.normalizeMac(macAddr);
+        if (normalizedMac == null || normalizedMac.isEmpty()) {
+            return null;
+        }
+        List<WhitelistInfo> list = whitelistMapper.selectList(null);
+        for (WhitelistInfo w : list) {
+            if (normalizedMac.equals(MacUtils.normalizeMac(w.getMacAddr()))) {
+                return w;
+            }
+        }
+        return null;
     }
 }
