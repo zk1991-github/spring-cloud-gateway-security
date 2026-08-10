@@ -131,7 +131,8 @@ public class SecurityConfig {
                                                             DefaultUserImpl userDetailsService,
             IPermission iPermission,
                                                              IWhitelist iWhitelist,
-                                                             WhitelistToggle whitelistToggle) {
+                                                             WhitelistToggle whitelistToggle,
+                                                             LoginProperties loginProperties) {
         http.authorizeExchange(exchanges -> {
                     ServerHttpSecurity.AuthorizeExchangeSpec access = exchanges
                             .pathMatchers(SUCCESS_URL, FAIL_URL, INVALID_URL,
@@ -176,7 +177,9 @@ public class SecurityConfig {
             http.csrf(ServerHttpSecurity.CsrfSpec::disable);
         }
         // 始终注册白名单过滤器，由 WhitelistToggle 在运行时控制 IP/MAC 开关
-        http.addFilterBefore(new IpWhitelistWebFilter(iWhitelist, whitelistToggle), SecurityWebFiltersOrder.FORM_LOGIN);
+        String exemptUsername = loginProperties.getUser() != null ? loginProperties.getUser().getUsername() : null;
+        http.addFilterBefore(new IpWhitelistWebFilter(iWhitelist, whitelistToggle, exemptUsername),
+                SecurityWebFiltersOrder.FORM_LOGIN);
         return http.build();
     }
 

@@ -12,7 +12,7 @@
     <artifactId>spring-cloud-gateway-security</artifactId>
     <version>v5.0.0-1</version>
     <name>spring-cloud-gateway-security</name>
-    <description>项目特别需求，用户、IP、mac地址三重绑定登录</description>
+    <description>项目特别需求，IP、mac地址绑定登录</description>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>

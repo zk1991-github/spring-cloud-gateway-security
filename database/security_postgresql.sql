@@ -1,298 +1,369 @@
--- PostgreSQL 数据库建库脚本
--- 使用前请手动创建数据库: CREATE DATABASE security_db;
+/*
+ Navicat Premium Dump SQL
 
--- 字典表
-CREATE TABLE IF NOT EXISTS gateway_dict (
-    id          bigint NOT NULL,
-    dict_type_id bigint NOT NULL,
-    dict_val    varchar(255) NOT NULL,
-    dict_name   varchar(255) NOT NULL,
-    PRIMARY KEY (id)
-);
+ Source Server         : 192.168.110.100
+ Source Server Type    : PostgreSQL
+ Source Server Version : 160003 (160003)
+ Source Host           : 192.168.110.100:5432
+ Source Catalog        : vector-map-data
+ Source Schema         : public
 
-COMMENT ON TABLE gateway_dict IS '字典表';
-COMMENT ON COLUMN gateway_dict.id IS '唯一id';
-COMMENT ON COLUMN gateway_dict.dict_type_id IS '字典类型id';
-COMMENT ON COLUMN gateway_dict.dict_val IS '字典值';
-COMMENT ON COLUMN gateway_dict.dict_name IS '字典名称';
+ Target Server Type    : PostgreSQL
+ Target Server Version : 160003 (160003)
+ File Encoding         : 65001
 
-INSERT INTO gateway_dict (id, dict_type_id, dict_val, dict_name)
-VALUES (1, 1, '0', '私有'), (2, 1, '1', '公开'), (3, 1, '2', '匿名')
-ON CONFLICT (id) DO NOTHING;
+ Date: 10/08/2026 14:59:23
+*/
 
--- 字典类型表
-CREATE TABLE IF NOT EXISTS gateway_dict_type (
-    id   bigint NOT NULL,
-    name varchar(255) NOT NULL,
-    PRIMARY KEY (id)
-);
 
-COMMENT ON TABLE gateway_dict_type IS '字典类型表';
-COMMENT ON COLUMN gateway_dict_type.id IS '唯一id';
-COMMENT ON COLUMN gateway_dict_type.name IS '类型名称';
+-- ----------------------------
+-- Table structure for gateway_config
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."gateway_config";
+CREATE TABLE "public"."gateway_config" (
+  "id" int8 NOT NULL,
+  "config_key" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
+  "config_value" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+  "create_time" timestamp(6),
+  "update_time" timestamp(6)
+)
+;
 
-INSERT INTO gateway_dict_type (id, name)
-VALUES (1, '接口权限')
-ON CONFLICT (id) DO NOTHING;
+-- ----------------------------
+-- Records of gateway_config
+-- ----------------------------
+INSERT INTO "public"."gateway_config" VALUES (1, 'ip_whitelist_enabled', 'true', NULL, '2026-08-07 11:12:35.803863');
+INSERT INTO "public"."gateway_config" VALUES (2, 'mac_whitelist_enabled', 'true', NULL, NULL);
 
--- 权限表
-CREATE TABLE IF NOT EXISTS gateway_permission (
-    id          bigint NOT NULL,
-    group_id    bigint NOT NULL,
-    url_name    varchar(255),
-    url         varchar(255) NOT NULL,
-    open        smallint NOT NULL,
-    description varchar(255),
-    fixed       smallint NOT NULL,
-    create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
-);
+-- ----------------------------
+-- Table structure for gateway_dict
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."gateway_dict";
+CREATE TABLE "public"."gateway_dict" (
+  "id" int8 NOT NULL,
+  "dict_type_id" int8 NOT NULL,
+  "dict_val" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "dict_name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL
+)
+;
+COMMENT ON COLUMN "public"."gateway_dict"."id" IS '唯一id';
+COMMENT ON COLUMN "public"."gateway_dict"."dict_type_id" IS '字典类型id';
+COMMENT ON COLUMN "public"."gateway_dict"."dict_val" IS '字典值';
+COMMENT ON COLUMN "public"."gateway_dict"."dict_name" IS '字典名称';
+COMMENT ON TABLE "public"."gateway_dict" IS '字典表';
 
-COMMENT ON TABLE gateway_permission IS '权限表';
-COMMENT ON COLUMN gateway_permission.id IS '权限id';
-COMMENT ON COLUMN gateway_permission.group_id IS '组id';
-COMMENT ON COLUMN gateway_permission.url_name IS '接口名称';
-COMMENT ON COLUMN gateway_permission.url IS '接口地址';
-COMMENT ON COLUMN gateway_permission.open IS '是否公开 0:私有 1:公开 2:匿名';
-COMMENT ON COLUMN gateway_permission.description IS '描述';
-COMMENT ON COLUMN gateway_permission.fixed IS '是否固定 0:非固定 1:固定';
-COMMENT ON COLUMN gateway_permission.create_time IS '创建时间';
+-- ----------------------------
+-- Records of gateway_dict
+-- ----------------------------
+INSERT INTO "public"."gateway_dict" VALUES (1, 1, '0', '私有');
+INSERT INTO "public"."gateway_dict" VALUES (2, 1, '1', '公开');
+INSERT INTO "public"."gateway_dict" VALUES (3, 1, '2', '匿名');
 
-INSERT INTO gateway_permission (id, group_id, url_name, url, open, description, fixed, create_time) VALUES
-(1652509001346134017, 1652508934101630977, '放权', '/gateway/test/**', 1, '', 0, '2023-04-30 01:29:30'),
-(1652590143767207938, 1652508934101630977, '测试放权', '/gateway/hello/**', 1, '', 0, '2023-04-30 07:08:24'),
-(1655736656925999106, 1655736526144806914, '日志分页', '/log/logPage', 0, '', 0, '2023-05-09 02:09:13'),
-(1655736673993146369, 1655736526144806914, '日志删除', '/log/delLog', 0, '', 0, '2023-05-09 02:09:17'),
-(1686199840235286530, 1655736526144806914, '查看所有请求监控', '/requestMonitor/selectAll', 0, '', 0, '2023-08-01 14:34:41'),
-(1686386764905422849, 1652508934101630977, '全部放行', '/**', 2, '', 1, '2023-08-02 03:24:40'),
-(1687416688680931329, 1687416601613008898, '用户分页', '/user/userPage', 0, '', 0, '2023-08-04 23:47:43'),
-(1687416715191365633, 1687416601613008898, '新增用户', '/user/addUser', 0, '', 0, '2023-08-04 23:47:49'),
-(1687416736441782273, 1687416601613008898, '重置密码', '/user/resetPassword', 0, '', 0, '2023-08-04 23:47:54'),
-(1687416766954745857, 1687416601613008898, '删除用户', '/user/delUser', 0, '', 0, '2023-08-04 23:48:01'),
-(1687416811210264577, 1687416601613008898, '修改用户', '/user/updateUser', 0, '', 0, '2023-08-04 23:48:12'),
-(1687416973747474434, 1687416918134075393, '角色分页', '/role/rolePage', 0, '', 0, '2023-08-04 23:48:52'),
-(1687416997182042113, 1687416918134075393, '新增角色', '/role/addRole', 0, '', 0, '2023-08-04 23:48:58'),
-(1687417019693838337, 1687416918134075393, '修改角色', '/role/updateRole', 0, '', 0, '2023-08-04 23:49:03'),
-(1687417039714037761, 1687416918134075393, '删除角色', '/role/delRole', 0, '', 0, '2023-08-04 23:49:08'),
-(1687417100028473345, 1687416918134075393, '授权', '/role/assignPermission', 0, '', 0, '2023-08-04 23:49:22'),
-(1687425795737088002, 1687425761876586498, '权限分页', '/permission/permissionPage', 0, '', 0, '2023-08-05 00:23:28'),
-(1687425838362628097, 1687425761876586498, '新增权限', '/permission/addPermission', 0, '', 0, '2023-08-05 00:23:38'),
-(1687425877668024322, 1687425761876586498, '修改权限', '/permission/updatePermission', 0, '', 0, '2023-08-05 00:23:47'),
-(1687425925790142465, 1687425761876586498, '删除权限', '/permission/delPermission', 0, '', 0, '2023-08-05 00:23:58'),
-(1687425966917586946, 1687425761876586498, '添加分组', '/permission/addGroup', 0, '', 0, '2023-08-05 00:24:08'),
-(1687426000124940290, 1687425761876586498, '分组分页', '/permission/groupPage', 0, '', 0, '2023-08-05 00:24:16')
-ON CONFLICT (id) DO NOTHING;
+-- ----------------------------
+-- Table structure for gateway_dict_type
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."gateway_dict_type";
+CREATE TABLE "public"."gateway_dict_type" (
+  "id" int8 NOT NULL,
+  "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL
+)
+;
+COMMENT ON COLUMN "public"."gateway_dict_type"."id" IS '唯一id';
+COMMENT ON COLUMN "public"."gateway_dict_type"."name" IS '类型名称';
+COMMENT ON TABLE "public"."gateway_dict_type" IS '字典类型表';
 
--- 权限分组表
-CREATE TABLE IF NOT EXISTS gateway_permission_group (
-    id          bigint NOT NULL,
-    group_name  varchar(15) NOT NULL,
-    create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
-);
+-- ----------------------------
+-- Records of gateway_dict_type
+-- ----------------------------
+INSERT INTO "public"."gateway_dict_type" VALUES (1, '接口类型');
 
-COMMENT ON TABLE gateway_permission_group IS '权限分组表';
-COMMENT ON COLUMN gateway_permission_group.id IS '分组id';
-COMMENT ON COLUMN gateway_permission_group.group_name IS '分组名';
-COMMENT ON COLUMN gateway_permission_group.create_time IS '创建时间';
+-- ----------------------------
+-- Table structure for gateway_permission
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."gateway_permission";
+CREATE TABLE "public"."gateway_permission" (
+  "id" int8 NOT NULL,
+  "group_id" int8 NOT NULL,
+  "url_name" varchar(255) COLLATE "pg_catalog"."default",
+  "url" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "open" int2 NOT NULL,
+  "description" varchar(255) COLLATE "pg_catalog"."default",
+  "fixed" int2 NOT NULL,
+  "create_time" timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP
+)
+;
+COMMENT ON COLUMN "public"."gateway_permission"."id" IS '权限id';
+COMMENT ON COLUMN "public"."gateway_permission"."group_id" IS '组id';
+COMMENT ON COLUMN "public"."gateway_permission"."url_name" IS '接口名称';
+COMMENT ON COLUMN "public"."gateway_permission"."url" IS '接口地址';
+COMMENT ON COLUMN "public"."gateway_permission"."open" IS '是否公开 0:私有 1:公开 2:匿名';
+COMMENT ON COLUMN "public"."gateway_permission"."description" IS '描述';
+COMMENT ON COLUMN "public"."gateway_permission"."fixed" IS '是否固定 0:非固定 1:固定';
+COMMENT ON COLUMN "public"."gateway_permission"."create_time" IS '创建时间';
+COMMENT ON TABLE "public"."gateway_permission" IS '权限表';
 
-INSERT INTO gateway_permission_group (id, group_name, create_time) VALUES
-(1652508934101630977, '放权', '2023-04-30 01:29:13'),
-(1655736526144806914, '监控', '2023-05-09 02:08:53'),
-(1687416601613008898, '用户管理', '2023-08-04 23:47:21'),
-(1687416918134075393, '角色管理', '2023-08-04 23:48:36'),
-(1687425761876586498, '权限管理', '2023-08-05 00:23:19')
-ON CONFLICT (id) DO NOTHING;
+-- ----------------------------
+-- Records of gateway_permission
+-- ----------------------------
+INSERT INTO "public"."gateway_permission" VALUES (2077937030405197826, 0, '网关内置接口', '/gateway/**', 0, '', 1, '2026-07-17 10:02:48.909457');
+INSERT INTO "public"."gateway_permission" VALUES (2079039559297921026, 0, '业务', '/vector-map/**', 0, '', 0, '2026-07-20 11:03:52.284565');
 
--- 请求监控表
-CREATE TABLE IF NOT EXISTS gateway_request_monitor (
-    id                bigint NOT NULL,
-    url_path          varchar(255) NOT NULL,
-    status            int NOT NULL,
-    response_duration bigint NOT NULL,
-    exception_desc    varchar(255) NOT NULL,
-    request_time      timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
-);
+-- ----------------------------
+-- Table structure for gateway_permission_group
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."gateway_permission_group";
+CREATE TABLE "public"."gateway_permission_group" (
+  "id" int8 NOT NULL,
+  "group_name" varchar(15) COLLATE "pg_catalog"."default" NOT NULL,
+  "create_time" timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP
+)
+;
+COMMENT ON COLUMN "public"."gateway_permission_group"."id" IS '分组id';
+COMMENT ON COLUMN "public"."gateway_permission_group"."group_name" IS '分组名';
+COMMENT ON COLUMN "public"."gateway_permission_group"."create_time" IS '创建时间';
+COMMENT ON TABLE "public"."gateway_permission_group" IS '权限分组表';
 
-COMMENT ON TABLE gateway_request_monitor IS '请求监控表';
-COMMENT ON COLUMN gateway_request_monitor.id IS '唯一id';
-COMMENT ON COLUMN gateway_request_monitor.url_path IS 'url路径';
-COMMENT ON COLUMN gateway_request_monitor.status IS '响应状态';
-COMMENT ON COLUMN gateway_request_monitor.response_duration IS '响应时长';
-COMMENT ON COLUMN gateway_request_monitor.exception_desc IS '异常描述';
-COMMENT ON COLUMN gateway_request_monitor.request_time IS '请求时间';
+-- ----------------------------
+-- Records of gateway_permission_group
+-- ----------------------------
 
--- 角色权限关联表
-CREATE TABLE IF NOT EXISTS gateway_role_permission (
-    id            bigint NOT NULL,
-    role_id       bigint NOT NULL,
-    permission_id bigint NOT NULL,
-    PRIMARY KEY (id)
-);
+-- ----------------------------
+-- Table structure for gateway_request_monitor
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."gateway_request_monitor";
+CREATE TABLE "public"."gateway_request_monitor" (
+  "id" int8 NOT NULL,
+  "url_path" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "status" int4 NOT NULL,
+  "response_duration" int8 NOT NULL,
+  "exception_desc" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "request_time" timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP
+)
+;
+COMMENT ON COLUMN "public"."gateway_request_monitor"."id" IS '唯一id';
+COMMENT ON COLUMN "public"."gateway_request_monitor"."url_path" IS 'url路径';
+COMMENT ON COLUMN "public"."gateway_request_monitor"."status" IS '响应状态';
+COMMENT ON COLUMN "public"."gateway_request_monitor"."response_duration" IS '响应时长';
+COMMENT ON COLUMN "public"."gateway_request_monitor"."exception_desc" IS '异常描述';
+COMMENT ON COLUMN "public"."gateway_request_monitor"."request_time" IS '请求时间';
+COMMENT ON TABLE "public"."gateway_request_monitor" IS '请求监控表';
 
-COMMENT ON TABLE gateway_role_permission IS '角色权限关联表';
-COMMENT ON COLUMN gateway_role_permission.id IS '唯一id';
-COMMENT ON COLUMN gateway_role_permission.role_id IS '角色id';
-COMMENT ON COLUMN gateway_role_permission.permission_id IS '权限id';
+-- ----------------------------
+-- Records of gateway_request_monitor
+-- ----------------------------
 
-INSERT INTO gateway_role_permission (id, role_id, permission_id) VALUES
-(1652510271258333186, 1, 1652509001346134017),
-(1652590143767207938, 1, 1652590143767207938),
-(1655736656925999106, 1, 1655736656925999106),
-(1655736673993146369, 1, 1655736673993146369),
-(1686199840235286530, 1, 1686199840235286530),
-(1686386764905422849, 1, 1686386764905422849),
-(1687416688680931329, 1, 1687416688680931329),
-(1687416715191365633, 1, 1687416715191365633),
-(1687416736441782273, 1, 1687416736441782273),
-(1687416766954745857, 1, 1687416766954745857),
-(1687416811210264577, 1, 1687416811210264577),
-(1687416973747474434, 1, 1687416973747474434),
-(1687416997182042113, 1, 1687416997182042113),
-(1687417019693838337, 1, 1687417019693838337),
-(1687417039714037761, 1, 1687417039714037761),
-(1687417100028473345, 1, 1687417100028473345),
-(1687425795737088002, 1, 1687425795737088002),
-(1687425838362628097, 1, 1687425838362628097),
-(1687425877668024322, 1, 1687425877668024322),
-(1687425925790142465, 1, 1687425925790142465),
-(1687425966917586946, 1, 1687425966917586946),
-(1687426000124940290, 1, 1687426000124940290),
-(1756102532051693570, 2, 1686386764905422849),
-(1756102532051693571, 2, 1686386764905422849),
-(1756102532051693572, 2, 1686386764905422849),
-(1756102532051693573, 2, 1686386764905422849),
-(1756102532051693574, 2, 1686386764905422849),
-(1756102532051693575, 2, 1686386764905422849)
-ON CONFLICT (id) DO NOTHING;
+-- ----------------------------
+-- Table structure for gateway_role_permission
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."gateway_role_permission";
+CREATE TABLE "public"."gateway_role_permission" (
+  "id" int8 NOT NULL,
+  "role_id" int8 NOT NULL,
+  "permission_id" int8 NOT NULL
+)
+;
+COMMENT ON COLUMN "public"."gateway_role_permission"."id" IS '唯一id';
+COMMENT ON COLUMN "public"."gateway_role_permission"."role_id" IS '角色id';
+COMMENT ON COLUMN "public"."gateway_role_permission"."permission_id" IS '权限id';
+COMMENT ON TABLE "public"."gateway_role_permission" IS '角色权限关联表';
 
--- 白名单表
-CREATE TABLE IF NOT EXISTS gateway_whitelist (
-    id          bigint NOT NULL,
-    ip_addr     varchar(255) NOT NULL,
-    mac_addr    varchar(50),
-    create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time timestamp NOT NULL DEFAULT '1970-01-01 00:00:00',
-    PRIMARY KEY (id)
-);
+-- ----------------------------
+-- Records of gateway_role_permission
+-- ----------------------------
+INSERT INTO "public"."gateway_role_permission" VALUES (2079041339473678338, 1, 2077937030405197826);
+INSERT INTO "public"."gateway_role_permission" VALUES (2079041339486261249, 1, 2079039559297921026);
 
-COMMENT ON TABLE gateway_whitelist IS '白名单表';
-COMMENT ON COLUMN gateway_whitelist.id IS '唯一id';
-COMMENT ON COLUMN gateway_whitelist.ip_addr IS 'ip地址';
-COMMENT ON COLUMN gateway_whitelist.mac_addr IS 'mac地址';
-COMMENT ON COLUMN gateway_whitelist.create_time IS '创建时间';
-COMMENT ON COLUMN gateway_whitelist.update_time IS '修改时间';
+-- ----------------------------
+-- Table structure for gateway_whitelist
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."gateway_whitelist";
+CREATE TABLE "public"."gateway_whitelist" (
+  "id" int8 NOT NULL,
+  "ip_addr" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "mac_addr" varchar(50) COLLATE "pg_catalog"."default",
+  "create_time" timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "update_time" timestamp(6) NOT NULL DEFAULT '1970-01-01 00:00:00'::timestamp without time zone
+)
+;
+COMMENT ON COLUMN "public"."gateway_whitelist"."id" IS '唯一id';
+COMMENT ON COLUMN "public"."gateway_whitelist"."ip_addr" IS 'ip地址';
+COMMENT ON COLUMN "public"."gateway_whitelist"."mac_addr" IS 'mac地址';
+COMMENT ON COLUMN "public"."gateway_whitelist"."create_time" IS '创建时间';
+COMMENT ON COLUMN "public"."gateway_whitelist"."update_time" IS '修改时间';
+COMMENT ON TABLE "public"."gateway_whitelist" IS '白名单表';
 
-INSERT INTO gateway_whitelist (id, ip_addr, mac_addr, create_time, update_time)
-VALUES (1, '127.0.0.1', '6C-1F-F7-05-93-84', '2026-06-25 11:20:56', '1970-01-01 00:00:00')
-ON CONFLICT (id) DO NOTHING;
+-- ----------------------------
+-- Records of gateway_whitelist
+-- ----------------------------
+INSERT INTO "public"."gateway_whitelist" VALUES (1, '127.0.0.1', '00-50-56-C0-00-08', '2026-08-07 05:04:02.66725', '1970-01-01 00:00:00');
 
--- 通用配置表
-CREATE TABLE IF NOT EXISTS gateway_config (
-    id           bigint NOT NULL,
-    config_key   varchar(100) NOT NULL,
-    config_value varchar(255) NOT NULL,
-    create_time  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time  timestamp NOT NULL DEFAULT '1970-01-01 00:00:00',
-    PRIMARY KEY (id),
-    CONSTRAINT uk_config_key UNIQUE (config_key)
-);
+-- ----------------------------
+-- Table structure for t_log
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."t_log";
+CREATE TABLE "public"."t_log" (
+  "id" int8 NOT NULL,
+  "user_id" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "username" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "ip" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "status" int2 NOT NULL,
+  "msg" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "time" timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP
+)
+;
+COMMENT ON COLUMN "public"."t_log"."id" IS '唯一id';
+COMMENT ON COLUMN "public"."t_log"."user_id" IS '用户id';
+COMMENT ON COLUMN "public"."t_log"."username" IS '用户名';
+COMMENT ON COLUMN "public"."t_log"."ip" IS 'ip地址';
+COMMENT ON COLUMN "public"."t_log"."status" IS '登录状态';
+COMMENT ON COLUMN "public"."t_log"."msg" IS '登录信息';
+COMMENT ON COLUMN "public"."t_log"."time" IS '登录时间';
+COMMENT ON TABLE "public"."t_log" IS '登录日志表';
 
-COMMENT ON TABLE gateway_config IS '通用配置表';
-COMMENT ON COLUMN gateway_config.id IS '唯一id';
-COMMENT ON COLUMN gateway_config.config_key IS '配置键';
-COMMENT ON COLUMN gateway_config.config_value IS '配置值';
-COMMENT ON COLUMN gateway_config.create_time IS '创建时间';
-COMMENT ON COLUMN gateway_config.update_time IS '修改时间';
+-- ----------------------------
+-- Records of t_log
+-- ----------------------------
+INSERT INTO "public"."t_log" VALUES (1840730109544116225, '1', 'admin', '172.30.1.44', 1, '登录成功', '2024-09-30 21:19:29');
+INSERT INTO "public"."t_log" VALUES (1840730178705858562, '1', 'admin', '172.30.1.44', 1, '登录成功', '2024-09-30 21:19:45');
+INSERT INTO "public"."t_log" VALUES (1840731196375900161, '1', 'admin', '172.30.1.44', 1, '登录成功', '2024-09-30 21:23:46');
+INSERT INTO "public"."t_log" VALUES (1840731225751793665, '1', 'admin', '172.30.1.44', 1, '登录成功', '2024-09-30 21:23:53');
+INSERT INTO "public"."t_log" VALUES (2072254623007752194, '1', 'admin', '0:0:0:0:0:0:0:1', 1, '登录成功', '2026-07-01 17:42:57.409023');
+INSERT INTO "public"."t_log" VALUES (2072257869281607681, '1', 'admin', '0:0:0:0:0:0:0:1', 1, '登录成功', '2026-07-01 17:55:51.38469');
+INSERT INTO "public"."t_log" VALUES (2072258036256849922, '0', 'superadmin', '0:0:0:0:0:0:0:1', 1, '登录成功', '2026-07-01 17:56:31.192414');
+INSERT INTO "public"."t_log" VALUES (2072258474041524226, '1', 'admin', '0:0:0:0:0:0:0:1', 1, '登录成功', '2026-07-01 17:58:15.570862');
+INSERT INTO "public"."t_log" VALUES (2072258864241819649, '0', 'superadmin', '0:0:0:0:0:0:0:1', 1, '登录成功', '2026-07-01 17:59:48.601431');
+INSERT INTO "public"."t_log" VALUES (2072583650457161730, '1', 'admin', '0:0:0:0:0:0:0:1', 1, '登录成功', '2026-07-02 15:30:23');
 
-INSERT INTO gateway_config (id, config_key, config_value, create_time, update_time)
-VALUES (1, 'ip_whitelist_enabled', 'false', '2026-08-06 16:00:00', '1970-01-01 00:00:00'),
-       (2, 'mac_whitelist_enabled', 'false', '2026-08-06 16:00:00', '1970-01-01 00:00:00')
-ON CONFLICT (id) DO NOTHING;
+-- ----------------------------
+-- Table structure for t_role
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."t_role";
+CREATE TABLE "public"."t_role" (
+  "id" int8 NOT NULL,
+  "role_name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+  "description" varchar(255) COLLATE "pg_catalog"."default"
+)
+;
+COMMENT ON COLUMN "public"."t_role"."id" IS '角色id';
+COMMENT ON COLUMN "public"."t_role"."role_name" IS '角色名称';
+COMMENT ON COLUMN "public"."t_role"."description" IS '描述';
+COMMENT ON TABLE "public"."t_role" IS '角色表';
 
--- 登录日志表
-CREATE TABLE IF NOT EXISTS t_log (
-    id       bigint NOT NULL,
-    user_id  varchar(255) NOT NULL,
-    username varchar(255) NOT NULL,
-    ip       varchar(255) NOT NULL,
-    status   smallint NOT NULL,
-    msg      varchar(255) NOT NULL,
-    time     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
-);
+-- ----------------------------
+-- Records of t_role
+-- ----------------------------
+INSERT INTO "public"."t_role" VALUES (1, '管理员', NULL);
+INSERT INTO "public"."t_role" VALUES (2, '普通用户', NULL);
 
-COMMENT ON TABLE t_log IS '登录日志表';
-COMMENT ON COLUMN t_log.id IS '唯一id';
-COMMENT ON COLUMN t_log.user_id IS '用户id';
-COMMENT ON COLUMN t_log.username IS '用户名';
-COMMENT ON COLUMN t_log.ip IS 'ip地址';
-COMMENT ON COLUMN t_log.status IS '登录状态';
-COMMENT ON COLUMN t_log.msg IS '登录信息';
-COMMENT ON COLUMN t_log.time IS '登录时间';
+-- ----------------------------
+-- Table structure for t_user
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."t_user";
+CREATE TABLE "public"."t_user" (
+  "id" int8 NOT NULL,
+  "username" varchar(20) COLLATE "pg_catalog"."default" NOT NULL,
+  "password" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "phone" varchar(255) COLLATE "pg_catalog"."default",
+  "account_non_locked" int2 NOT NULL DEFAULT 1,
+  "create_time" timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP
+)
+;
+COMMENT ON COLUMN "public"."t_user"."id" IS '用户id';
+COMMENT ON COLUMN "public"."t_user"."username" IS '用户名';
+COMMENT ON COLUMN "public"."t_user"."password" IS '密码';
+COMMENT ON COLUMN "public"."t_user"."phone" IS '手机号';
+COMMENT ON COLUMN "public"."t_user"."account_non_locked" IS '是否未锁定';
+COMMENT ON COLUMN "public"."t_user"."create_time" IS '创建时间';
+COMMENT ON TABLE "public"."t_user" IS '用户表';
 
-INSERT INTO t_log (id, user_id, username, ip, status, msg, time) VALUES
-(1840730109544116225, '1', 'admin', '172.30.1.44', 1, '登录成功', '2024-09-30 21:19:29'),
-(1840730178705858562, '1', 'admin', '172.30.1.44', 1, '登录成功', '2024-09-30 21:19:45'),
-(1840731196375900161, '1', 'admin', '172.30.1.44', 1, '登录成功', '2024-09-30 21:23:46'),
-(1840731225751793665, '1', 'admin', '172.30.1.44', 1, '登录成功', '2024-09-30 21:23:53')
-ON CONFLICT (id) DO NOTHING;
+-- ----------------------------
+-- Records of t_user
+-- ----------------------------
+INSERT INTO "public"."t_user" VALUES (1, 'admin', '{bcrypt}$2a$10$zLX9NstaOMno60xyqDWaOupK5KXCPQp1n75GOIoa4JVFO.BrZJWm2', '13333333333', 1, '2024-03-27 15:31:30');
+INSERT INTO "public"."t_user" VALUES (2, 'zk', '{bcrypt}$2a$10$0EQexC0XYw58x.ys.Ym8QO3H2Llr0G4wEAFddm8PkOUGy6hQraaui', '14444444444', 1, '2023-10-07 15:04:32');
 
--- 角色表
-CREATE TABLE IF NOT EXISTS t_role (
-    id          bigint NOT NULL,
-    role_name   varchar(50) NOT NULL,
-    description varchar(255),
-    PRIMARY KEY (id)
-);
+-- ----------------------------
+-- Table structure for user_role
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."user_role";
+CREATE TABLE "public"."user_role" (
+  "id" int8 NOT NULL,
+  "user_id" int8 NOT NULL,
+  "role_id" int8 NOT NULL
+)
+;
+COMMENT ON COLUMN "public"."user_role"."id" IS '唯一id';
+COMMENT ON COLUMN "public"."user_role"."user_id" IS '用户id';
+COMMENT ON COLUMN "public"."user_role"."role_id" IS '角色id';
+COMMENT ON TABLE "public"."user_role" IS '用户角色关联表';
 
-COMMENT ON TABLE t_role IS '角色表';
-COMMENT ON COLUMN t_role.id IS '角色id';
-COMMENT ON COLUMN t_role.role_name IS '角色名称';
-COMMENT ON COLUMN t_role.description IS '描述';
+-- ----------------------------
+-- Records of user_role
+-- ----------------------------
+INSERT INTO "public"."user_role" VALUES (1, 1, 1);
+INSERT INTO "public"."user_role" VALUES (2, 2, 2);
 
-INSERT INTO t_role (id, role_name, description)
-VALUES (1, '管理员', NULL), (2, '普通用户', NULL)
-ON CONFLICT (id) DO NOTHING;
+-- ----------------------------
+-- Uniques structure for table gateway_config
+-- ----------------------------
+ALTER TABLE "public"."gateway_config" ADD CONSTRAINT "gateway_config_config_key_key" UNIQUE ("config_key");
 
--- 用户表
-CREATE TABLE IF NOT EXISTS t_user (
-    id                bigint NOT NULL,
-    username          varchar(20) NOT NULL,
-    password          varchar(255) NOT NULL,
-    phone             varchar(255),
-    account_non_locked smallint NOT NULL DEFAULT 1,
-    create_time       timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
-);
+-- ----------------------------
+-- Primary Key structure for table gateway_config
+-- ----------------------------
+ALTER TABLE "public"."gateway_config" ADD CONSTRAINT "gateway_config_pkey" PRIMARY KEY ("id");
 
-COMMENT ON TABLE t_user IS '用户表';
-COMMENT ON COLUMN t_user.id IS '用户id';
-COMMENT ON COLUMN t_user.username IS '用户名';
-COMMENT ON COLUMN t_user.password IS '密码';
-COMMENT ON COLUMN t_user.phone IS '手机号';
-COMMENT ON COLUMN t_user.account_non_locked IS '是否未锁定';
-COMMENT ON COLUMN t_user.create_time IS '创建时间';
+-- ----------------------------
+-- Primary Key structure for table gateway_dict
+-- ----------------------------
+ALTER TABLE "public"."gateway_dict" ADD CONSTRAINT "gateway_dict_pkey" PRIMARY KEY ("id");
 
-INSERT INTO t_user (id, username, password, phone, account_non_locked, create_time) VALUES
-(1, 'admin', '{bcrypt}$2a$10$zLX9NstaOMno60xyqDWaOupK5KXCPQp1n75GOIoa4JVFO.BrZJWm2', '13333333333', 1, '2024-03-27 15:31:30'),
-(2, 'zk', '{bcrypt}$2a$10$0EQexC0XYw58x.ys.Ym8QO3H2Llr0G4wEAFddm8PkOUGy6hQraaui', '14444444444', 1, '2023-10-07 15:04:32')
-ON CONFLICT (id) DO NOTHING;
+-- ----------------------------
+-- Primary Key structure for table gateway_dict_type
+-- ----------------------------
+ALTER TABLE "public"."gateway_dict_type" ADD CONSTRAINT "gateway_dict_type_pkey" PRIMARY KEY ("id");
 
--- 用户角色关联表
-CREATE TABLE IF NOT EXISTS user_role (
-    id      bigint NOT NULL,
-    user_id bigint NOT NULL,
-    role_id bigint NOT NULL,
-    PRIMARY KEY (id)
-);
+-- ----------------------------
+-- Primary Key structure for table gateway_permission
+-- ----------------------------
+ALTER TABLE "public"."gateway_permission" ADD CONSTRAINT "gateway_permission_pkey" PRIMARY KEY ("id");
 
-COMMENT ON TABLE user_role IS '用户角色关联表';
-COMMENT ON COLUMN user_role.id IS '唯一id';
-COMMENT ON COLUMN user_role.role_id IS '角色id';
-COMMENT ON COLUMN user_role.user_id IS '用户id';
+-- ----------------------------
+-- Primary Key structure for table gateway_permission_group
+-- ----------------------------
+ALTER TABLE "public"."gateway_permission_group" ADD CONSTRAINT "gateway_permission_group_pkey" PRIMARY KEY ("id");
 
-INSERT INTO user_role (id, user_id, role_id)
-VALUES (1, 1, 1), (2, 2, 2)
-ON CONFLICT (id) DO NOTHING;
+-- ----------------------------
+-- Primary Key structure for table gateway_request_monitor
+-- ----------------------------
+ALTER TABLE "public"."gateway_request_monitor" ADD CONSTRAINT "gateway_request_monitor_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table gateway_role_permission
+-- ----------------------------
+ALTER TABLE "public"."gateway_role_permission" ADD CONSTRAINT "gateway_role_permission_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table gateway_whitelist
+-- ----------------------------
+ALTER TABLE "public"."gateway_whitelist" ADD CONSTRAINT "gateway_whitelist_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table t_log
+-- ----------------------------
+ALTER TABLE "public"."t_log" ADD CONSTRAINT "t_log_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table t_role
+-- ----------------------------
+ALTER TABLE "public"."t_role" ADD CONSTRAINT "t_role_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table t_user
+-- ----------------------------
+ALTER TABLE "public"."t_user" ADD CONSTRAINT "t_user_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table user_role
+-- ----------------------------
+ALTER TABLE "public"."user_role" ADD CONSTRAINT "user_role_pkey" PRIMARY KEY ("id");

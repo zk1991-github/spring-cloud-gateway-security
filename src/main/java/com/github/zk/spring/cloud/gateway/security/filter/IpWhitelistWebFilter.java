@@ -40,6 +40,7 @@ import java.nio.charset.StandardCharsets;
  * 白名单拦截器
  * 在表单登录之前校验客户端 IP 地址和 MAC 地址是否在白名单中
  * 支持通过 {@link WhitelistToggle} 在运行时分别控制 IP 白名单和 MAC 白名单的开关
+ * 超级管理员（免校验用户名）不受白名单限制
  *
  * @author zhaokai
  * @since 5.1.0
@@ -50,9 +51,15 @@ public class IpWhitelistWebFilter implements WebFilter {
     private final IWhitelist iWhitelist;
     private final WhitelistToggle whitelistToggle;
 
-    public IpWhitelistWebFilter(IWhitelist iWhitelist, WhitelistToggle whitelistToggle) {
+    /**
+     * 免校验用户名（超级管理员），为 null 时不启用免校验
+     */
+    private final String exemptUsername;
+
+    public IpWhitelistWebFilter(IWhitelist iWhitelist, WhitelistToggle whitelistToggle, String exemptUsername) {
         this.iWhitelist = iWhitelist;
         this.whitelistToggle = whitelistToggle;
+        this.exemptUsername = exemptUsername;
     }
 
     @Override
@@ -67,6 +74,27 @@ public class IpWhitelistWebFilter implements WebFilter {
             return chain.filter(exchange);
         }
 
+        // 读取登录用户名，超级管理员免校验 IP 和 MAC
+        return exchange.getFormData()
+                .flatMap(formData -> {
+                    String username = formData.getFirst("username");
+                    if (exemptUsername != null && exemptUsername.equals(username)) {
+                        logger.debug("超级管理员【{}】登录，跳过白名单校验", username);
+                        return chain.filter(exchange);
+                    }
+                    return checkWhitelist(exchange, chain);
+                });
+    }
+
+    /**
+     * 校验客户端 IP 和 MAC 是否在白名单中
+     *
+     * @param exchange 请求
+     * @param chain    过滤器链
+     * @return 校验结果
+     */
+    private Mono<Void> checkWhitelist(ServerWebExchange exchange, WebFilterChain chain) {
+        ServerHttpRequest request = exchange.getRequest();
         String ipAddr = IpUtils.getIpAddr(request);
         String macAddr = MacUtils.getMacAddr(request);
 
