@@ -98,6 +98,7 @@ public class IpWhitelistWebFilter implements WebFilter {
         String ipAddr = IpUtils.getIpAddr(request);
         String macAddr = MacUtils.getMacAddr(request);
 
+        logger.info("获取到客户端 ip 地址【{}】，mac 地址【{}】", ipAddr, macAddr);
         // IP 和 MAC 开关都开启：必须在同一条白名单记录中同时匹配 IP 和 MAC
         // 仅开启其中之一：分别查询对应的白名单
         Mono<Boolean> check;

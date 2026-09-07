@@ -25,6 +25,8 @@ import com.github.zk.spring.cloud.gateway.security.core.LoginProcessor;
 import com.github.zk.spring.cloud.gateway.security.core.WhitelistToggle;
 import com.github.zk.spring.cloud.gateway.security.dao.UserMapper;
 import com.github.zk.spring.cloud.gateway.security.filter.IpWhitelistWebFilter;
+import com.github.zk.spring.cloud.gateway.security.handler.LogoutHandler;
+import com.github.zk.spring.cloud.gateway.security.log.LogHolder;
 import com.github.zk.spring.cloud.gateway.security.property.LoginProperties;
 import com.github.zk.spring.cloud.gateway.security.property.SecurityProperties;
 import com.github.zk.spring.cloud.gateway.security.service.IPermission;
@@ -68,6 +70,9 @@ public class SecurityConfig {
 
     @Autowired
     private SecurityProperties securityProperties;
+
+    @Autowired
+    private LogHolder logHolder;
     private String[] antPatterns;
     private String proxyUrl;
     private boolean csrfEnable;
@@ -163,7 +168,7 @@ public class SecurityConfig {
                 // 登出设置
                 .logout(logout ->
                         // 设置登出处理器
-                        logout.logoutHandler(new WebSessionServerLogoutHandler())
+                        logout.logoutHandler(new LogoutHandler(logHolder))
                                 // 设置登出成功处理器
                                 .logoutSuccessHandler(createRedirectServerLogoutSuccessHandler()))
                 // 启用跨域拦截
