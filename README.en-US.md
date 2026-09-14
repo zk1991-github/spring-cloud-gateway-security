@@ -485,3 +485,19 @@ spring:
 
 - Standalone version: Select the `stand-alone` profile in Maven and run `package`.
 - Cluster version: Select the `cluster` profile in Maven and run `package`.
+
+### 6. Source Code startup
+Choose standalone or cluster version for source code startup, which needs to be configured in `application.yml`
+
+**standalone configuration**
+```yaml
+platform:
+  mode:
+    type: standalone
+```
+**cluster configuration**
+```yaml
+platform:
+  mode:
+    type: cluster
+```
