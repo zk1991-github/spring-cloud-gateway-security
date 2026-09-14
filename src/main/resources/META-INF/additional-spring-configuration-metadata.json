@@ -89,6 +89,27 @@
       "name": "log.database",
       "type": "java.lang.String",
       "description": "是否记录到数据库"
+    },
+    {
+      "name": "platform.mode.type",
+      "type": "java.lang.String",
+      "description": "平台模式",
+      "defaultValue": "standalone"
+    }
+  ],
+  "hints": [
+    {
+      "name": "platform.mode.type",
+      "values": [
+        {
+          "value": "standalone",
+          "description": "单机版本，使用本地 Map 缓存。"
+        },
+        {
+          "value": "cluster",
+          "description": "集群版本，使用 Redis 缓存。"
+        }
+      ]
     }
   ]
 }

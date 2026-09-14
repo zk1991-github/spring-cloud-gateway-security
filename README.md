@@ -483,3 +483,19 @@ spring:
 
 - 单机版本，在maven的`profiles`选择`stand-alone`进行package打包
 - 集群版本，在maven的`profiles`选择`cluster`进行package打包
+
+### 6. 源码启动
+源码启动选择单机或集群版本，需在application.yml中配置
+
+**单机配置**
+```yaml
+platform:
+  mode:
+    type: standalone
+```
+**集群配置**
+```yaml
+platform:
+  mode:
+    type: cluster
+```

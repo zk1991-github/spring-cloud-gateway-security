@@ -25,6 +25,7 @@ import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitor;
 import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitorRedis;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.ReactiveRedisConnection;
@@ -44,9 +45,11 @@ import java.time.Duration;
  * @since 4.3.0
  */
 @Configuration
-@ConditionalOnClass({ReactiveRedisSessionRepository.class,
-        ReactiveRedisTemplate.class,
-        ReactiveStringRedisTemplate.class})
+@ConditionalOnProperty(
+        prefix = "platform.mode",
+        name = "type",
+        havingValue = "cluster"
+)
 @EnableRedisWebSession
 public class AutoConfigurationRedisCache {
 

@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.github.zk</groupId>
     <artifactId>spring-cloud-gateway-security</artifactId>
-    <version>v6.0.4</version>
+    <version>v6.0.5</version>
     <name>spring-cloud-gateway-security</name>
     <description>Spring Cloud gateway 整合 Spring Security</description>
     <properties>
@@ -30,6 +30,13 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway-server-webflux</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+<!--            <version>${mysql.version}</version>-->
+            <scope>runtime</scope>
         </dependency>
         <!-- MyBatis plus 相关jar -->
         <dependency>
@@ -104,12 +111,6 @@
         <profile>
             <id>cluster</id>
             <dependencies>
-                <dependency>
-                    <groupId>com.mysql</groupId>
-                    <artifactId>mysql-connector-j</artifactId>
-                    <version>${mysql.version}</version>
-                    <scope>runtime</scope>
-                </dependency>
                 <!-- 引入spring-cloud-loadbalancer 负载均衡-->
                 <dependency>
                     <groupId>org.springframework.cloud</groupId>

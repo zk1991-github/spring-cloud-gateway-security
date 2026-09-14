@@ -25,6 +25,7 @@ import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitor;
 import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitorMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.server.WebSession;
@@ -42,7 +43,12 @@ import java.time.Duration;
  * @since 4.3.0
  */
 @Configuration
-@ConditionalOnMissingBean(AutoConfigurationRedisCache.class)
+@ConditionalOnProperty(
+        prefix = "platform.mode",
+        name = "type",
+        havingValue = "standalone",
+        matchIfMissing = true
+)
 public class AutoConfigurationMapCache {
 
     @Value("${spring.cloud.gateway.session.timeout:30}")
@@ -69,7 +75,6 @@ public class AutoConfigurationMapCache {
      * {@link DefaultWebSessionManager}。我们替换它，注入自定义的 session store。
      */
     @Bean
-    @ConditionalOnMissingBean(AutoConfigurationRedisCache.class)
     public DefaultWebSessionManager webSessionManager() {
         Duration maxIdleTime = Duration.ofMinutes(timeoutMinutes);
         DefaultWebSessionManager manager = new DefaultWebSessionManager();
