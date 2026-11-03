@@ -47,6 +47,20 @@
             <version>${druid.version}</version>
         </dependency>
 
+        <!-- Source: https://mvnrepository.com/artifact/com.dameng/gt-dameng-2.8 -->
+        <dependency>
+            <groupId>com.dameng</groupId>
+            <artifactId>gt-dameng-2.8</artifactId>
+            <version>8.1.4.125</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.dameng</groupId>
+            <artifactId>DmJdbcDriver8</artifactId>
+            <version>8.1.5.45</version>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- Spring-Session Session共享 -->
         <dependency>
             <groupId>org.springframework.session</groupId>

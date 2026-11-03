@@ -96,7 +96,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
         return authentication
                 .flatMap(auth -> {
                     // 匿名权限匹配
-                    String realRequestPath = getRealRequestPath(exchange);
+                    String realRequestPath = getRequestPath(exchange);
                     return anonymousPermissionMatch(exchange, auth, realRequestPath);
                 })
                 .flatMap(authenticationHolder -> {
@@ -110,7 +110,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                         return Mono.just(authenticationHolder);
                     }
                     // 所有角色的公开权限匹配
-                    String realRequestPath = getRealRequestPath(exchange);
+                    String realRequestPath = getRequestPath(exchange);
                     return openPermissionMatch(exchange, auth, realRequestPath);
                 })
                 .map(authenticationHolder -> {
@@ -119,7 +119,7 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                         return new AuthorizationDecision(true);
                     }
                     // 私有权限验证
-                    String realRequestPath = getRealRequestPath(exchange);
+                    String realRequestPath = getRequestPath(exchange);
                     logger.info("转发地址：{}", realRequestPath);
 
                     // 获取用户信息
@@ -283,6 +283,18 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
             }
         }
         return new AuthorizationDecision(false);
+    }
+
+    /**
+     * 获取请求地址
+     *
+     * @param exchange 请求对象
+     * @return 请求地址
+     */
+    private String getRequestPath(ServerWebExchange exchange) {
+        ServerHttpRequest request = exchange.getRequest();
+        // 请求的uri
+        return request.getURI().getPath();
     }
 
     /**
