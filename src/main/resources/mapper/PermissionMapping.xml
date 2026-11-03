@@ -65,36 +65,30 @@
     </select>
 
     <select id="selectGroupPermissionsPage" resultMap="PermissionsResultMap">
-        select gpg.group_name, gpg.create_time AS group_create_time, gp.*
-        from gateway_permission_group gpg
-        right join gateway_permission gp ON gpg.id = gp.group_id
-        left join
-        (select dict_name, dict_val from gateway_dict where dict_type_id = 1) gd
-        on gp.open = gd.dict_val
-        <if test="ew.customSqlSegment != null and ew.customSqlSegment != ''">
+        select group_name, group_create_time, id, group_id, url_name, url, open, description, fixed, create_time
+        from (
+            select gpg.group_name,
+                   gpg.create_time as group_create_time,
+                   gp.id,
+                   gp.group_id,
+                   gp.url_name,
+                   gp.url,
+                   gp.open,
+                   gp.description,
+                   gp.fixed,
+                   gp.create_time,
+                   row_number() over (
+                       partition by gp.group_id
+                       order by gp.create_time desc, gp.id desc
+                   ) as group_row
+            from gateway_permission gp
+            left join gateway_permission_group gpg on gpg.id = gp.group_id
+            left join (select dict_name, dict_val from gateway_dict where dict_type_id = 1) gd
+                on gp.open = gd.dict_val
             ${ew.customSqlSegment}
-        </if>
-        <if test="ew.customSqlSegment == null or ew.customSqlSegment == ''">
-            where 1 = 1
-        </if>
-        and group_id != 0
-        group by group_id
-        union all
-        select gpg.group_name, gpg.create_time as group_create_time, gp.*
-        from gateway_permission_group gpg
-        right join gateway_permission gp on gpg.id = gp.group_id
-        left join
-        (select dict_name, dict_val from gateway_dict where dict_type_id = 1) gd
-        on gp.open = gd.dict_val
-        <if test="ew.customSqlSegment != null and ew.customSqlSegment != ''">
-            ${ew.customSqlSegment}
-        </if>
-        <if test="ew.customSqlSegment == null or ew.customSqlSegment == ''">
-            where 1 = 1
-        </if>
-        and group_id = 0
-
-        order by group_create_time desc, create_time desc
+        ) group_permissions
+        where group_id = 0 or group_row = 1
+        order by group_create_time desc nulls last, create_time desc nulls last
     </select>
 
 </mapper>
