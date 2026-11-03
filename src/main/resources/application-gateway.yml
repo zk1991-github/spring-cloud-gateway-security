@@ -27,13 +27,6 @@ spring:
             - name: RequestSize
               args:
                 maxSize: 5000000
-            # 限流
-            - name: RequestRateLimiter
-              args:
-                # 每秒生成的令牌数
-                redis-rate-limiter.replenishRate: 100
-                # 最大令牌数量
-                redis-rate-limiter.burstCapacity: 200
         - id: server_route2
           # 转发地址, providerService为"application-loadbalance.yml"配置文件中
           # spring.cloud.discovery:client.simple.instances 下的key
