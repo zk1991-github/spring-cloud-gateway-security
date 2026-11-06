@@ -86,13 +86,6 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
     public Mono<AuthorizationDecision> check(Mono<Authentication> authentication, AuthorizationContext authorizationContext) {
         // 设置下游服务传递的头信息
         ServerWebExchange exchange = authorizationContext.getExchange();
-        if (sourceIpEnable) {
-            ServerHttpRequest newRequest = exchange.getRequest().mutate()
-                    .header("XReal-IP", IpUtils.getIpAddr(exchange.getRequest()))
-                    .build();
-            exchange.mutate().request(newRequest).build();
-        }
-
         return authentication
                 .flatMap(auth -> {
                     // 匿名权限匹配
@@ -119,17 +112,17 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                         return new AuthorizationDecision(true);
                     }
                     // 私有权限验证
-                    String realRequestPath = getRequestPath(exchange);
-                    logger.info("转发地址：{}", realRequestPath);
+                    String requestPath = getRequestPath(exchange);
+                    logger.info("转发地址：{}", requestPath);
 
                     // 获取用户信息
                     Object principal = authenticationHolder.getAuthentication().getPrincipal();
                     if (principal instanceof UserInfo) {
                         UserInfo userInfo = (UserInfo) principal;
-                        return userInfoAuthorization(userInfo, exchange, realRequestPath);
+                        return userInfoAuthorization(userInfo, requestPath);
                     } else if (principal instanceof WeChatUserInfo) {
                         WeChatUserInfo weChatUserInfo = (WeChatUserInfo) principal;
-                        return weChatUserInfoAuthorization(weChatUserInfo, exchange, realRequestPath);
+                        return weChatUserInfoAuthorization(weChatUserInfo, requestPath);
                     } else {
                         return new AuthorizationDecision(false);
                     }
@@ -194,10 +187,8 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                     }
                     if (principal instanceof UserInfo) {
                         UserInfo userInfo = (UserInfo) principal;
-                        exchangeSetHeader(exchange, userInfo.getUsername(), String.valueOf(userInfo.getId()));
                     } else if (principal instanceof WeChatUserInfo) {
                         WeChatUserInfo weChatUserInfo = (WeChatUserInfo) principal;
-                        exchangeSetHeader(exchange, weChatUserInfo.getNickName(), weChatUserInfo.getOpenid());
                     }
                     authenticationHolder.setAuthorizationDecision(new AuthorizationDecision(true));
                     return authenticationHolder;
@@ -222,12 +213,10 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
      * web鉴权
      *
      * @param userInfo    用户信息
-     * @param exchange    web请求
      * @param requestPath 请求地址
      * @return 权限信息
      */
-    private AuthorizationDecision userInfoAuthorization(UserInfo userInfo, ServerWebExchange exchange,
-                                                        String requestPath) {
+    private AuthorizationDecision userInfoAuthorization(UserInfo userInfo, String requestPath) {
 
         logger.debug("用户名【{}】,角色【{}】", userInfo.getUsername(), userInfo.getRoles());
         //角色的url权限过滤
@@ -241,8 +230,6 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                 // 请求地址匹配权限地址
                 boolean match = ANT_PATH_MATCHER.match(permissionInfo.getUrl(), requestPath);
                 if (match) {
-                    // 设置下游服务传递的头信息
-                    exchangeSetHeader(exchange, userInfo.getUsername(), String.valueOf(userInfo.getId()));
                     return new AuthorizationDecision(true);
                 }
             }
@@ -254,11 +241,10 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
      * 微信鉴权
      *
      * @param weChatUserInfo 微信用户信息
-     * @param exchange       请求
      * @param requestPath    请求地址
      * @return 权限信息
      */
-    private AuthorizationDecision weChatUserInfoAuthorization(WeChatUserInfo weChatUserInfo, ServerWebExchange exchange,
+    private AuthorizationDecision weChatUserInfoAuthorization(WeChatUserInfo weChatUserInfo,
                                                               String requestPath) {
         // 定义编码昵称
         String encodedNickName = "";
@@ -277,7 +263,6 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
                 boolean match = ANT_PATH_MATCHER.match(permissionInfo.getUrl(), requestPath);
                 if (match) {
                     // 设置下游服务传递的头信息
-                    exchangeSetHeader(exchange, encodedNickName, String.valueOf(weChatUserInfo.getOpenid()));
                     return new AuthorizationDecision(true);
                 }
             }
@@ -298,7 +283,8 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
     }
 
     /**
-     * 获取真实请求地址
+     * 获取真实请求地址。
+     * 根据网关跳过配置，获取路由路径
      *
      * @param exchange 请求对象
      * @return 真实的请求地址
@@ -351,21 +337,5 @@ public class CustomReactiveAuthorizationManager implements ReactiveAuthorization
         // 当未跳过路径时，请求地址为转发地址
         realRequestPath = new StringBuilder((realRequestPath.length() == 0) ? requestPath : realRequestPath.toString());
         return realRequestPath.toString();
-    }
-
-    /**
-     * 请求设置头信息
-     *
-     * @param exchange 请求
-     * @param username 用户名
-     * @param userId   用户id
-     */
-    private void exchangeSetHeader(ServerWebExchange exchange, String username, String userId) {
-        // 设置下游服务传递的头信息
-        ServerHttpRequest newRequest = exchange.getRequest().mutate()
-                .header("username", username)
-                .header("userId", String.valueOf(userId))
-                .build();
-        exchange.mutate().request(newRequest).build();
     }
 }

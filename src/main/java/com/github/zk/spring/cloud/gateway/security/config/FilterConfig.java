@@ -18,10 +18,7 @@
 
 package com.github.zk.spring.cloud.gateway.security.config;
 
-import com.github.zk.spring.cloud.gateway.security.filter.factory.MonitorGatewayFilterFactory;
-import com.github.zk.spring.cloud.gateway.security.filter.factory.RequestBodyOperationGatewayFilterFactory;
-import com.github.zk.spring.cloud.gateway.security.filter.factory.SessionGatewayFilterFactory;
-import com.github.zk.spring.cloud.gateway.security.filter.factory.TokenCheckGatewayFilterFactory;
+import com.github.zk.spring.cloud.gateway.security.filter.factory.*;
 import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,15 +41,6 @@ public class FilterConfig {
     }
 
     /**
-     * 注入session拦截 bean
-     * @return session拦截工厂
-     */
-    @Bean
-    public SessionGatewayFilterFactory sessionGatewayFilterFactory() {
-        return new SessionGatewayFilterFactory();
-    }
-
-    /**
      * 修改请求体拦截 bean
      * @return 修改请求体工厂
      */
@@ -69,6 +57,16 @@ public class FilterConfig {
     @Bean
     public MonitorGatewayFilterFactory monitorGatewayFilterFactory(RequestMonitor requestMonitor) {
         return new MonitorGatewayFilterFactory(requestMonitor);
+    }
+
+    /**
+     * 请求头拦截处理
+     *
+     * @return 请求头拦截工厂
+     */
+    @Bean
+    public AuthHeaderGatewayFilterFactory authHeaderGatewayFilterFactory() {
+        return new AuthHeaderGatewayFilterFactory();
     }
 
 }
