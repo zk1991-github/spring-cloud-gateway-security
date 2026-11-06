@@ -23,6 +23,7 @@ import com.github.zk.spring.cloud.gateway.security.core.GatewaySecurityCacheRedi
 import com.github.zk.spring.cloud.gateway.security.dao.RequestMonitorMapper;
 import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitor;
 import com.github.zk.spring.cloud.gateway.security.monitor.RequestMonitorRedis;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +31,10 @@ import org.springframework.data.redis.connection.ReactiveRedisConnection;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
+import org.springframework.session.config.ReactiveSessionRepositoryCustomizer;
+import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
+
+import java.time.Duration;
 
 /**
  * Redis 缓存自动配置
@@ -40,6 +45,9 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 @Configuration
 @ConditionalOnClass(ReactiveRedisTemplate.class)
 public class AutoConfigurationRedisCache {
+
+    @Value("${spring.cloud.gateway.session.timeout:30}")
+    private long timeoutMinutes;
 
     @Bean
     public GatewaySecurityCache gatewaySecurityCacheRedis(ReactiveStringRedisTemplate reactiveStringRedisTemplate,
@@ -53,6 +61,19 @@ public class AutoConfigurationRedisCache {
     public RequestMonitor requestMonitorRedis(RequestMonitorMapper requestMonitorMapper,
                                               ReactiveStringRedisTemplate reactiveStringRedisTemplate) {
         return new RequestMonitorRedis(requestMonitorMapper, reactiveStringRedisTemplate);
+    }
+
+    /**
+     * Redis 模式 —— 自定义 ReactiveRedisSessionRepository 默认超时
+     *
+     * <p>通过 {@link ReactiveSessionRepositoryCustomizer} 设置
+     * {@link ReactiveRedisSessionRepository#setDefaultMaxInactiveInterval(Duration)}，
+     * 从源头控制 Redis key 的 TTL 过期时间。
+     */
+    @Bean
+    public ReactiveSessionRepositoryCustomizer<ReactiveRedisSessionRepository> redisSessionTimeoutCustomizer() {
+        Duration timeout = Duration.ofMinutes(timeoutMinutes);
+        return sessionRepository -> sessionRepository.setDefaultMaxInactiveInterval(timeout);
     }
 
 }
